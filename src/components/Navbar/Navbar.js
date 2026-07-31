@@ -4,11 +4,12 @@ import { useTheme } from 'components/ThemeProvider';
 import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/router';
-import { cssProps, media, msToNum, numToMs } from 'utils/style';
+import { cssProps, media, msToNum, numToMs, classes } from 'utils/style';
 import { NavToggle } from './NavToggle';
+import { NavGroup } from './NavbarSubmenu';
 import styles from './Navbar.module.css';
 import { ThemeToggle } from './ThemeToggle';
-import { navLinks, socialLinks } from './navData';
+import { navLinks, socialLinks, hashIds } from './navData';
 
 export const Navbar = () => {
   const [current, setCurrent] = useState();
@@ -39,10 +40,6 @@ export const Navbar = () => {
   // Scroll-spy: highlight nav link for the section currently in view
   useEffect(() => {
     if (route !== '/') return;
-
-    const hashIds = navLinks
-      .filter(l => l.pathname.startsWith('/#'))
-      .map(l => l.pathname.slice(2));
 
     const intersecting = new Set();
 
@@ -147,12 +144,11 @@ export const Navbar = () => {
 
   // Check if a nav item should be active
   const getCurrent = (url = '') => {
-    const nonTrailing = current?.endsWith('/') ? current?.slice(0, -1) : current;
+    const nonTrailing = current?.endsWith('/') ? current.slice(0, -1) : current;
 
-    if (url === nonTrailing) {
-      return 'page';
-    }
-
+    if (!nonTrailing) return '';
+    if (url === nonTrailing) return 'page';
+    if (url !== '/' && nonTrailing.startsWith(`${url}/`)) return 'true';
     return '';
   };
 
@@ -172,6 +168,29 @@ export const Navbar = () => {
     if (menuOpen) dispatch({ type: 'toggleMenu' });
   };
 
+  const getIsActive = ({ pathname, match }) => {
+    if (pathname.startsWith('/#')) {
+      if (route === '/' && scrollActive === pathname.slice(2)) return 'page';
+      return undefined;
+    }
+    if (match) {
+      const result = getCurrent(match);
+      return result || undefined;
+    }
+    const result = getCurrent(pathname);
+    return result || undefined;
+  };
+
+  // Check if Experience section is in view for forceOpen
+  const experienceIds = ['experience', 'experience-intuit', 'experience-rivian', 'experience-walmart'];
+  const inExperience = route === '/' && experienceIds.includes(scrollActive);
+
+  // Flatten mobile items to keep stagger indices consistent
+  const mobileItems = navLinks.flatMap(link => [
+    { ...link, nested: false },
+    ...(link.children ?? []).map(child => ({ ...child, nested: true })),
+  ]);
+
   return (
     <header className={styles.navbar} ref={headerRef}>
       <RouterLink
@@ -187,41 +206,55 @@ export const Navbar = () => {
       <NavToggle onClick={() => dispatch({ type: 'toggleMenu' })} menuOpen={menuOpen} />
       <nav className={styles.nav}>
         <div className={styles.navList}>
-          {navLinks.map(({ label, pathname }) => (
-            <RouterLink
-              href={pathname}
-              scroll={false}
-              key={label}
-              data-navbar-item
-              className={styles.navLink}
-              aria-current={
-                pathname.startsWith('/#')
-                  ? (route === '/' && scrollActive === pathname.slice(2) ? 'page' : undefined)
-                  : getCurrent(pathname)
-              }
-              onClick={handleNavItemClick}
-            >
-              {label}
-            </RouterLink>
-          ))}
+          {navLinks.map(link => {
+            const isActive = getIsActive(link);
+
+            if (link.children) {
+              return (
+                <NavGroup
+                  key={link.label}
+                  label={link.label}
+                  pathname={link.pathname}
+                  isActive={isActive}
+                  forceOpen={inExperience}
+                  // eslint-disable-next-line react/no-children-prop
+                  children={link.children.map(child => ({
+                    ...child,
+                    isActive: getIsActive(child),
+                  }))}
+                  onClick={handleNavItemClick}
+                />
+              );
+            }
+
+            return (
+              <RouterLink
+                href={link.pathname}
+                scroll={false}
+                key={link.label}
+                data-navbar-item
+                className={styles.navLink}
+                aria-current={isActive}
+                onClick={handleNavItemClick}
+              >
+                {link.label}
+              </RouterLink>
+            );
+          })}
         </div>
         <NavbarIcons desktop />
       </nav>
       <Transition unmount in={menuOpen} timeout={msToNum(tokens.base.durationL)}>
         {visible => (
           <nav className={styles.mobileNav} data-visible={visible}>
-            {navLinks.map(({ label, pathname }, index) => (
+            {mobileItems.map((item, index) => (
               <RouterLink
-                href={pathname}
+                href={item.pathname}
                 scroll={false}
-                key={label}
-                className={styles.mobileNavLink}
+                key={`${item.label}-${index}`}
+                className={classes(styles.mobileNavLink, item.nested && styles.mobileNavSubLink)}
                 data-visible={visible}
-                aria-current={
-                  pathname.startsWith('/#')
-                    ? (route === '/' && scrollActive === pathname.slice(2) ? 'page' : undefined)
-                    : getCurrent(pathname)
-                }
+                aria-current={getIsActive(item)}
                 onClick={handleMobileNavClick}
                 style={cssProps({
                   transitionDelay: numToMs(
@@ -229,7 +262,7 @@ export const Navbar = () => {
                   ),
                 })}
               >
-                {label}
+                {item.label}
               </RouterLink>
             ))}
             <NavbarIcons />

@@ -6,6 +6,12 @@ export const navLinks = [
   {
     label: 'Experience',
     pathname: '/#experience',
+    match: '/experience',
+    children: [
+      { label: 'Intuit', pathname: '/#experience-intuit', match: '/experience/intuit' },
+      { label: 'Rivian', pathname: '/#experience-rivian', match: '/experience/rivian' },
+      { label: 'Walmart', pathname: '/#experience-walmart', match: '/experience/walmart' },
+    ],
   },
   {
     label: 'Skills',
@@ -18,12 +24,18 @@ export const navLinks = [
   {
     label: 'Articles',
     pathname: '/articles',
+    match: '/articles',
   },
   {
     label: 'Contact',
     pathname: '/contact',
   },
 ];
+
+export const hashIds = navLinks
+  .flatMap(link => [...(link.children ?? []), link])
+  .filter(l => l.pathname.startsWith('/#'))
+  .map(l => l.pathname.slice(2));
 
 export const socialLinks = [
   {
