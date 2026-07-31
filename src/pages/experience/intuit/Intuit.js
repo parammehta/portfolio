@@ -4,7 +4,7 @@ import intuitDesignSystem from 'assets/intuit-design-system-1.png';
 import intuitIdentityConsole from 'assets/intuit-identity-console-1.png';
 import intuitMdlVerification from 'assets/intuit-mdl-verification.png';
 import intuitPasskeyEnrollment from 'assets/intuit-passkey-enrollment.png';
-import { Footer, Image, Meta } from 'components';
+import { Breadcrumbs, Footer, Image, Meta } from 'components';
 import {
   ExperienceBackground,
   ExperienceContainer,
@@ -36,6 +36,13 @@ export const Intuit = () => {
     <Fragment>
       <Meta title={title} prefix="Experiences" description={description} />
       <ExperienceContainer className={styles.intuit}>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Experience', href: '/#experience' },
+            { label: 'Intuit', href: '/experience/intuit' },
+          ]}
+        />
         <ExperienceBackground
           src={intuitBackground}
           srcSet={`${intuitBackground.src} 1280w, ${intuitBackground.src} 2560w`}

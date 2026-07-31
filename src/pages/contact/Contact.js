@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import {
+  Breadcrumbs,
   Button,
   DecoderText,
   Divider,
@@ -81,6 +82,12 @@ export const Contact = () => {
         description="Send me a message if you're interested in discussing a project, an opportunity, or just want to say hello."
       />
       <Section className={styles.contact}>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Contact', href: '/contact' },
+          ]}
+        />
         <Transition unmount in={!complete} timeout={1600}>
           {(visible, status) => (
             <form className={styles.form} method="post" onSubmit={onSubmit}>

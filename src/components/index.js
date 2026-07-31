@@ -1,3 +1,4 @@
+export * from './Breadcrumbs';
 export * from './Button';
 export * from './Carousel';
 export * from './Code';

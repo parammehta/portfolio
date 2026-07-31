@@ -1,5 +1,6 @@
 import Barcode from 'assets/barcode.svg';
 import {
+  Breadcrumbs,
   Button,
   DecoderText,
   Divider,
@@ -182,6 +183,12 @@ export const Articles = ({ posts, featured }) => {
       <Meta
         title="Articles"
         description="A collection of technical design and development articles. May contain incoherent ramblings."
+      />
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Articles', href: '/articles' },
+        ]}
       />
       <Section className={styles.content}>
         {!isSingleColumn && (

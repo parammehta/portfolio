@@ -10,7 +10,7 @@ import walmartSeller2 from 'assets/walmart-seller-2.png';
 import walmartBabyRegistry1 from 'assets/walmart-baby-registry-1.png';
 import walmartBabyRegistry2 from 'assets/walmart-baby-registry-2.png';
 import walmartCoreComponents from 'assets/walmart-core-components-1.png';
-import { Footer, Image, Meta } from 'components';
+import { Breadcrumbs, Footer, Image, Meta } from 'components';
 import {
   ExperienceBackground,
   ExperienceContainer,
@@ -37,6 +37,13 @@ export const Walmart = () => {
     <Fragment>
       <ExperienceContainer className={styles.walmart}>
         <Meta title={title} prefix="Experiences" description={description} />
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Experience', href: '/#experience' },
+            { label: 'Walmart', href: '/experience/walmart' },
+          ]}
+        />
         <ExperienceBackground
           opacity={0.5}
           src={backgroundWalmart}

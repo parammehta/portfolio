@@ -6,7 +6,7 @@ import rivianFleetMobileScreen2 from 'assets/rivian-fleet-os-mobile-2.png';
 import rivianFleetScreen2 from 'assets/rivian-fleet-os-2.png';
 import rivianFleetScreen3 from 'assets/rivian-fleet-os-3.png';
 import rivianFleetScreen4 from 'assets/rivian-fleet-os-4.png';
-import { Footer, Image, Meta } from 'components';
+import { Breadcrumbs, Footer, Image, Meta } from 'components';
 import {
   ExperienceBackground,
   ExperienceContainer,
@@ -38,6 +38,13 @@ export const Rivian = () => {
     <Fragment>
       <Meta title={title} prefix="Experiences" description={description} />
       <ExperienceContainer className={styles.slice}>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Experience', href: '/#experience' },
+            { label: 'Rivian', href: '/experience/rivian' },
+          ]}
+        />
         <ExperienceBackground
           src={rivianBackground}
           srcSet={`${rivianBackground.src} 1280w, ${rivianBackground.src} 2560w`}
