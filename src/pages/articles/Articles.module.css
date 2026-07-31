@@ -13,7 +13,10 @@
 }
 
 .grid {
-  --verticalPadding: var(--space4XL);
+  /* Mirrors the Project/Experience header top offset so Articles starts at the
+     same height as every other page. Owned here rather than on .header so both
+     columns shift together. */
+  --verticalPadding: calc(var(--space5XL) + var(--space3XL));
 
   max-width: 1800px;
   display: grid;
@@ -27,15 +30,19 @@
   height: 100%;
 
   @media (--mediaDesktop) {
-    --verticalPadding: var(--spaceOuter);
-
     gap: var(--space4XL);
     padding-left: 0;
   }
 
   @media (--mediaLaptop) {
+    --verticalPadding: var(--space5XL);
+
     gap: var(--space3XL);
     padding-bottom: var(--space3XL);
+  }
+
+  @media (--mediaTablet) {
+    --verticalPadding: var(--space4XL);
   }
 
   @media (--singleColumnWidth), (--mediaMobileLS) {
@@ -44,9 +51,10 @@
   }
 
   @media (--mediaMobile), (--mediaMobileLS) {
+    --verticalPadding: var(--space5XL);
+
     gap: var(--space2XL);
     padding-bottom: var(--spaceXL);
-    padding-top: var(--mobileNavOffset);
   }
 }
 
@@ -54,15 +62,15 @@
   grid-column: 1 / -1;
 }
 
+/* No top padding: .grid owns the page's top offset, so the left column starts
+   level with the featured post in the right column. */
 .header {
-  padding-top: var(--spaceS);
   padding-bottom: var(--space2XL);
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
 
   @media (--singleColumnWidth) {
-    padding-top: calc(var(--spaceM) - var(--spaceXS));
     padding-bottom: 0;
   }
 
