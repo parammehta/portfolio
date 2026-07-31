@@ -82,6 +82,22 @@ See `.env.example`:
 - `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions
 - `NEXT_PUBLIC_FATHOM_ID` / `NEXT_PUBLIC_FATHOM_URL` — analytics
 
+## Commit conventions
+
+All commits use [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Prefix | When to use |
+|---|---|
+| `feat:` | New feature or functionality |
+| `fix:` | Bug fix |
+| `chore:` | Tooling, deps, config, build |
+| `docs:` | Documentation only |
+| `style:` | Formatting, whitespace (not CSS) |
+| `refactor:` | Code restructure, no behavior change |
+| `test:` | Adding or updating tests |
+
+Optional scope in parens: `feat(navbar):`, `fix(contact):`. Keep the subject line under 72 characters, lowercase, no trailing period.
+
 ## Guidelines for changes
 
 - Keep the static-export constraint in mind — no `getServerSideProps`, no API routes in the Next.js app itself.
