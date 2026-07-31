@@ -15,15 +15,25 @@
   }
 }
 
-/* Own row above the form so it stays put across the form/success states */
+/* Own row above the form so it stays put across the form/success states.
+   The offsets mirror the Project/Experience header so the breadcrumb lands in
+   the same place here as on every other page, even though this page centres
+   its form instead of using a page header. */
 .breadcrumbs {
   grid-area: 1 / 1;
-  max-width: var(--maxWidthS);
-  width: 100%;
-  padding-top: var(--space2XL);
+  justify-self: stretch;
+  padding-top: calc(var(--space5XL) + var(--space3XL));
+
+  @media (--mediaLaptop) {
+    padding-top: var(--space5XL);
+  }
+
+  @media (--mediaTablet) {
+    padding-top: var(--space4XL);
+  }
 
   @media (--mediaMobile) {
-    padding-top: var(--mobileNavOffset);
+    padding-top: var(--space5XL);
   }
 }
 
