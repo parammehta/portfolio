@@ -2,7 +2,7 @@
   --formHeight: 530px;
 
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr;
   grid-template-columns: 100%;
   justify-items: center;
   justify-content: center;
@@ -15,14 +15,26 @@
   }
 }
 
-.form {
+/* Own row above the form so it stays put across the form/success states */
+.breadcrumbs {
   grid-area: 1 / 1;
+  max-width: var(--maxWidthS);
+  width: 100%;
+  padding-top: var(--space2XL);
+
+  @media (--mediaMobile) {
+    padding-top: var(--mobileNavOffset);
+  }
+}
+
+.form {
+  grid-area: 2 / 1;
   max-width: var(--maxWidthS);
   width: 100%;
   padding: var(--space2XL) 0;
 
   @media (--mediaMobile) {
-    padding: var(--space5XL) 0 var(--space2XL);
+    padding: var(--spaceXL) 0 var(--space2XL);
     align-self: flex-start;
   }
 }
@@ -200,7 +212,7 @@
 }
 
 .complete {
-  grid-area: 1 / 1;
+  grid-area: 2 / 1;
   display: flex;
   flex-direction: column;
   align-items: center;

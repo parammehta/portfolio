@@ -1,45 +1,14 @@
+/* Sits inside an already-padded container (a Section or page header), so it
+   carries no horizontal padding of its own — only the gap below itself. */
 .breadcrumbs {
-  position: absolute;
-  z-index: var(--zIndex1);
+  /* Lifts above the absolutely positioned header background image, the same
+     way the header content itself does. */
+  position: relative;
   width: 100%;
-  top: 0;
-  left: 0;
-  padding-top: 0;
-  padding-bottom: var(--spaceS);
-  padding-right: var(--space5XL);
-  padding-left: calc(var(--space4XL) * 2);
-  pointer-events: none;
-
-  & a,
-  & span {
-    pointer-events: auto;
-  }
-
-  @media (min-width: 2080px) {
-    padding-left: var(--space5XL);
-  }
-
-  @media (--mediaTablet) {
-    padding-left: calc(var(--space4XL) + var(--space3XL));
-  }
+  margin-bottom: var(--spaceL);
 
   @media (--mediaMobile) {
-    position: relative;
-    top: auto;
-    padding-bottom: var(--spaceL);
-    padding-right: var(--spaceL);
-    padding-left: var(--spaceL);
-    padding-top: calc(var(--space2XL) + var(--spaceL));
-  }
-
-  @media (--mediaMobile), (--mediaMobileLS) {
-    padding-left: var(--spaceOuter);
-    padding-right: var(--spaceOuter);
-  }
-
-  @media (max-width: 820px) and (max-height: 420px) {
-    padding-left: var(--space4XL);
-    padding-right: var(--space4XL);
+    margin-bottom: var(--spaceM);
   }
 }
 

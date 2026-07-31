@@ -155,6 +155,13 @@ export const Articles = ({ posts, featured }) => {
 
   const postsHeader = (
     <header className={styles.header}>
+      <Breadcrumbs
+        className={styles.breadcrumbs}
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Articles', href: '/articles' },
+        ]}
+      />
       <Heading className={styles.heading} level={5} as="h1">
         <DecoderText text="Latest articles" />
       </Heading>
@@ -183,12 +190,6 @@ export const Articles = ({ posts, featured }) => {
       <Meta
         title="Articles"
         description="A collection of technical design and development articles. May contain incoherent ramblings."
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Articles', href: '/articles' },
-        ]}
       />
       <Section className={styles.content}>
         {!isSingleColumn && (

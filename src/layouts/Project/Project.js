@@ -1,3 +1,4 @@
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Button } from 'components/Button';
 import { Heading } from 'components/Heading';
 import { Image } from 'components/Image';
@@ -18,10 +19,12 @@ export function ProjectHeader({
   linkLabel = 'Visit website',
   url,
   roles,
+  breadcrumbs,
   className,
 }) {
   return (
     <Section className={classes(styles.header, className)} as="section">
+      {!!breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
       <div
         className={styles.headerContent}
         style={cssProps({ initDelay: numToMs(initDelay) })}

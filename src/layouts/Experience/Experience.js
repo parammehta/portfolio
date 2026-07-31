@@ -1,5 +1,13 @@
 import { forwardRef, useRef } from 'react';
-import { Button, Heading, Image, Section, Text, Transition } from 'components';
+import {
+  Breadcrumbs,
+  Button,
+  Heading,
+  Image,
+  Section,
+  Text,
+  Transition,
+} from 'components';
 import { tokens } from 'components/ThemeProvider';
 import { useParallax } from 'hooks';
 import { classes, cssProps, msToNum, numToMs } from 'utils/style';
@@ -13,10 +21,12 @@ export function ExperienceHeader({
   linkLabel = 'Visit website',
   url,
   roles,
+  breadcrumbs,
   className,
 }) {
   return (
     <Section className={classes(styles.header, className)} as="section">
+      {!!breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
       <div
         className={styles.headerContent}
         style={cssProps({ initDelay: numToMs(initDelay) })}

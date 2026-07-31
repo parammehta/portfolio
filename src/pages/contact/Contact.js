@@ -83,6 +83,7 @@ export const Contact = () => {
       />
       <Section className={styles.contact}>
         <Breadcrumbs
+          className={styles.breadcrumbs}
           items={[
             { label: 'Home', href: '/' },
             { label: 'Contact', href: '/contact' },

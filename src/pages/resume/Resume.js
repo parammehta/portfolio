@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { Breadcrumbs, Button, Footer, Meta } from 'components';
+import { Button, Footer, Meta } from 'components';
 import {
   ProjectContainer,
   ProjectHeader,
@@ -36,15 +36,13 @@ export const Resume = () => {
         description="Resume of Param Mehta — senior software engineer specialising in identity, frontend, and AI-native experiences."
       />
       <ProjectContainer className={styles.resume}>
-        <Breadcrumbs
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Resume', href: '/resume' },
-          ]}
-        />
         <ProjectHeader
           title="Resume"
           description="Software engineer with 8+ years building identity, frontend, and AI-native experiences."
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'Resume', href: '/resume' },
+          ]}
         />
         <ProjectSection padding="none" className={styles.section}>
           <ProjectSectionContent>
