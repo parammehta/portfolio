@@ -45,17 +45,14 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
   return (
     <article className={styles.post}>
       <Meta title={title} prefix="" description={abstract} ogImage={ogImage} />
-      <Section className={styles.headerSection}>
+      <Section>
         <Breadcrumbs
-          className={styles.breadcrumbs}
           items={[
             { label: 'Home', href: '/' },
             { label: 'Articles', href: '/articles' },
             { label: title, href: `/articles/${slug}` },
           ]}
         />
-      </Section>
-      <Section>
         {banner && (
           <div className={styles.banner} ref={imageRef}>
             <div className={styles.bannerImage}>
@@ -76,6 +73,8 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
             </div>
           </div>
         )}
+      </Section>
+      <Section>
         <header className={styles.header}>
           <div className={styles.headerText}>
             <Transition in timeout={msToNum(tokens.base.durationM)}>
