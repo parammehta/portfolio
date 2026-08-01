@@ -11,6 +11,9 @@
 | 3D | Three.js + three-stdlib (Draco GLTF loader) |
 | Blog | MDX via `mdx-bundler` |
 | Analytics | Fathom (client-side) |
+| Contact API | AWS Lambda + API Gateway (REST), Node 20, `functions/` |
+| Email | AWS SES (`us-east-1`) |
+| Spam protection | Cloudflare Turnstile (managed widget) + honeypot field |
 | Testing | Jest + React Testing Library |
 | Component dev | Storybook 10 |
 | Linting | ESLint (flat config) + Stylelint + Prettier |
@@ -97,8 +100,23 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`.
 
 ## Deployment Targets
 
-| Target | S3 Bucket | Command |
+| Target | Infrastructure | Command |
 |---|---|---|
-| Main site | `parammehta-portfolio-site` | `npm run deploy` |
-| Storybook | `parammehta-portfolio-storybook` | `npm run deploy:storybook` |
-| API functions | Serverless Framework | `npm run deploy:functions` |
+| Main site | S3 `parammehta-portfolio-site` → CloudFront | `npm run deploy` |
+| Storybook | S3 `parammehta-portfolio-storybook` → CloudFront | `npm run deploy:storybook` |
+| API functions | Lambda + API Gateway → `api.parammehta.com` | `cd functions && CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy` |
+
+## Contact Form API
+
+The contact form backend lives in `functions/` and is deployed separately via the Serverless Framework (v3).
+
+| Resource | Detail |
+|---|---|
+| Lambda function | `parammehta-portfolio-production-api` (`us-east-1`, `arm64`) |
+| API Gateway | REST API `a6bwt3cky9`, stage `production` |
+| Custom domain | `api.parammehta.com` → CloudFront distribution `d26zddtw9cku0h.cloudfront.net` |
+| ACM cert | `api.parammehta.com` (`us-east-1`) |
+| SES identity | `param.mehta95@gmail.com` (verified) |
+| Runtime | Node 20 (`nodejs20.x`) |
+
+CORS is restricted to `https://parammehta.com` and `https://www.parammehta.com`. To test locally, use a REST client directly against the raw API Gateway URL or temporarily add `http://localhost:3000` to the `ORIGINS` array in `functions/index.js`.

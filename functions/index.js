@@ -43,10 +43,28 @@ app.post('/message', async (req, res) => {
     const isBot = DOMPurify.sanitize(req.body.name);
     const email = DOMPurify.sanitize(req.body.email);
     const message = DOMPurify.sanitize(req.body.message);
+    const turnstileToken = req.body.turnstileToken;
 
     // Silently succeed without sending if the honeypot field was filled in by a bot
     if (isBot) {
       return res.status(200).json({});
+    }
+
+    // Verify Turnstile token if configured
+    if (process.env.CLOUDFLARE_TURNSTILE_SECRET) {
+      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: process.env.CLOUDFLARE_TURNSTILE_SECRET,
+          response: turnstileToken,
+          remoteip: req.headers['x-forwarded-for'] || req.ip,
+        }),
+      });
+      const { success } = await verifyRes.json();
+      if (!success) {
+        return res.status(400).json({ error: 'Security check failed. Please refresh and try again.' });
+      }
     }
 
     // Validate email request

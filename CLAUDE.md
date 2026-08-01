@@ -79,8 +79,15 @@ Static site deployed to S3 + CloudFront:
 
 See `.env.example`:
 - `NEXT_PUBLIC_WEBSITE_URL` — canonical site URL
-- `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions
+- `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions (`https://api.parammehta.com`)
 - `NEXT_PUBLIC_FATHOM_ID` / `NEXT_PUBLIC_FATHOM_URL` — analytics
+- `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key (public); if unset, the widget and check are skipped entirely (safe for local dev without Turnstile configured)
+
+The Lambda (`functions/`) also requires a secret at deploy time — pass it as an env var:
+```bash
+CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy:functions
+```
+The secret is stored as a Lambda environment variable via `serverless.yml`'s `${env:CLOUDFLARE_TURNSTILE_SECRET, ''}` reference. If the variable is absent the Lambda skips Turnstile verification (honeypot still active).
 
 ## Commit conventions
 

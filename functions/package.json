@@ -17,10 +17,11 @@
   },
   "devDependencies": {
     "eslint": "^8.21.0",
-    "eslint-plugin-promise": "^6.0.0"
+    "eslint-plugin-promise": "^6.0.0",
+    "serverless": "^3.40.0"
   },
   "engines": {
-    "node": "14.19.1"
+    "node": ">=18.0.0"
   },
   "private": true
 }

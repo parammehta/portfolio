@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Script from 'next/script';
 import {
   Breadcrumbs,
   Button,
@@ -28,6 +29,29 @@ export const Contact = () => {
   const initDelay = tokens.base.durationS;
 
   const name = useFormInput('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const turnstileRef = useRef(null);
+  const turnstileWidgetId = useRef(null);
+
+  useEffect(() => {
+    if (!scriptLoaded || !turnstileRef.current) return;
+
+    turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+      sitekey: process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY,
+      callback: setTurnstileToken,
+      'expired-callback': () => setTurnstileToken(''),
+      'error-callback': () => setTurnstileToken(''),
+      theme: 'auto',
+    });
+
+    return () => {
+      if (turnstileWidgetId.current != null) {
+        window.turnstile?.remove(turnstileWidgetId.current);
+        turnstileWidgetId.current = null;
+      }
+    };
+  }, [scriptLoaded]);
 
   const onSubmit = async event => {
     event.preventDefault();
@@ -38,6 +62,11 @@ export const Contact = () => {
     // Silently succeed without sending if the honeypot field was filled in by a bot
     if (name.value) {
       setComplete(true);
+      return;
+    }
+
+    if (process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatusError('Security check not complete. Please wait a moment and try again.');
       return;
     }
 
@@ -54,6 +83,7 @@ export const Contact = () => {
           name: name.value,
           email: email.value,
           message: message.value,
+          turnstileToken,
         }),
       });
 
@@ -72,11 +102,20 @@ export const Contact = () => {
     } catch (error) {
       setSending(false);
       setStatusError(error.message);
+      window.turnstile?.reset(turnstileWidgetId.current);
+      setTurnstileToken('');
     }
   };
 
   return (
     <>
+      {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+          onLoad={() => setScriptLoaded(true)}
+        />
+      )}
       <Meta
         title="Contact"
         description="Send me a message if you're interested in discussing a project, an opportunity, or just want to say hello."
@@ -135,6 +174,14 @@ export const Contact = () => {
                 maxLength={4096}
                 {...message}
               />
+              {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
+                <div
+                  ref={turnstileRef}
+                  className={styles.turnstile}
+                  data-status={status}
+                  style={getDelay(tokens.base.durationS, initDelay, 1.5)}
+                />
+              )}
               <Transition in={statusError} timeout={msToNum(tokens.base.durationM)}>
                 {errorStatus => (
                   <div

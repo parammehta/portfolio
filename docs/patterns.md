@@ -224,19 +224,51 @@ The `unobserveOnIntersect` parameter (second arg, `true`) means the observer dis
 
 ---
 
-## Honeypot Anti-Spam
+## Contact Form Spam Protection
 
-The contact form uses a hidden "Name" field as a honeypot:
+The contact form uses two complementary layers:
+
+### 1. Honeypot field
+
+A hidden "Name" field is placed in the DOM but invisible to real users:
 
 ```jsx
 <Input
-  className={styles.botkiller}  // visually hidden via CSS
+  className={styles.botkiller}  // display: none in CSS
   label="Name"
-  value={name}
+  {...name}
 />
 ```
 
-If a bot fills in this field, the form silently pretends to succeed without actually sending.
+If a bot fills it in, both the client (`Contact.js`) and the Lambda (`functions/index.js`) silently pretend to succeed without sending.
+
+### 2. Cloudflare Turnstile
+
+A managed Turnstile widget loads after the page is interactive (`next/script` with `strategy="afterInteractive"`). Real users pass automatically with no friction; bots are challenged:
+
+```jsx
+useEffect(() => {
+  if (!scriptLoaded || !turnstileRef.current) return;
+  turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+    sitekey: process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY,
+    callback: setTurnstileToken,
+    theme: 'auto',
+  });
+}, [scriptLoaded]);
+```
+
+The resulting token is submitted with the form and verified server-side in the Lambda before SES is called:
+
+```js
+const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+  method: 'POST',
+  body: JSON.stringify({ secret: process.env.CLOUDFLARE_TURNSTILE_SECRET, response: turnstileToken }),
+});
+const { success } = await verifyRes.json();
+if (!success) return res.status(400).json({ error: 'Security check failed.' });
+```
+
+If `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` is absent (local dev without Turnstile configured) the widget is not rendered and the check is skipped. The Lambda similarly skips verification when `CLOUDFLARE_TURNSTILE_SECRET` is unset.
 
 ---
 

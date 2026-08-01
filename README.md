@@ -6,13 +6,13 @@ My personal portfolio site. Built with [Next.js](https://nextjs.org/), [Three.js
 
 ## Install & run
 
-Make sure you have Node.js `20.9.0` or higher and npm `8.6.0` or higher installed (see `.nvmrc` — run `nvm use` if you use nvm). Install dependencies with:
+Make sure you have Node.js `24.12.0` installed (see `.nvmrc` — run `nvm use` if you use nvm). Install dependencies with:
 
 ```bash
 npm install
 ```
 
-Once it's done, copy `.env.example` to `.env` and fill in the values, then start up a local server with:
+Once it's done, copy `.env.example` to `.env` and fill in the values (see `docs/architecture.md` for details on each variable), then start up a local server with:
 
 ```bash
 npm run dev
@@ -40,11 +40,11 @@ Deploy the site to S3:
 npm run deploy
 ```
 
-Deploy the serverless contact form function:
+Deploy the serverless contact form function (requires `CLOUDFLARE_TURNSTILE_SECRET` env var):
 
 ```bash
 cd functions
-npm run deploy:api
+CLOUDFLARE_TURNSTILE_SECRET=<your-secret> npm run deploy
 ```
 
 ## Notes
