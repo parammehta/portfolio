@@ -1,11 +1,9 @@
 import js from '@eslint/js';
 import nextConfig from 'eslint-config-next';
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook';
+import tseslint from 'typescript-eslint';
 
-export default [
-  // Generated/vendored output. Flat config does not read .gitignore, so these
-  // have to be repeated here even though .gitignore already covers them.
+export default tseslint.config(
   {
     ignores: [
       '.next/**',
@@ -13,23 +11,26 @@ export default [
       'build-storybook/**',
       'public/draco/**',
       'public/og/**',
+      'functions/**',
+      'next-env.d.ts',
     ],
   },
   js.configs.recommended,
+  ...tseslint.configs.recommended,
   ...nextConfig,
   ...storybook.configs['flat/recommended'],
   {
     rules: {
       semi: 'error',
-      'no-unused-vars': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'import/no-anonymous-default-export': 'off',
       'react/display-name': 'off',
       '@next/next/no-img-element': 'off',
     },
   },
   {
-    // Jest globals for test files and the setup file
-    files: ['**/*.test.{js,jsx}', 'jest.setup.js'],
+    files: ['**/*.test.{js,jsx,ts,tsx}', 'jest.setup.ts'],
     languageOptions: {
       globals: {
         describe: 'readonly',
@@ -44,4 +45,25 @@ export default [
       },
     },
   },
-];
+  {
+    files: [
+      'scripts/**/*.js',
+      'postcss.config.js',
+      '__mocks__/*.js',
+      'next.config.js',
+    ],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        require: 'readonly',
+        module: 'writable',
+        __dirname: 'readonly',
+        process: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+);

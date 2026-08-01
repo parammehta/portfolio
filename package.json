@@ -14,6 +14,11 @@
     "@svgr/webpack": "^6.5.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.19.43",
+    "@types/react": "~18.3",
+    "@types/react-dom": "~18.3",
+    "@types/three": "^0.185.3",
     "esbuild": "^0.15.18",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.12",
@@ -35,7 +40,8 @@
     "stylelint": "^17.14.1",
     "stylelint-config-css-modules": "^4.6.0",
     "stylelint-config-standard": "^40.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.65.0"
   },
   "dependencies": {
     "fathom-client": "^3.7.2",
@@ -75,5 +81,9 @@
   "engines": {
     "npm": ">=8.6.0",
     "node": ">=20.9.0"
+  },
+  "overrides": {
+    "@types/react": "$@types/react",
+    "@types/react-dom": "$@types/react-dom"
   }
 }
