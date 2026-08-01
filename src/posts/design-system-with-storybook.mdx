@@ -1,0 +1,210 @@
+---
+title: Building a Design System with Storybook
+abstract: How to use Storybook as the foundation of a scalable component library — from initial setup to visual testing, design token integration, and keeping design and code in sync.
+date: '2025-10-29'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+A design system is one of those investments that pays dividends slowly, then all at once. The first few weeks feel like overhead — documenting components no one is asking about, writing stories for buttons and inputs. Then six months later, a new feature takes a day instead of a sprint because every primitive you needed already existed, already tested, already consistent.
+
+Storybook is the tool that makes this practical. It gives you a development environment for components in isolation, a living documentation site, and a visual testing surface — all in one.
+
+Here's how I'd approach setting one up from scratch.
+
+## Why Storybook
+
+The core value of Storybook is isolation. You build and test components outside of your app, without having to navigate to the right page, log in, seed the right data, or wait for the network. You render a component in exactly the state you want to inspect.
+
+This unlocks a few things:
+
+- **Faster iteration**: you can iterate on a component without touching the app.
+- **Edge case coverage**: you can render loading states, error states, and empty states that are hard to reproduce in the real app.
+- **Living documentation**: stories become the source of truth for how a component should be used.
+- **Visual testing**: screenshots of stories catch visual regressions automatically.
+
+## Project Structure
+
+Each component lives in its own directory:
+
+```
+src/components/
+  Button/
+    Button.js
+    Button.module.css
+    Button.stories.js
+    index.js
+  Input/
+    Input.js
+    Input.module.css
+    Input.stories.js
+    index.js
+```
+
+The story file is co-located with the component. This is important — stories aren't documentation that lives somewhere else, they're part of the component itself.
+
+## Writing Good Stories
+
+A story is a named export that renders the component in a specific state. The pattern that scales best is using `args` to control props declaratively:
+
+```jsx
+// Button.stories.js
+export default {
+  title: 'Components/Button',
+  component: Button,
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['primary', 'secondary', 'ghost'],
+    },
+    size: {
+      control: 'radio',
+      options: ['small', 'medium', 'large'],
+    },
+  },
+};
+
+// The default story — most common use case
+export const Default = {
+  args: {
+    children: 'Click me',
+    variant: 'primary',
+    size: 'medium',
+  },
+};
+
+// Document the variants explicitly
+export const Secondary = {
+  args: { ...Default.args, variant: 'secondary' },
+};
+
+export const Ghost = {
+  args: { ...Default.args, variant: 'ghost' },
+};
+
+// Edge cases worth calling out
+export const LongLabel = {
+  args: { ...Default.args, children: 'A very long button label that might cause layout issues' },
+};
+
+export const Disabled = {
+  args: { ...Default.args, disabled: true },
+};
+```
+
+The rule I follow: write a story for every state that could break. Empty state, loading state, error state, truncated text, right-to-left text, maximum data. If it's a state worth testing, it's a state worth a story.
+
+## Design Tokens
+
+Design tokens are the bridge between your design file and your code. They're named values for colors, spacing, typography, and other visual properties that both designers and developers reference.
+
+In CSS, I use custom properties:
+
+```css
+/* tokens.css */
+:root {
+  --color-primary: oklch(55% 0.2 264);
+  --color-primary-dark: oklch(45% 0.2 264);
+  --color-text: oklch(15% 0 0);
+  --color-text-subtle: oklch(45% 0 0);
+  --color-surface: oklch(98% 0 0);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+}
+```
+
+Components reference tokens, not raw values:
+
+```css
+.button {
+  background-color: var(--color-primary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+}
+```
+
+When a designer changes the primary color, one token value changes and it propagates everywhere. No hunting through files for hardcoded hex values.
+
+In Storybook, I use the `@storybook/addon-themes` addon to let reviewers toggle between themes:
+
+```js
+// .storybook/preview.js
+export const decorators = [
+  (Story, context) => {
+    const theme = context.globals.theme;
+    return (
+      <div data-theme={theme}>
+        <Story />
+      </div>
+    );
+  },
+];
+
+export const globalTypes = {
+  theme: {
+    name: 'Theme',
+    defaultValue: 'light',
+    toolbar: {
+      items: ['light', 'dark'],
+    },
+  },
+};
+```
+
+## Visual Testing
+
+This is where the ROI really compounds. Storybook integrates with Chromatic (from the Storybook team) to capture screenshots of every story and diff them against a baseline. Any visual change — intentional or not — gets flagged for review.
+
+```bash
+npx chromatic --project-token=your-token
+```
+
+Every story becomes a visual test. Add a new story for an edge case, and you have a regression test for that edge case. The component library becomes harder to accidentally break over time.
+
+If you'd rather self-host, `@storybook/addon-storyshots` with jest-image-snapshot gets you similar results:
+
+```js
+// storyshots.test.js
+import initStoryshots from '@storybook/addon-storyshots';
+import { imageSnapshot } from '@storybook/addon-storyshots-puppeteer';
+
+initStoryshots({
+  suite: 'Image storyshots',
+  test: imageSnapshot({ storybookUrl: 'http://localhost:6006' }),
+});
+```
+
+## Keeping Design and Code in Sync
+
+The hardest part of a design system isn't the code — it's the process. Components drift between the design file and the implementation. Tokens get out of sync. New variants get added in one place and not the other.
+
+A few practices that help:
+
+**Designate the design system as the source of truth for visual decisions.** When there's ambiguity, the design system component wins, not a one-off implementation in a feature.
+
+**Link stories to design file frames.** Most Storybook design plugins let you embed or link the Figma frame alongside the story. It makes the comparison immediate.
+
+**Review the Storybook, not just the code, in PRs.** Visual changes are much easier to evaluate in Storybook than in a code diff.
+
+**Version the design system separately** if your team is large enough. A `CHANGELOG` and semantic versioning lets consumers know what changed and when.
+
+## The Payoff
+
+A design system is a long-term bet. For the first few months, you're writing infrastructure that doesn't ship features. But once it reaches critical mass — once most of your UI is built from system primitives — every new feature gets faster, every visual update gets cheaper, and the product gets more consistent almost automatically.
+
+Storybook is the environment that makes the system tangible and testable. The stories are the contract between design and engineering. And once that contract exists, both sides can move faster within it.

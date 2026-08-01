@@ -1,0 +1,210 @@
+---
+title: 'Modern CSS: Container Queries and What They Unlock'
+abstract: Container queries change the fundamental model of responsive design — from viewport-relative to component-relative. Here's what they are, how to use them, and what becomes possible when components can respond to their own context.
+date: '2025-07-08'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+For years, responsive design meant media queries — breakpoints keyed to the viewport width. It worked, but it had a fundamental problem: components don't live in the viewport, they live inside layouts. A card component might be full-width on a small screen and one-third-width on a large one, and it needed different styles in each case. Media queries couldn't help, because they knew nothing about the card's container.
+
+Container queries fix this. They let components respond to the size of their parent rather than the size of the viewport. This sounds like a small change but it unlocks a fundamentally different approach to building responsive UIs.
+
+## The Core Idea
+
+Before container queries, the only way to make a component layout-aware was to pass props. If a card was in a "narrow" context, you'd pass `size="narrow"`. If it was in a "wide" context, you'd pass `size="wide"`. The component's appearance was controlled by its caller, not by its own context.
+
+Container queries let the CSS do this automatically.
+
+```css
+/* Declare the container */
+.card-wrapper {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* Style the card based on the container's width */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+@container card (min-width: 400px) {
+  .card {
+    flex-direction: row;
+  }
+}
+```
+
+The card stacks vertically in narrow contexts and goes horizontal in wider ones — without any JavaScript, and without the parent needing to tell it which mode to use.
+
+## Setting Up Containers
+
+To query a container, you first need to declare it. The `container-type` property does this:
+
+```css
+/* Responds to inline size (width) changes — most common */
+.wrapper {
+  container-type: inline-size;
+}
+
+/* Responds to both width and height changes */
+.wrapper {
+  container-type: size;
+}
+```
+
+You can also name containers with `container-name` (or the shorthand `container`), which lets descendant elements target a specific ancestor by name rather than just the nearest container:
+
+```css
+.sidebar {
+  container: sidebar / inline-size;
+}
+
+.main-content {
+  container: main / inline-size;
+}
+
+/* Targets the sidebar container specifically, from anywhere inside it */
+@container sidebar (min-width: 300px) {
+  .nav-item {
+    display: flex;
+  }
+}
+```
+
+## The Pattern That Changes Everything
+
+The biggest shift container queries enable is truly self-contained components. A component can define all its layout variants internally, based solely on the space it's given — the caller just needs to put it somewhere.
+
+```css
+/* card.css — the card knows all its own variants */
+.card {
+  container-type: inline-size;
+  padding: 16px;
+}
+
+.card__body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* When the card itself is wider than 300px, go two-column */
+@container (min-width: 300px) {
+  .card__body {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+/* When it's wider than 500px, show the extended metadata */
+@container (min-width: 500px) {
+  .card__meta {
+    display: flex;
+  }
+}
+```
+
+This card works correctly at any width, in any layout, without any external coordination. Drop it in a full-width section or a narrow sidebar — it adapts on its own.
+
+## Container Query Units
+
+CSS also ships new viewport-like units scoped to the container:
+
+| Unit | Meaning |
+|---|---|
+| `cqw` | 1% of the container's width |
+| `cqh` | 1% of the container's height |
+| `cqi` | 1% of the container's inline size |
+| `cqb` | 1% of the container's block size |
+| `cqmin` | Smaller of `cqi` and `cqb` |
+| `cqmax` | Larger of `cqi` and `cqb` |
+
+These let you size things proportionally to their container, similar to how `vw` and `vh` work for the viewport:
+
+```css
+.card__title {
+  /* Font scales with the container width */
+  font-size: clamp(1rem, 3cqw, 1.5rem);
+}
+
+.card__image {
+  /* Image fills 40% of the container */
+  width: 40cqi;
+}
+```
+
+## Style Queries
+
+An emerging extension of container queries lets you query computed style values, not just dimensions. This is particularly useful for theming:
+
+```css
+.theme-dark {
+  container-type: style;
+  --theme: dark;
+}
+
+@container style(--theme: dark) {
+  .card {
+    background: #1a1a1a;
+    color: #fff;
+  }
+}
+```
+
+Style queries aren't yet universally supported, but they're on the horizon and will make theme propagation significantly cleaner.
+
+## Working with React
+
+Container queries are pure CSS — React doesn't need to know about them. But there are patterns worth noting.
+
+Since a container must be a parent of the queried element, you'll sometimes need to add a wrapper:
+
+```jsx
+function Card({ children }) {
+  return (
+    // The container wrapper — CSS uses this as the query target
+    <div className="cardContainer">
+      <article className="card">
+        {children}
+      </article>
+    </div>
+  );
+}
+```
+
+```css
+.cardContainer {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .card {
+    flex-direction: row;
+  }
+}
+```
+
+An element can't be both a container and query that same container. The wrapper pattern separates the two cleanly.
+
+## Where This Fits With Media Queries
+
+Container queries don't replace media queries — they complement them. Media queries still make sense for:
+
+- Page-level layout decisions (single vs. multi-column)
+- Global typographic scale adjustments
+- Navigation patterns that depend on the full viewport
+
+Container queries take over for:
+
+- Component-level layout variants
+- Anything that can appear in multiple layout contexts
+- Reusable components in a design system
+
+A useful mental model: media queries for the page, container queries for components.
+
+## Browser Support
+
+Container queries (`container-type`, `@container`) have been supported in all major browsers since early 2023. They're safe to use today without a polyfill. Style queries have more limited support and should be treated as progressive enhancement for now.
+
+If you've been waiting for browser support to catch up, that wait is over. Container queries are ready for production.

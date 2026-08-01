@@ -1,0 +1,208 @@
+---
+title: 3D on the Web with Three.js
+abstract: A practical introduction to integrating Three.js into a React app — from scene setup and 3D models to performance, lighting, and the techniques behind this site's hero and device renders.
+date: '2026-02-17'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+The hero on this site has a floating 3D sphere with a displacement effect that reacts to your cursor. The project pages show device mockups rendered in WebGL. When I first added these, I expected 3D to be a heavy lift — and it can be — but the fundamentals are surprisingly approachable once you know what you're working with.
+
+This is a practical guide to Three.js in React: how the core concepts fit together, how to load and render 3D models, and the techniques I used specifically on this site.
+
+## The Three.js Mental Model
+
+Three.js is a layer on top of WebGL, which is the browser's low-level 3D graphics API. Writing raw WebGL is verbose and unforgiving. Three.js handles the boilerplate and gives you a scene graph to work with.
+
+Every Three.js scene has three ingredients:
+
+1. **Scene** — the container. Everything you render lives in the scene.
+2. **Camera** — your view into the scene. A `PerspectiveCamera` gives you a realistic field of view; an `OrthographicCamera` gives you a flat projection useful for UI work.
+3. **Renderer** — the WebGL context. It draws the scene from the camera's perspective onto a `<canvas>`.
+
+```js
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75,                                        // field of view in degrees
+  window.innerWidth / window.innerHeight,    // aspect ratio
+  0.1,                                       // near clipping plane
+  1000                                       // far clipping plane
+);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+```
+
+Objects in the scene are `Mesh` instances — a geometry (shape) paired with a material (appearance):
+
+```js
+const geometry = new THREE.SphereGeometry(1, 64, 64);
+const material = new THREE.MeshStandardMaterial({ color: 0x8844ee });
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
+```
+
+## React Integration with @react-three/fiber
+
+For React apps, `@react-three/fiber` is the standard way to use Three.js. It gives you a declarative JSX API over the Three.js scene graph — no imperative setup, no lifecycle management, no cleanup headaches.
+
+```bash
+npm install three @react-three/fiber @react-three/drei
+```
+
+```jsx
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+
+function Scene() {
+  return (
+    <Canvas camera={{ position: [0, 0, 3], fov: 75 }}>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} />
+      <mesh>
+        <sphereGeometry args={[1, 64, 64]} />
+        <meshStandardMaterial color="#8844ee" />
+      </mesh>
+      <OrbitControls />
+    </Canvas>
+  );
+}
+```
+
+`@react-three/drei` is a collection of helpers — `OrbitControls`, `Environment`, `useGLTF`, `Text`, and many more — that cover most common needs.
+
+## Loading 3D Models
+
+The GLTF format is the standard for web 3D models. It's compact, widely supported, and preserves materials and animations.
+
+```jsx
+import { useGLTF } from '@react-three/drei';
+
+function DeviceModel({ url }) {
+  const { scene } = useGLTF(url);
+  return <primitive object={scene} />;
+}
+```
+
+For this site's device models, I use Draco compression to reduce file size significantly. Draco-compressed GLTF files need a decoder, which you ship as a static asset:
+
+```bash
+# Copy the decoder from the drei package to public/
+cp -r node_modules/@react-three/drei/helpers/draco/ public/draco/
+```
+
+```jsx
+import { useGLTF } from '@react-three/drei';
+
+// Configure the decoder path before using
+useGLTF.preload('/models/device.glb');
+
+function DeviceModel() {
+  const { scene } = useGLTF('/models/device.glb', '/draco/');
+  return <primitive object={scene} />;
+}
+```
+
+## The Displacement Sphere
+
+The hero sphere on this site uses a displacement map — a texture that pushes vertices outward based on pixel brightness. Combined with cursor tracking, the effect makes the sphere look like it's reacting to the user's presence.
+
+```jsx
+import { useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useTexture } from '@react-three/drei';
+import * as THREE from 'three';
+
+function DisplacementSphere() {
+  const meshRef = useRef();
+  const { viewport } = useThree();
+  const [displacementMap] = useTexture(['/textures/displacement.png']);
+
+  useFrame(({ mouse }) => {
+    if (!meshRef.current) return;
+
+    // Convert mouse position (-1 to 1) to subtle rotation
+    meshRef.current.rotation.x = mouse.y * 0.2;
+    meshRef.current.rotation.y = mouse.x * 0.2;
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[2, 128, 128]} />
+      <meshStandardMaterial
+        displacementMap={displacementMap}
+        displacementScale={0.4}
+        wireframe={false}
+        color="#8b5cf6"
+        roughness={0.4}
+        metalness={0.6}
+      />
+    </mesh>
+  );
+}
+```
+
+Higher segment counts (`128, 128`) give the displacement more geometry to work with — the effect looks smooth instead of faceted.
+
+## Lighting
+
+Lighting makes or breaks a 3D scene. The most realistic starting point for product/portfolio work is using an HDR environment map for image-based lighting (IBL):
+
+```jsx
+import { Environment } from '@react-three/drei';
+
+function Scene() {
+  return (
+    <Canvas>
+      {/* HDR environment for realistic reflections and lighting */}
+      <Environment preset="city" />
+      <DeviceModel />
+    </Canvas>
+  );
+}
+```
+
+`@react-three/drei` ships several presets. For custom HDRs, you can point `Environment` at a file in your public directory.
+
+For more control, combine point lights and directional lights:
+
+```jsx
+<ambientLight intensity={0.2} />
+<pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
+<pointLight position={[-10, -5, -10]} intensity={0.5} color="#6644ee" />
+```
+
+A key light (primary source), fill light (softer secondary), and rim light (behind the subject, creates separation from background) is the classic three-point setup and works well in 3D too.
+
+## Performance
+
+WebGL is expensive. A few things that matter:
+
+**Limit draw calls.** Each separate mesh is a draw call. Merge static geometry where possible. Use instancing for repeated objects.
+
+**Use compressed textures.** Basis Universal (`.basis`) and KTX2 are GPU-compressed formats that are faster to decompress and use less VRAM than PNG or JPEG. `@react-three/drei` has a `KTX2Loader` for this.
+
+**Reduce polygon count.** Mobile GPUs struggle with high-poly models. Use a lower-poly model for mobile or reduce tessellation on geometry.
+
+**Suspend during load.** Use React Suspense to show a fallback while models load. `useGLTF` already integrates with Suspense.
+
+```jsx
+<Suspense fallback={<LoadingSpinner />}>
+  <DeviceModel />
+</Suspense>
+```
+
+**Dispose resources.** Three.js doesn't garbage-collect textures and geometries automatically. With `@react-three/fiber`, the `Canvas` handles cleanup for JSX elements, but manually created resources need explicit disposal.
+
+## When to Reach for 3D
+
+3D adds real visual weight to a site, but it also adds bundle size, performance cost, and complexity. The places it earns its keep:
+
+- Hero sections where you want a memorable visual identity
+- Product showcases where you want to show an object from all sides
+- Data visualizations where 3D adds genuine insight (not just decoration)
+- Interactions where the third dimension makes the concept clearer
+
+For everything else, a well-executed 2D design is almost always faster to build, lighter to ship, and clearer to understand. 3D is a tool, not a flex — use it when it serves the experience, not just to show it can be done.
+
+If you want to explore the implementation on this site, take a look at the [source code](https://github.com/parammehta/parammehta).

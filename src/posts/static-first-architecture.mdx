@@ -1,0 +1,157 @@
+---
+title: 'Static-First Architecture: Next.js, S3, and CloudFront'
+abstract: A practical breakdown of how I built and deploy this site — static export with Next.js, hosted on S3, served globally through CloudFront — and why this stack is hard to beat for portfolio and marketing sites.
+date: '2025-03-22'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+This site — the one you're reading right now — is a statically exported Next.js app deployed to S3 and served through CloudFront. No server, no container, no database. Just HTML, CSS, JavaScript, and a CDN.
+
+It's a stack I'd recommend to anyone building a portfolio, marketing site, or documentation site. Here's how it works and why I chose it.
+
+## Why Static?
+
+The case for static is simple: static files are fast, cheap, and nearly indestructible.
+
+- **Fast**: No server-side rendering on the request path. CloudFront serves files from an edge location close to the user. Time to first byte is typically under 50ms.
+- **Cheap**: S3 storage costs pennies. CloudFront has a generous free tier. For a site with moderate traffic, the total cost is often under $1/month.
+- **Reliable**: There's no app server to crash, no database to go down, no container to OOM. If S3 and CloudFront are up (they almost always are), your site is up.
+
+The tradeoff is that everything must be known at build time. No user-specific pages, no server-side session handling, no real-time data. For a portfolio site, that's a perfectly acceptable constraint.
+
+## Setting Up Next.js for Static Export
+
+Next.js makes static export straightforward. The key config option is `output: 'export'`:
+
+```js
+// next.config.js
+const nextConfig = {
+  output: 'export',
+  // Needed if you want to serve from a CDN without a trailing slash redirect
+  trailingSlash: true,
+};
+```
+
+With this set, `next build` generates a fully static site in an `out/` directory — plain HTML, CSS, and JavaScript, no Node.js required to serve it.
+
+A few things to keep in mind:
+
+- **No `getServerSideProps`**: Everything must use `getStaticProps` or `getStaticPaths`.
+- **No API routes**: Next.js API routes require a Node.js server. Use a separate serverless function if you need a backend.
+- **Image optimization**: Next.js's built-in `<Image>` component requires a server for on-demand optimization. For static export, either use a third-party image CDN or set `unoptimized: true` and handle optimization yourself.
+
+## The Deployment Pipeline
+
+Here's the full deploy flow for this site:
+
+```bash
+# 1. Build the static site
+next build
+# Output is in out/
+
+# 2. Move to a named build directory
+mv out/ build/
+
+# 3. Sync to S3
+aws s3 sync build/ s3://your-bucket-name \
+  --delete \
+  --cache-control "public, max-age=31536000, immutable"
+
+# 4. Invalidate the CloudFront cache
+aws cloudfront create-invalidation \
+  --distribution-id YOUR_DISTRIBUTION_ID \
+  --paths "/*"
+```
+
+The `--delete` flag removes files from S3 that no longer exist in the build. The `--cache-control` header tells browsers and CloudFront to cache assets aggressively — Next.js generates hashed filenames for JS and CSS, so stale caches are never an issue for those. HTML files get a shorter cache or none, since they reference the hashed assets and need to stay fresh.
+
+## S3 Bucket Setup
+
+The S3 bucket needs to be set up for static website hosting or, better, left private and fronted entirely by CloudFront.
+
+**Option A: S3 static website hosting** — Enable static website hosting on the bucket, set `index.html` as the index document. The bucket must be public. Works but lacks HTTPS and edge caching.
+
+**Option B: Private bucket + CloudFront OAC (recommended)** — Keep the bucket private. Use CloudFront Origin Access Control to allow CloudFront to read from it. All traffic goes through CloudFront, which handles HTTPS, caching, and edge delivery.
+
+```json
+// Bucket policy for CloudFront OAC
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-bucket-name/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::ACCOUNT_ID:distribution/DISTRIBUTION_ID"
+        }
+      }
+    }
+  ]
+}
+```
+
+## CloudFront Configuration
+
+A few CloudFront settings worth getting right:
+
+### Error pages
+
+S3 returns a 403 (not 404) for missing files when using OAC, because the file doesn't exist in the bucket. Configure CloudFront to remap 403 errors to your `404/index.html`:
+
+```
+Error code: 403
+Response page path: /404/index.html
+Response code: 404
+```
+
+### Cache behaviors
+
+You want aggressive caching for hashed assets and minimal caching for HTML:
+
+| Path pattern | Cache TTL | Notes |
+|---|---|---|
+| `/_next/static/*` | 1 year | Hashed filenames, safe to cache forever |
+| `*.html` | 0 (or short) | Must stay fresh |
+| Default | 5 minutes | General fallback |
+
+### Custom domain and HTTPS
+
+CloudFront integrates with AWS Certificate Manager. Request a certificate for your domain in ACM (must be in `us-east-1` for CloudFront), attach it to your distribution, and add a CNAME record in your DNS.
+
+## Handling Serverless Functions
+
+Static sites can't run server code — but sometimes you need a backend. For this site, the contact form posts to a serverless function deployed separately via the Serverless Framework on AWS Lambda.
+
+```yaml
+# serverless.yml
+service: portfolio-functions
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+
+functions:
+  contact:
+    handler: functions/contact.handler
+    events:
+      - httpApi:
+          path: /contact
+          method: post
+```
+
+The frontend calls this API endpoint directly. The Next.js app itself stays completely static — no hybrid rendering, no API routes, no server.
+
+## The Result
+
+The full deploy — build, S3 sync, CloudFront invalidation — takes under two minutes. The site loads in under a second from most locations. Hosting costs are negligible.
+
+For anything where content is known at build time, this stack is hard to beat. The complexity ceiling is low, the performance floor is high, and there's almost nothing to operate.
+
+If you want to see the full setup, the source is on [GitHub](https://github.com/parammehta/parammehta).

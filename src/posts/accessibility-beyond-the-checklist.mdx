@@ -1,0 +1,205 @@
+---
+title: Accessibility Beyond the Checklist
+abstract: How to build truly accessible UIs that go beyond audit scores — covering focus management, ARIA live regions, keyboard navigation, and the mindset shift that makes it stick.
+date: '2024-11-14'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+Accessibility often gets treated as a compliance exercise. Run a linter, fix the contrast ratios, add some `alt` text, ship it. But a passing audit score and a usable experience for people with disabilities are two very different things. I've seen apps that score 100 on Lighthouse Accessibility and are still nearly impossible to navigate with a keyboard.
+
+This article is about the gap between "passing" and "working" — and how to close it.
+
+## The Checklist Mindset vs. The User Mindset
+
+Automated tools like axe or Lighthouse catch around 30–40% of accessibility issues. The rest require human judgment. The reason is simple: automated tools can verify that an element *has* an `aria-label`, but they can't verify whether that label is *meaningful*. They can confirm a button is focusable, but not that the focus order makes sense.
+
+The shift I'd recommend is moving from "does this element satisfy the rule?" to "can a real person accomplish this task without a mouse?"
+
+That question changes everything.
+
+## Focus Management
+
+The most overlooked area in accessible UIs is focus management — where keyboard focus goes after an action. When you open a modal, focus should move into it. When you close it, focus should return to the element that triggered it.
+
+```jsx
+function Modal({ isOpen, onClose, triggerRef, children }) {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Move focus into the modal when it opens
+      modalRef.current?.focus();
+    } else {
+      // Return focus to the trigger when it closes
+      triggerRef.current?.focus();
+    }
+  }, [isOpen, triggerRef]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      tabIndex={-1}
+    >
+      {children}
+      <button onClick={onClose}>Close</button>
+    </div>
+  );
+}
+```
+
+Without this, a keyboard user who opens a modal finds their focus stranded on the button behind it. They have to tab through the entire page to get back to where they were. That's not a subtle inconvenience — it makes the feature unusable.
+
+### Focus Trapping
+
+Dialogs and menus need to trap focus inside them while open. Users shouldn't be able to tab out into background content.
+
+```jsx
+function useFocusTrap(ref, isActive) {
+  useEffect(() => {
+    if (!isActive) return;
+
+    const focusable = ref.current?.querySelectorAll(
+      'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+
+    function handleKeyDown(e) {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [ref, isActive]);
+}
+```
+
+## ARIA Live Regions
+
+Screen readers announce content linearly. When something changes on the page — a status message, a validation error, a toast notification — a sighted user sees it immediately, but a screen reader user might never know it happened unless you explicitly announce it.
+
+ARIA live regions solve this. Any content inside a live region is announced to screen readers when it changes.
+
+```jsx
+function StatusMessage({ message, type = 'polite' }) {
+  return (
+    <div
+      role="status"
+      aria-live={type}
+      aria-atomic="true"
+    >
+      {message}
+    </div>
+  );
+}
+
+// Usage
+<StatusMessage message="Form submitted successfully" />
+<StatusMessage message="Error: email is required" type="assertive" />
+```
+
+- `aria-live="polite"` waits for the user to finish what they're doing before announcing.
+- `aria-live="assertive"` interrupts immediately — use only for urgent errors, not general status.
+- `aria-atomic="true"` ensures the entire region is read, not just the changed part.
+
+A common mistake is dynamically rendering the live region alongside the message. Screen readers only detect *changes* to live regions — if the element doesn't exist yet, the initial content won't be announced. Always render the container first, then update its content.
+
+```jsx
+// Wrong: the initial message won't be announced
+{message && <div aria-live="polite">{message}</div>}
+
+// Right: the container is always in the DOM
+<div aria-live="polite">{message}</div>
+```
+
+## Keyboard Navigation Patterns
+
+Beyond basic focusability, some UI patterns have established keyboard interaction conventions that users with assistive technology expect. Deviating from them causes confusion.
+
+### Tabs
+
+Tab panels should use arrow keys to move between tabs, not Tab. The Tab key moves focus out of the tab list to the panel content.
+
+```jsx
+function TabList({ tabs, activeTab, onChange }) {
+  function handleKeyDown(e, index) {
+    const count = tabs.length;
+    if (e.key === 'ArrowRight') onChange((index + 1) % count);
+    if (e.key === 'ArrowLeft') onChange((index - 1 + count) % count);
+    if (e.key === 'Home') onChange(0);
+    if (e.key === 'End') onChange(count - 1);
+  }
+
+  return (
+    <div role="tablist">
+      {tabs.map((tab, i) => (
+        <button
+          key={tab.id}
+          role="tab"
+          aria-selected={activeTab === i}
+          tabIndex={activeTab === i ? 0 : -1}
+          onKeyDown={e => handleKeyDown(e, i)}
+          onClick={() => onChange(i)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+### Comboboxes and Autocomplete
+
+Comboboxes are one of the most complex accessible patterns. The ARIA spec defines exactly which keys do what. If you're building one from scratch, read the [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) first — or better yet, use a library like Radix UI or Headless UI that handles it for you.
+
+## Semantic HTML: The Foundation
+
+Before reaching for ARIA, use the right HTML element. A `<button>` is focusable, activatable with Enter and Space, and announces itself as a button — for free. A `<div onClick>` does none of that without extra work.
+
+```jsx
+// Requires: role, tabIndex, onKeyDown, aria-label
+<div onClick={submit} role="button" tabIndex={0} onKeyDown={...}>
+  Submit
+</div>
+
+// All of that for free
+<button onClick={submit}>Submit</button>
+```
+
+ARIA is for when HTML doesn't have the right element for the job. If HTML has it, use it.
+
+## Testing Accessibility for Real
+
+The only way to know if something is actually accessible is to use it:
+
+1. **Unplug your mouse** and try to complete the feature with only a keyboard.
+2. **Turn on a screen reader** — VoiceOver on Mac (`⌘ F5`), NVDA on Windows (free). Try to navigate your feature.
+3. **Zoom to 200%** and verify nothing breaks or overflows.
+4. **Test with axe DevTools** as a baseline, but don't stop there.
+
+Automated tooling catches the easy stuff. Real testing catches the rest.
+
+## The Mindset Shift
+
+The goal isn't to make your app pass an audit. It's to make it usable by everyone who might need it. That includes people who navigate only by keyboard, people who use screen readers, people who zoom in to read, and people with motor impairments who use switch devices or voice control.
+
+When you internalize that, the checklist becomes a floor, not a ceiling.

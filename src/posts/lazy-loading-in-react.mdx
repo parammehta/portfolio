@@ -1,0 +1,269 @@
+---
+title: Lazy Loading in React — The Complete Picture
+abstract: A practical guide to lazy loading in React apps — code splitting with dynamic imports, lazy image loading, virtualizing long lists, and how to avoid the pitfalls that slow things down.
+date: '2025-05-19'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+Performance rarely fails all at once. It degrades incrementally — one large dependency here, an unvirtualized list there — until the page feels sluggish and you're not sure where to start. Lazy loading is the systematic answer to one category of that problem: deferring work until it's actually needed.
+
+In React, lazy loading shows up in a few distinct forms. This article covers all of them.
+
+## Code Splitting with Dynamic Imports
+
+JavaScript bundles are the most common culprit for slow initial loads. When everything ships in a single bundle, the user downloads and parses code for every page and feature upfront — including things they may never use.
+
+React's `lazy` and `Suspense` make component-level code splitting straightforward:
+
+```jsx
+import { lazy, Suspense } from 'react';
+
+const HeavyChart = lazy(() => import('./HeavyChart'));
+
+function Dashboard() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <HeavyChart />
+    </Suspense>
+  );
+}
+```
+
+`lazy` takes a function that returns a dynamic `import()`. The component's code isn't fetched until it's first rendered. `Suspense` handles the loading state with the `fallback` prop.
+
+The bundle for `HeavyChart` gets split into its own chunk by your bundler (Webpack, Vite, etc.) automatically — no extra config needed.
+
+### Route-level Splitting
+
+The highest-leverage application of code splitting is at the route level. Each route loads only the code it needs:
+
+```jsx
+import { lazy, Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+
+function App() {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </Suspense>
+  );
+}
+```
+
+A user visiting the home page never downloads the dashboard or settings code. As the app grows, each new page adds to that page's bundle, not the initial load.
+
+### Named Exports
+
+`React.lazy` only works with default exports. For named exports, wrap them:
+
+```jsx
+// Wrapping a named export for lazy loading
+const Modal = lazy(() =>
+  import('./components/Modal').then(module => ({ default: module.Modal }))
+);
+```
+
+## Lazy Loading Images
+
+Images are often the heaviest assets on a page. The browser's native `loading="lazy"` attribute handles most cases:
+
+```jsx
+<img
+  src="/static/hero.jpg"
+  alt="Hero image"
+  loading="lazy"
+  width={1200}
+  height={600}
+/>
+```
+
+With `loading="lazy"`, the browser skips images below the fold and fetches them as the user scrolls. Always include `width` and `height` to prevent layout shift — the browser reserves the space before the image loads.
+
+### Intersection Observer for Custom Behaviour
+
+When you need more control — a fade-in on load, custom thresholds, or a blur-up placeholder — `IntersectionObserver` is the tool:
+
+```jsx
+import { useRef, useEffect, useState } from 'react';
+
+function LazyImage({ src, placeholder, alt, ...props }) {
+  const imgRef = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' } // start loading 200px before it enters view
+    );
+
+    if (imgRef.current) observer.observe(imgRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={imgRef} style={{ position: 'relative' }}>
+      {placeholder && !loaded && (
+        <img src={placeholder} alt="" aria-hidden style={{ filter: 'blur(8px)' }} {...props} />
+      )}
+      {inView && (
+        <img
+          src={src}
+          alt={alt}
+          onLoad={() => setLoaded(true)}
+          style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }}
+          {...props}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+The `rootMargin: '200px'` starts loading before the image enters view, so it's usually ready by the time the user scrolls to it.
+
+## Virtualizing Long Lists
+
+Rendering thousands of DOM nodes is expensive — even if they're off-screen. The browser still constructs them, lays them out, and paints them. For long lists, virtualization is the solution: only the visible rows (plus a small buffer) are in the DOM at any time.
+
+[TanStack Virtual](https://tanstack.com/virtual) is a framework-agnostic virtualizer with a React adapter:
+
+```bash
+npm install @tanstack/react-virtual
+```
+
+```jsx
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useRef } from 'react';
+
+function VirtualList({ items }) {
+  const parentRef = useRef(null);
+
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56, // estimated row height in px
+    overscan: 5,            // render 5 extra rows above/below visible area
+  });
+
+  return (
+    <div ref={parentRef} style={{ height: '600px', overflow: 'auto' }}>
+      <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+        {virtualizer.getVirtualItems().map(virtualItem => (
+          <div
+            key={virtualItem.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualItem.size}px`,
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          >
+            {items[virtualItem.index].name}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+A list of 10,000 items renders only ~15 DOM nodes at a time. Scrolling through it is smooth at any size.
+
+## Lazy Loading Heavy Components Conditionally
+
+Some components are only needed under certain conditions — a date picker when a field is focused, a rich text editor when an edit button is clicked, a video player when play is pressed. Deferring the import until that moment avoids paying for them upfront:
+
+```jsx
+import { lazy, Suspense, useState } from 'react';
+
+const RichTextEditor = lazy(() => import('./RichTextEditor'));
+
+function PostEditor({ content }) {
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <div>
+      {editing ? (
+        <Suspense fallback={<Skeleton height={200} />}>
+          <RichTextEditor initialContent={content} />
+        </Suspense>
+      ) : (
+        <div onClick={() => setEditing(true)}>{content}</div>
+      )}
+    </div>
+  );
+}
+```
+
+The editor bundle — often 100kb+ for libraries like Slate or TipTap — isn't fetched until the user actually clicks to edit.
+
+## Prefetching
+
+The downside of lazy loading is that users might notice a delay when the lazy component first loads. Prefetching bridges this gap: load the chunk in the background before it's needed.
+
+```jsx
+// Prefetch on hover — load before the user clicks
+function NavLink({ to, children }) {
+  function handleMouseEnter() {
+    // Trigger the import so the chunk is cached when the user navigates
+    import(`../pages/${to}`);
+  }
+
+  return (
+    <a href={to} onMouseEnter={handleMouseEnter}>
+      {children}
+    </a>
+  );
+}
+```
+
+By the time the user's click registers, the chunk is often already in the browser cache. The lazy load feels instant.
+
+## Common Pitfalls
+
+**Defining lazy components inside other components.** This creates a new component type on every render, causing React to unmount and remount the lazy component constantly. Always define lazy components at the module level.
+
+```jsx
+// Wrong — new component type on every render
+function Page() {
+  const Modal = lazy(() => import('./Modal')); // Don't do this
+  return <Modal />;
+}
+
+// Right — defined at module scope
+const Modal = lazy(() => import('./Modal'));
+function Page() {
+  return <Modal />;
+}
+```
+
+**No Suspense boundary.** Lazy components must be wrapped in a `Suspense` boundary somewhere in the tree, or React will throw. A single boundary at the app root works, but more granular boundaries give better loading UX.
+
+**Lazy loading things that are always immediately visible.** Above-the-fold content should load eagerly. Lazy loading the hero image or the primary navigation introduces unnecessary delay. Reserve it for below-the-fold content, conditionally rendered components, and large route-level bundles.
+
+## Measuring Impact
+
+Lazy loading should be informed by data. Before optimizing, check:
+
+- **Lighthouse / PageSpeed Insights** for unused JavaScript and render-blocking resources
+- **Chrome DevTools Coverage tab** to see which bytes of each bundle are actually executed
+- **Network tab** with throttling to see what loads when and how large each chunk is
+
+The goal isn't to lazy load everything — it's to identify the chunks that are large and not immediately needed, and defer exactly those.
