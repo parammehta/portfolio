@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import {
+  Breadcrumbs,
   Divider,
   Footer,
   Heading,
@@ -18,7 +19,7 @@ import { formatDate } from 'utils/date';
 import { cssProps, msToNum, numToMs } from 'utils/style';
 import styles from './Post.module.css';
 
-export const Post = ({ children, title, date, abstract, banner, timecode, ogImage }) => {
+export const Post = ({ children, title, date, abstract, banner, timecode, ogImage, slug }) => {
   const scrollToHash = useScrollToHash();
   const imageRef = useRef();
   const [dateTime, setDateTime] = useState(null);
@@ -44,6 +45,16 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
   return (
     <article className={styles.post}>
       <Meta title={title} prefix="" description={abstract} ogImage={ogImage} />
+      <Section className={styles.headerSection}>
+        <Breadcrumbs
+          className={styles.breadcrumbs}
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Articles', href: '/articles' },
+            { label: title, href: `/articles/${slug}` },
+          ]}
+        />
+      </Section>
       <Section>
         {banner && (
           <div className={styles.banner} ref={imageRef}>

@@ -13,13 +13,13 @@ import { formatTimecode } from 'utils/timecode';
 import rehypePrism from '@mapbox/rehype-prism';
 import { generateOgImage } from './og-image';
 
-export default function PostPage({ frontmatter, code, timecode, ogImage }) {
+export default function PostPage({ frontmatter, code, timecode, ogImage, slug }) {
   // This is mdx-bundler's documented usage pattern: compiled MDX code is only
   // available at runtime, so the component must be created here, memoized on `code`.
   const MDXComponent = useMemo(() => getMDXComponent(code), [code]);
 
   return (
-    <Post timecode={timecode} ogImage={ogImage} {...frontmatter}>
+    <Post timecode={timecode} ogImage={ogImage} slug={slug} {...frontmatter}>
       {/* eslint-disable-next-line react-hooks/static-components */}
       <MDXComponent components={postMarkdown} />
     </Post>
@@ -57,7 +57,7 @@ export const getStaticProps = async ({ params }) => {
   });
 
   return {
-    props: { code, frontmatter, timecode, ogImage },
+    props: { code, frontmatter, timecode, ogImage, slug: params.slug },
     notFound: process.env.NODE_ENV === 'production' && frontmatter.draft,
   };
 };
