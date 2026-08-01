@@ -45,7 +45,7 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
   return (
     <article className={styles.post}>
       <Meta title={title} prefix="" description={abstract} ogImage={ogImage} />
-      <Section>
+      <Section className={styles.breadcrumbSection}>
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },

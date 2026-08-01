@@ -22,6 +22,22 @@
   overflow-x: hidden;
 }
 
+.breadcrumbSection {
+  padding-top: calc(var(--space5XL) + var(--space3XL));
+
+  @media (--mediaLaptop) {
+    padding-top: var(--space5XL);
+  }
+
+  @media (--mediaTablet) {
+    padding-top: var(--space4XL);
+  }
+
+  @media (--mediaMobile) {
+    padding-top: var(--space5XL);
+  }
+}
+
 
 .header {
   display: grid;
