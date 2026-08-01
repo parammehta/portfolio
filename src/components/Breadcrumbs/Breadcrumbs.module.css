@@ -4,6 +4,7 @@
   /* Lifts above the absolutely positioned header background image, the same
      way the header content itself does. */
   position: relative;
+  z-index: 1;
   width: 100%;
   margin-bottom: var(--spaceL);
 
