@@ -75,6 +75,19 @@ Static site deployed to S3 + CloudFront:
 - `npm run deploy` → syncs `build/` to S3, invalidates CloudFront cache
 - Storybook builds to `build-storybook/`, deployed to a separate S3 bucket
 
+The site deploy also runs automatically on release — see [Releases](#releases). The `npm run deploy` scripts remain available for manual/out-of-band deploys.
+
+## Releases
+
+Versioning and site deploys are automated with [release-please](https://github.com/googleapis/release-please) (GitHub Action in `.github/workflows/release.yml`, config in `release-please-config.json` + `.release-please-manifest.json`).
+
+Flow: push Conventional Commits to `main` → release-please opens/updates a **Release PR** that bumps `package.json` and regenerates `CHANGELOG.md` → merging that PR tags the commit, publishes a GitHub Release, and triggers the `deploy` job (build + `aws s3 sync` + CloudFront invalidation). The deploy job runs only when a release is actually cut, not on every push.
+
+- Commit type drives the version bump: `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE:` → major.
+- The CI build re-supplies the `NEXT_PUBLIC_*` values (stored as repo **Variables**) because they are baked in at build time for the static export. AWS credentials are stored as repo **Secrets** (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`). The CloudFront distribution ID and S3 bucket are hardcoded in the deploy scripts, so they need no secrets.
+- Scope is the **site only** — the `functions/` Lambda is deployed separately via `npm run deploy:functions`.
+- Do not hand-edit `CHANGELOG.md`, the `version` in `package.json`, or `.release-please-manifest.json` — release-please owns them.
+
 ## Environment variables
 
 See `.env.example`:
@@ -104,6 +117,8 @@ All commits use [Conventional Commits](https://www.conventionalcommits.org/):
 | `test:` | Adding or updating tests |
 
 Optional scope in parens: `feat(navbar):`, `fix(contact):`. Keep the subject line under 72 characters, lowercase, no trailing period.
+
+These commit types also drive automated versioning and changelog generation — see [Releases](#releases).
 
 ## Guidelines for changes
 
