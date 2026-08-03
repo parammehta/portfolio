@@ -10,7 +10,7 @@ import {
   Text,
   Transition,
 } from 'components';
-import profileKatakana from 'assets/katakana-profile.svg?url';
+import profileDevanagari from 'assets/devanagari-profile.svg?url';
 import profileImgLarge from 'assets/profile-large.jpg';
 import profileImgPlaceholder from 'assets/profile-placeholder.jpg';
 import profileImg from 'assets/profile.jpg';
@@ -103,17 +103,17 @@ export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
                   placeholder={profileImgPlaceholder}
                   srcSet={[profileImg, profileImgLarge]}
                   sizes={`(max-width: ${media.mobile}px) 100vw, 480px`}
-                  alt="Me Standing in front of the Tahoe Lake."
+                  alt="Me leaning against a lava rock wall with palm trees in the background."
                 />
                 <svg
                   aria-hidden="true"
-                  width="135"
-                  height="765"
-                  viewBox="0 0 135 765"
+                  width="200"
+                  height="900"
+                  viewBox="0 0 200 900"
                   className={styles.svg}
                   data-visible={visible}
                 >
-                  <use href={`${profileKatakana}#katakana-profile`} />
+                  <use href={`${profileDevanagari}#devanagari-profile`} />
                 </svg>
               </div>
             </div>

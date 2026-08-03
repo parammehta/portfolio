@@ -1,4 +1,4 @@
- _____ 
+ _____
 |  __ |  /\   /\
 | |     /\ \ /\ \
 |_|    /\ \ \  \ \
@@ -8,7 +8,7 @@ and graphic assets behind this site humanstxt.org.
 
 _______________________________________________________________________________
 
-Software Engineer | ソフトウェアエンジニア
+Software Engineer | सॉफ़्टवेयर इंजीनियर
 
 Param Mehta
 Hand crafted design & web development
@@ -18,7 +18,7 @@ github.com/parammehta
 
 _______________________________________________________________________________
 
-TECHNOLOGY | テクノロジー
+TECHNOLOGY | तकनीक
 
 React
 Next.js
@@ -27,7 +27,7 @@ Framer Motion
 
 _______________________________________________________________________________
 
-FONTS | フォント
+FONTS | फ़ॉन्ट
 
 Gotham
-Hiragino Kaku Gothic
+Kohinoor Devanagari
