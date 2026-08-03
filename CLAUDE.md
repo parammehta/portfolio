@@ -79,11 +79,14 @@ The site deploy also runs automatically on release — see [Releases](#releases)
 
 ## Releases
 
-Versioning and site deploys are automated with [release-please](https://github.com/googleapis/release-please) (GitHub Action in `.github/workflows/release.yml`, config in `release-please-config.json` + `.release-please-manifest.json`).
+Versioning and site deploys are automated with [release-please](https://github.com/googleapis/release-please) (GitHub Action in `.github/workflows/release-deploy.yml`, config in `release-please-config.json` + `.release-please-manifest.json`).
 
-Flow: push Conventional Commits to `main` → release-please opens/updates a **Release PR** that bumps `package.json` and regenerates `CHANGELOG.md` → merging that PR tags the commit, publishes a GitHub Release, and triggers the `deploy` job (build + `aws s3 sync` + CloudFront invalidation). The deploy job runs only when a release is actually cut, not on every push.
+Flow: push Conventional Commits to `main` → release-please opens/updates a **Release PR** that bumps `package.json` and regenerates `CHANGELOG.md` → the workflow **auto-merges that Release PR** (squash) → the merge tags the commit, publishes a GitHub Release, and triggers the `deploy` job (build + `aws s3 sync` + CloudFront invalidation). The deploy job runs only when a release is actually cut, not on every push.
 
+- **Auto-merge means no human gate**: every push to `main` containing a `feat:`/`fix:` (etc.) ships to production automatically. There is no batching/review window.
+- The merge is scoped to **only** the release-please Release PR (targeted by its exact PR number); it never touches your other PRs.
 - Commit type drives the version bump: `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE:` → major.
+- Auto-merge requires a **PAT** stored as the `RELEASE_PLEASE_TOKEN` secret (Contents + Pull requests read/write), because merges made with the default `GITHUB_TOKEN` do not re-trigger the workflow — so the release/tag/deploy would never fire. (The direct squash merge needs no repo-wide "Allow auto-merge" setting.)
 - The CI build re-supplies the `NEXT_PUBLIC_*` values (stored as repo **Variables**) because they are baked in at build time for the static export. AWS credentials are stored as repo **Secrets** (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`). The CloudFront distribution ID and S3 bucket are hardcoded in the deploy scripts, so they need no secrets.
 - Scope is the **site only** — the `functions/` Lambda is deployed separately via `npm run deploy:functions`.
 - Do not hand-edit `CHANGELOG.md`, the `version` in `package.json`, or `.release-please-manifest.json` — release-please owns them.
