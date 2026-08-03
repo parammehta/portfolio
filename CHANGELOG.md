@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.0...portfolio-v1.1.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* **ci:** launch puppeteer with --no-sandbox for og-image build ([#4](https://github.com/parammehta/portfolio/issues/4)) ([f84f34d](https://github.com/parammehta/portfolio/commit/f84f34d826ec2b5d518e15d4461c73e1dcf5af05))
+
 ## [1.1.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.0.0...portfolio-v1.1.0) (2026-08-02)
 
 
