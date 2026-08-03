@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.2.0...portfolio-v1.3.0) (2026-08-03)
+
+
+### Features
+
+* swap Japanese decor for Devanagari, refresh profile photo ([#8](https://github.com/parammehta/portfolio/issues/8)) ([84bff7e](https://github.com/parammehta/portfolio/commit/84bff7e8e55d8022897a9f4ce212d4cbd21d1616))
+
 ## [1.2.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.1...portfolio-v1.2.0) (2026-08-03)
 
 
