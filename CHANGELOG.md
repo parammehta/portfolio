@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.1...portfolio-v1.2.0) (2026-08-03)
+
+
+### Features
+
+* **ci:** auto-merge release PR + rename workflow to Release & Deploy ([#3](https://github.com/parammehta/portfolio/issues/3)) ([e88a3ed](https://github.com/parammehta/portfolio/commit/e88a3ed6ac2eca902c29dff1f0f02c3c96e095e6))
+
 ## [1.1.1](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.0...portfolio-v1.1.1) (2026-08-03)
 
 
