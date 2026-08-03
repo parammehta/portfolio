@@ -1,0 +1,152 @@
+---
+title: Migrating This Site to TypeScript
+abstract: A file-by-file account of converting a 159-file Next.js portfolio from JavaScript to strict TypeScript — the ordering that kept the build green, the ambient declarations that made SVGs and shaders type-check, and the one config change that can silently delete your routes.
+date: '2026-08-02'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+This site was JavaScript for years. Not because I had anything against types — I just never found a stretch of time where converting 159 files felt worth stopping feature work. What finally pushed me over was the accumulation of small, avoidable mistakes: a prop renamed in one place and not another, a context value read that was always `undefined`, a reducer action with a typo that failed silently. None of these were hard bugs. They were just bugs that types would have caught before I ever hit save.
+
+So I did the whole thing in one pass — `src/`, Storybook, the tests, the config — all to `strict: true`. Here's what that actually took, and the parts I'd have wanted to know going in.
+
+## The Decision: All At Once, Not Incremental
+
+The conventional advice is to migrate incrementally: turn on `allowJs`, convert a few leaf modules, and let the two languages coexist for months. That's the right call for a large team on a product with deadlines.
+
+For a personal site with a clear boundary, I went the other way. A half-migrated codebase has a real cost — every file you open, you have to remember which world it lives in, and the "convert as you touch" strategy tends to stall out at about 60%. Doing it all at once meant one big diff, one review, and no lingering ambiguity afterward.
+
+I did keep `allowJs: true` *during* the migration, though. That's the trick that makes a big-bang conversion survivable: with `allowJs` on, `tsc --noEmit` stays green at every commit boundary, so I could convert bottom-up and always know the whole project still type-checked. It gets flipped to `false` at the very end, once the last `.js` file is gone.
+
+## Order Matters: Convert Bottom-Up
+
+The single most important decision was the order of conversion. Types flow upward — a component can only be well-typed if the hooks and utilities it depends on are already typed. Convert top-down and every file is a sea of `any`; convert bottom-up and each layer inherits real types from the one below.
+
+The order I settled on:
+
+```
+utils → hooks → contexts/providers → components → layouts → pages → stories → tests
+```
+
+`utils` first because they're pure leaf functions with no dependencies. Then `hooks`, which consume utils. Then the context providers and the app reducer, because half the component tree reads from them. Only then the components themselves, then the layouts that compose them, then the pages that compose layouts.
+
+By the time I reached the pages — the top of the tree — nearly everything they touched was already typed, so the errors that surfaced were real design questions, not noise.
+
+## Ambient Declarations for Non-Code Imports
+
+The first thing that breaks when you turn on TypeScript in a Next.js project with a custom webpack config is every import that isn't JavaScript. This site imports SVGs as React components, GLSL shaders as strings, and `.glb` 3D models as URLs. TypeScript has no idea what any of those are.
+
+The fix is a single ambient declaration file that tells the compiler what each file extension resolves to:
+
+```ts
+// types/assets.d.ts
+
+// SVGs go through @svgr/webpack and become React components
+declare module '*.svg' {
+  import type { FC, SVGProps } from 'react';
+  const ReactComponent: FC<SVGProps<SVGSVGElement> & { title?: string }>;
+  export default ReactComponent;
+}
+
+// ...but the `?url` variant is just a string URL
+declare module '*.svg?url' {
+  const src: string;
+  export default src;
+}
+
+// GLSL shaders are loaded as raw source text
+declare module '*.glsl' {
+  const source: string;
+  export default source;
+}
+
+// Models, videos, and fonts resolve to emitted URLs
+declare module '*.glb' { const src: string; export default src; }
+declare module '*.hdr' { const src: string; export default src; }
+declare module '*.mp4' { const src: string; export default src; }
+```
+
+The subtlety here is the `?url` resource query. The same `.svg` file resolves to two completely different types depending on how you import it — a component by default, a string when you append `?url`. You need both declarations, and they don't conflict because the module specifiers are distinct.
+
+One thing I *didn't* have to declare: CSS Modules and static image imports. Next.js generates `next-env.d.ts` on the first build, and that file already covers `*.module.css` (as a string map) and `*.png` / `*.jpg` (as `StaticImageData`). Don't hand-write those — let Next own them, and commit the generated file.
+
+## The Config Change That Can Delete Your Routes
+
+This one deserves its own warning. Next.js routing in this project keys off a `pageExtensions` setting:
+
+```js
+// before
+pageExtensions: ['page.js', 'api.js']
+// after
+pageExtensions: ['page.tsx', 'page.ts', 'api.ts']
+```
+
+The moment you flip that array, any `*.page.js` file you haven't yet renamed to `.page.tsx` **stops being a route**. And here's the dangerous part: nothing errors. `next build` succeeds. The static export just quietly comes out missing whole directories, and you don't find out until you click a dead link.
+
+It's made worse by the file layout on this site, where each page sits next to a same-named helper — `contact/index.page.js` lives beside `contact/Contact.js`. A careless bulk rename can't tell the route from the helper, and `Contact.tsx` versus `Contact.page.tsx` is a one-character difference between "still works" and "404."
+
+Two things made this safe. First, a transitional `pageExtensions` that accepts *both* during the migration, so pages could be converted one at a time with a green build the whole way:
+
+```js
+pageExtensions: ['page.tsx', 'page.ts', 'page.js', 'api.ts', 'api.js']
+```
+
+Second — and this is the part I'd insist on for anyone doing this — a route manifest diff. Before touching anything, I captured the built output:
+
+```bash
+npm run build && find build -name index.html | sort > routes-before.txt
+```
+
+After the flip, I diffed it against a fresh build. An empty diff was the only proof that every route survived. (Don't forget the sitemap generator, which also globs for `.page.js` — it needs the same extension update, or it silently emits an empty `<urlset>`.)
+
+## Typing the Interesting Parts
+
+Most files were mechanical. A handful genuinely needed design decisions.
+
+**The app reducer** became a discriminated union, which is where TypeScript earns its keep for state management:
+
+```ts
+type ThemeId = 'light' | 'dark';
+
+type AppAction =
+  | { type: 'setTheme'; value: ThemeId }
+  | { type: 'toggleTheme' }
+  | { type: 'toggleMenu' };
+```
+
+There's a trap here. The original reducer destructured `const { type, value } = action` at the top of the function — and that *breaks* discrimination. TypeScript can only narrow the union if you switch on `action.type` and read `action.value` inside each case. Destructure first and you're back to `value` being possibly-undefined everywhere. Restructuring to a plain `switch (action.type)` gets you exhaustiveness checking for free.
+
+**The three React contexts** were all initialized as `createContext({})`, which infers the type `{}` and makes every consumer property access an error. Each needed an explicit type argument describing its real shape.
+
+**The Three.js components** were the longest slog. The device-model renderer alone holds about a dozen `useRef`s for the renderer, scene, cameras, and materials. The pattern that came up over and over: a ref created with no initial value needs an explicit type, and every read of `.current` after that needs a guard or a non-null assertion, because the ref genuinely *is* empty until the effect runs. The duck-typed `object.isMesh` checks inside `scene.traverse` got replaced with real `instanceof Mesh` narrowing, which is both safer and gives you the mesh's properties for free.
+
+**The MDX frontmatter** — the very system rendering this article — got a shared interface:
+
+```ts
+interface PostFrontmatter {
+  title: string;
+  abstract: string;
+  date: string;
+  banner: string;
+  featured: boolean;
+  draft?: boolean;
+}
+```
+
+Passing that as the generic to `bundleMDX<PostFrontmatter>()` means the fields I read downstream are checked, instead of being the untyped `Record<string, unknown>` you get by default.
+
+## What I Deliberately Left as JavaScript
+
+Not everything should be converted, and knowing where to stop matters as much as knowing how to start.
+
+The `scripts/` directory — sitemap generation, Draco decoder copying — stayed CommonJS JavaScript. Those files run directly via `node scripts/x` and are `require`d from inside the webpack config; converting them would mean adding a build step or a loader for zero type-safety benefit in the actual app.
+
+The serverless `functions/` directory was the clearest "leave it alone." It's a separate package deployed by zipping the directory as-is, with a handler pointing at `index.handler`. Rename it to `index.ts` and the deploy ships a Lambda with no `index.js` — which fails not at deploy time but at *invoke* time, when a real request comes in. That's exactly the kind of silent, delayed failure the whole migration was meant to eliminate. Both directories are simply excluded from the `tsconfig`.
+
+## Was It Worth It?
+
+The migration surfaced a handful of latent bugs on its own — a `ResizeObserver` observing a possibly-undefined element, a context value that consumers assumed was always present, a couple of props that were being passed but never actually read. None were on fire. All were the kind of thing that eventually becomes a confusing afternoon.
+
+The real payoff isn't the bugs it found, though. It's that the next feature I build starts from a codebase that tells me when I'm wrong, immediately, in the editor. For a site I'll keep tinkering with for years, that compounding feedback is worth one big diff.
+
+If you're sitting on a JavaScript project and wondering whether it's worth it: convert bottom-up, keep `allowJs` on until the end, diff your build output before and after any routing change, and be honest about which files don't belong in the type system at all. The rest is mostly patience.
