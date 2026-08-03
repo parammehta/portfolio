@@ -1,4 +1,4 @@
-name: Release
+name: Release & Deploy
 
 on:
   push:
@@ -26,13 +26,18 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      # Auto-merge the Release PR so releases ship without manual intervention.
-      # Requires "Allow auto-merge" enabled in repo settings.
-      - name: Auto-merge the Release PR
+      # Merge ONLY the Release PR that release-please just created (targeted by
+      # its exact PR number) so releases ship without manual intervention. No
+      # other PRs are affected, and a direct merge needs no repo-wide
+      # "Allow auto-merge" setting. A PAT is still required so the resulting
+      # merge push RE-TRIGGERS this workflow, letting release-please tag the
+      # release and the deploy job run — merges made with the default
+      # GITHUB_TOKEN never trigger workflows.
+      - name: Merge the Release PR
         if: ${{ steps.release.outputs.prs_created == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-        run: gh pr merge --squash --auto "${{ fromJson(steps.release.outputs.pr).number }}" -R ${{ github.repository }}
+        run: gh pr merge --squash "${{ fromJson(steps.release.outputs.pr).number }}" -R ${{ github.repository }}
 
   deploy:
     needs: release-please
