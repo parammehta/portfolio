@@ -162,10 +162,21 @@
       width: 100%;
       right: -10%;
       bottom: 18%;
+
+      @nest .summary[data-alternate='true'] & {
+        left: auto;
+        right: -10%;
+      }
     }
 
     @media (--mediaMobile) {
-      right: 0;
+      width: 60%;
+      right: 20%;
+
+      @nest .summary[data-alternate='true'] & {
+        left: auto;
+        right: 20%;
+      }
     }
   }
 
@@ -180,6 +191,11 @@
     @media (--mediaTablet) {
       width: 100%;
       bottom: 23%;
+    }
+
+    @media (--mediaMobile) {
+      width: 60%;
+      left: 20%;
     }
   }
 }
