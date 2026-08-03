@@ -160,13 +160,13 @@
 
     @media (--mediaTablet) {
       width: 100%;
-      right: -10%;
-      bottom: 18%;
+      right: 12%;
+      bottom: 26%;
 
       @nest .summary[data-alternate='true'] & {
         left: auto;
-        right: -10%;
-        bottom: 18%;
+        right: 12%;
+        bottom: 26%;
       }
     }
 
@@ -196,7 +196,7 @@
 
     @media (--mediaMobile) {
       width: 80%;
-      left: 10%;
+      right: 24%;
     }
   }
 }
