@@ -32,7 +32,18 @@ export async function generateOgImage(props: OgImageProps): Promise<string> {
   // Puppeteer is ESM-only, so import it dynamically to avoid bundling it into
   // the webpack build (this only runs in getStaticProps at build time).
   const { default: puppeteer } = await import('puppeteer');
-  const browser = await puppeteer.launch({ headless: true });
+  // --no-sandbox is required on CI runners (GitHub Actions), where Chrome's
+  // sandbox cannot start; the dev-shm/gpu flags avoid crashes in that headless
+  // environment. Locally these are harmless no-ops.
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+    ],
+  });
   const page = await browser.newPage();
   await page.setViewport({ width: 1200, height: 630 });
   await page.goto(url, { waitUntil: 'networkidle0' });
