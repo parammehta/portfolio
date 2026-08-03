@@ -5,23 +5,24 @@ import { delay } from 'utils/delay';
 import { classes } from 'utils/style';
 import styles from './DecoderText.module.css';
 
+// Standalone-renderable Devanagari only — no matras/conjuncts (they render
+// broken with a dotted-circle placeholder when shown in isolation).
 // prettier-ignore
 const glyphs = [
-  'ア', 'イ', 'ウ', 'エ', 'オ',
-  'カ', 'キ', 'ク', 'ケ', 'コ',
-  'サ', 'シ', 'ス', 'セ', 'ソ',
-  'タ', 'チ', 'ツ', 'テ', 'ト',
-  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ',
-  'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
-  'マ', 'ミ', 'ム', 'メ', 'モ',
-  'ヤ', 'ユ', 'ヨ', 'ー',
-  'ラ', 'リ', 'ル', 'レ', 'ロ',
-  'ワ', 'ヰ', 'ヱ', 'ヲ', 'ン',
-  'ガ', 'ギ', 'グ', 'ゲ', 'ゴ',
-  'ザ', 'ジ', 'ズ', 'ゼ', 'ゾ',
-  'ダ', 'ヂ', 'ヅ', 'デ', 'ド',
-  'バ', 'ビ', 'ブ', 'ベ', 'ボ',
-  'パ', 'ピ', 'プ', 'ペ', 'ポ',
+  // Independent vowels
+  'अ', 'आ', 'इ', 'ई', 'उ',
+  'ऊ', 'ऋ', 'ए', 'ऐ', 'ओ', 'औ',
+  // Consonants
+  'क', 'ख', 'ग', 'घ', 'ङ',
+  'च', 'छ', 'ज', 'झ', 'ञ',
+  'ट', 'ठ', 'ड', 'ढ', 'ण',
+  'त', 'थ', 'द', 'ध', 'न',
+  'प', 'फ', 'ब', 'भ', 'म',
+  'य', 'र', 'ल', 'व', 'श',
+  'ष', 'स', 'ह', 'ळ',
+  // Devanagari digits
+  '०', '१', '२', '३', '४',
+  '५', '६', '७', '८', '९',
 ];
 
 const CharType = {

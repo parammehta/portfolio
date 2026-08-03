@@ -147,19 +147,19 @@
 
   &[data-device='laptop'] {
     position: absolute;
-    width: 100%;
+    width: 130%;
     right: -36%;
     bottom: 24%;
     transform: translateY(50%);
 
     @nest .summary[data-alternate='true'] & {
       right: auto;
-      left: 0;
-      bottom: 15%;
+      left: -36%;
+      bottom: 24%;
     }
 
     @media (--mediaTablet) {
-      width: 80%;
+      width: 100%;
       right: -10%;
       bottom: 18%;
     }
@@ -173,12 +173,12 @@
     position: absolute;
     bottom: 23%;
     transform: translateY(50%);
-    width: 100%;
+    width: 130%;
 
     /* transition-delay: 800ms; */
 
     @media (--mediaTablet) {
-      width: 80%;
+      width: 100%;
       bottom: 23%;
     }
   }
