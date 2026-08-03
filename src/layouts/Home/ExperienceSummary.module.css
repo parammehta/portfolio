@@ -166,6 +166,7 @@
       @nest .summary[data-alternate='true'] & {
         left: auto;
         right: -10%;
+        bottom: 18%;
       }
     }
 
