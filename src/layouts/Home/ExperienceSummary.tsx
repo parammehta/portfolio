@@ -2,7 +2,7 @@ import { type RefObject, useState } from 'react';
 import { Button, Heading, Section, Text, Transition } from 'components';
 import { deviceModels } from 'components/Model/deviceModels';
 import { useTheme } from 'components/ThemeProvider';
-import projectDevanagari from 'assets/devanagari-project.svg?url';
+import experienceDevanagari from 'assets/devanagari-experience.svg?url';
 import { useWindowSize } from 'hooks';
 import dynamic from 'next/dynamic';
 import { cssProps, media } from 'utils/style';
@@ -72,7 +72,7 @@ export const ExperienceSummary = ({
       className={styles.svg}
       data-device={device}
     >
-      <use href={`${projectDevanagari}#devanagari-project`} />
+      <use href={`${experienceDevanagari}#devanagari-experience`} />
     </svg>
   );
 

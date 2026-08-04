@@ -10,7 +10,7 @@ import { tokens } from 'components/ThemeProvider/theme';
 import { Transition } from 'components/Transition';
 import { useParallax } from 'hooks';
 import { classes, cssProps, msToNum, numToMs } from 'utils/style';
-import styles from './Project.module.css';
+import styles from './Page.module.css';
 
 const initDelay = 300;
 
@@ -19,7 +19,7 @@ interface BreadcrumbItem {
   href: string;
 }
 
-interface ProjectHeaderProps {
+interface PageHeaderProps {
   title: string;
   description: string;
   linkLabel?: string;
@@ -29,7 +29,7 @@ interface ProjectHeaderProps {
   className?: string;
 }
 
-export function ProjectHeader({
+export function PageHeader({
   title,
   description,
   linkLabel = 'Visit website',
@@ -37,7 +37,7 @@ export function ProjectHeader({
   roles,
   breadcrumbs,
   className,
-}: ProjectHeaderProps) {
+}: PageHeaderProps) {
   return (
     <Section className={classes(styles.header, className)} as="section">
       {!!breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
@@ -82,15 +82,15 @@ export function ProjectHeader({
   );
 }
 
-interface ProjectContainerProps extends HTMLAttributes<HTMLElement> {
+interface PageContainerProps extends HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export const ProjectContainer = ({ className, ...rest }: ProjectContainerProps) => (
-  <article className={classes(styles.project, className)} {...rest} />
+export const PageContainer = ({ className, ...rest }: PageContainerProps) => (
+  <article className={classes(styles.page, className)} {...rest} />
 );
 
-interface ProjectSectionProps extends HTMLAttributes<HTMLElement> {
+interface PageSectionProps extends HTMLAttributes<HTMLElement> {
   className?: string;
   light?: boolean;
   padding?: 'both' | 'top' | 'bottom' | 'none';
@@ -100,7 +100,7 @@ interface ProjectSectionProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
 }
 
-export const ProjectSection = forwardRef<HTMLElement, ProjectSectionProps>(
+export const PageSection = forwardRef<HTMLElement, PageSectionProps>(
   (
     {
       className,
@@ -136,13 +136,13 @@ export const ProjectSection = forwardRef<HTMLElement, ProjectSectionProps>(
   )
 );
 
-interface ProjectBackgroundProps {
+interface PageBackgroundProps {
   opacity?: number;
   className?: string;
   [key: string]: unknown;
 }
 
-export const ProjectBackground = ({ opacity = 0.7, className, ...rest }: ProjectBackgroundProps) => {
+export const PageBackground = ({ opacity = 0.7, className, ...rest }: PageBackgroundProps) => {
   const imageRef = useRef<HTMLDivElement>(null);
 
   useParallax(0.6, (value: number) => {
@@ -167,24 +167,24 @@ export const ProjectBackground = ({ opacity = 0.7, className, ...rest }: Project
   );
 };
 
-interface ProjectImageProps {
+interface PageImageProps {
   className?: string;
   alt: string;
   [key: string]: unknown;
 }
 
-export const ProjectImage = ({ className, alt, ...rest }: ProjectImageProps) => (
+export const PageImage = ({ className, alt, ...rest }: PageImageProps) => (
   <div className={classes(styles.image, className)}>
     <Image reveal alt={alt} delay={300} {...rest} />
   </div>
 );
 
-interface ProjectSectionContentProps extends HTMLAttributes<HTMLDivElement> {
+interface PageSectionContentProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   width?: string;
 }
 
-export const ProjectSectionContent = ({ className, width = 'l', ...rest }: ProjectSectionContentProps) => (
+export const PageSectionContent = ({ className, width = 'l', ...rest }: PageSectionContentProps) => (
   <div
     className={classes(styles.sectionContent, className)}
     data-width={width}
@@ -192,14 +192,14 @@ export const ProjectSectionContent = ({ className, width = 'l', ...rest }: Proje
   />
 );
 
-interface ProjectSectionHeadingProps {
+interface PageSectionHeadingProps {
   className?: string;
   level?: number;
   as?: ElementType;
   [key: string]: unknown;
 }
 
-export const ProjectSectionHeading = ({ className, level = 3, as = 'h2', ...rest }: ProjectSectionHeadingProps) => (
+export const PageSectionHeading = ({ className, level = 3, as = 'h2', ...rest }: PageSectionHeadingProps) => (
   <Heading
     className={classes(styles.sectionHeading, className)}
     as={as}
@@ -209,16 +209,16 @@ export const ProjectSectionHeading = ({ className, level = 3, as = 'h2', ...rest
   />
 );
 
-interface ProjectSectionTextProps {
+interface PageSectionTextProps {
   className?: string;
   [key: string]: unknown;
 }
 
-export const ProjectSectionText = ({ className, ...rest }: ProjectSectionTextProps) => (
+export const PageSectionText = ({ className, ...rest }: PageSectionTextProps) => (
   <Text className={classes(styles.sectionText, className)} size="l" as="p" {...rest} />
 );
 
-interface ProjectTextRowProps extends HTMLAttributes<HTMLDivElement> {
+interface PageTextRowProps extends HTMLAttributes<HTMLDivElement> {
   center?: boolean;
   stretch?: boolean;
   justify?: string;
@@ -228,7 +228,7 @@ interface ProjectTextRowProps extends HTMLAttributes<HTMLDivElement> {
   centerMobile?: boolean;
 }
 
-export const ProjectTextRow = ({
+export const PageTextRow = ({
   center,
   stretch,
   justify = 'center',
@@ -237,7 +237,7 @@ export const ProjectTextRow = ({
   className,
   centerMobile,
   ...rest
-}: ProjectTextRowProps) => (
+}: PageTextRowProps) => (
   <div
     className={classes(styles.textRow, className)}
     data-center={center}
@@ -250,13 +250,13 @@ export const ProjectTextRow = ({
   />
 );
 
-interface ProjectSectionColumnsProps extends HTMLAttributes<HTMLDivElement> {
+interface PageSectionColumnsProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   centered?: boolean;
 }
 
-export const ProjectSectionColumns = ({ className, centered, ...rest }: ProjectSectionColumnsProps) => (
-  <ProjectSectionContent
+export const PageSectionColumns = ({ className, centered, ...rest }: PageSectionColumnsProps) => (
+  <PageSectionContent
     className={classes(styles.sectionColumns, className)}
     data-centered={centered}
     {...rest}

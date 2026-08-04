@@ -88,7 +88,7 @@ interface ExperienceContainerProps extends HTMLAttributes<HTMLElement> {
 }
 
 export const ExperienceContainer = ({ className, ...rest }: ExperienceContainerProps) => (
-  <article className={classes(styles.project, className)} {...rest} />
+  <article className={classes(styles.experience, className)} {...rest} />
 );
 
 interface ExperienceSectionProps extends HTMLAttributes<HTMLElement> {
