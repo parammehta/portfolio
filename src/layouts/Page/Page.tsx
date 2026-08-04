@@ -1,6 +1,7 @@
 import { forwardRef, type ElementType, type HTMLAttributes, type ReactNode, useRef } from 'react';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Button } from 'components/Button';
+import { DecoderText } from 'components/DecoderText';
 import { Heading } from 'components/Heading';
 import { Image } from 'components/Image';
 import { Section } from 'components/Section';
@@ -46,7 +47,7 @@ export function PageHeader({
       >
         <div className={styles.details}>
           <Heading className={styles.title} level={2} as="h1">
-            {title}
+            <DecoderText text={title} />
           </Heading>
           <Text className={styles.description} size="xl" as="p">
             {description}

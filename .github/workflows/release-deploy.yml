@@ -1,4 +1,4 @@
-name: Release
+name: Release & Deploy
 
 on:
   push:
@@ -18,8 +18,26 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
+          # A PAT (not the default GITHUB_TOKEN) is required: the auto-merge
+          # below must produce a push that RE-TRIGGERS this workflow so
+          # release-please can tag the release and the deploy job can run.
+          # Merges made with GITHUB_TOKEN never trigger workflows.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      # Merge ONLY the Release PR that release-please just created (targeted by
+      # its exact PR number) so releases ship without manual intervention. No
+      # other PRs are affected, and a direct merge needs no repo-wide
+      # "Allow auto-merge" setting. A PAT is still required so the resulting
+      # merge push RE-TRIGGERS this workflow, letting release-please tag the
+      # release and the deploy job run — merges made with the default
+      # GITHUB_TOKEN never trigger workflows.
+      - name: Merge the Release PR
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: gh pr merge --squash "${{ fromJson(steps.release.outputs.pr).number }}" -R ${{ github.repository }}
 
   deploy:
     needs: release-please

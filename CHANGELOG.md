@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.3.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.2.0...portfolio-v1.3.0) (2026-08-03)
+
+
+### Features
+
+* swap Japanese decor for Devanagari, refresh profile photo ([#8](https://github.com/parammehta/portfolio/issues/8)) ([84bff7e](https://github.com/parammehta/portfolio/commit/84bff7e8e55d8022897a9f4ce212d4cbd21d1616))
+
+## [1.2.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.1...portfolio-v1.2.0) (2026-08-03)
+
+
+### Features
+
+* **ci:** auto-merge release PR + rename workflow to Release & Deploy ([#3](https://github.com/parammehta/portfolio/issues/3)) ([e88a3ed](https://github.com/parammehta/portfolio/commit/e88a3ed6ac2eca902c29dff1f0f02c3c96e095e6))
+
+## [1.1.1](https://github.com/parammehta/portfolio/compare/portfolio-v1.1.0...portfolio-v1.1.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* **ci:** launch puppeteer with --no-sandbox for og-image build ([#4](https://github.com/parammehta/portfolio/issues/4)) ([f84f34d](https://github.com/parammehta/portfolio/commit/f84f34d826ec2b5d518e15d4461c73e1dcf5af05))
+
 ## [1.1.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.0.0...portfolio-v1.1.0) (2026-08-02)
 
 

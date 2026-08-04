@@ -29,7 +29,7 @@ Applied to `:root` via CSS custom properties:
 |---|---|
 | Colors | `--rgbBlack`, `--rgbWhite` |
 | Animation | `--bezierFastoutSlowin`, `--durationXS` through `--durationXL` |
-| Typography | `--fontStack` (Gotham), `--systemFontStack`, `--monoFontStack`, `--japaneseFontStack` |
+| Typography | `--fontStack` (Gotham), `--systemFontStack`, `--monoFontStack`, `--devanagariFontStack` |
 | Font weights | `--fontWeightRegular` (400), `--fontWeightMedium` (500), `--fontWeightBold` (700) |
 | Font sizes | `--fontSizeH0` through `--fontSizeH5`, `--fontSizeBodyXL` through `--fontSizeBodyXS` |
 | Line heights | `--lineHeightTitle`, `--lineHeightBody` |

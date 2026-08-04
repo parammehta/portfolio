@@ -88,7 +88,7 @@ Re-transitions the entire section when theme changes (keyed on `theme.themeId`).
 - Bio paragraphs with inline links
 - "Send me a message" button linking to `/contact`
 - Profile photo with responsive srcSet
-- Decorative katakana SVG
+- Decorative Devanagari SVG
 
 Activates on `visible || focused` for keyboard accessibility.
 

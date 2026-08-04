@@ -59,7 +59,7 @@ Detects language from className (e.g., `language-js`). Renders a language label,
 
 ## DecoderText
 
-Animated text reveal that scrambles through Katakana glyphs before settling on the target text.
+Animated text reveal that scrambles through Devanagari glyphs before settling on the target text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
