@@ -28,8 +28,10 @@ const repoPrompt = `
 |  ___|  /\u005C  /\u005C
 | |      \u005C \u005C \u005C \u005C
 |_|    /\u005C \u005C \u005C \u005C \u005C
-\n\nTaking a peek huh? Check out the source code: https://github.com/parammehta/parammehta.github.io
+\n\nTaking a peek huh? Check out the source code: https://github.com/parammehta/portfolio
 `;
+
+let repoPromptLogged = false;
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [storedTheme] = useLocalStorage('theme', 'dark');
@@ -58,7 +60,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   useEffect(() => {
-    console.info(`${repoPrompt}\n\n`);
+    if (!repoPromptLogged) {
+      repoPromptLogged = true;
+      console.info(`${repoPrompt}\n\n`);
+    }
   }, []);
 
   useEffect(() => {
