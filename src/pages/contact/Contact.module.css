@@ -18,7 +18,7 @@
 /* Own row above the form so it stays put across the form/success states.
    Shares the form's width so it lines up with the heading below it — this page
    centres its column rather than using a page header, so the breadcrumb follows
-   that column. The top offsets still mirror the Project/Experience header. */
+   that column. The top offsets still mirror the page/experience header. */
 .breadcrumbs {
   grid-area: 1 / 1;
   max-width: var(--maxWidthS);

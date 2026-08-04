@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from 'react';
 import { Button, Footer, Meta } from 'components';
 import {
-  ProjectContainer,
-  ProjectHeader,
-  ProjectSection,
-  ProjectSectionContent,
-} from 'layouts/Project';
+  PageContainer,
+  PageHeader,
+  PageSection,
+  PageSectionContent,
+} from 'layouts/Page';
 import { useWindowSize } from 'hooks';
 import { media } from 'utils/style';
 import styles from './Resume.module.css';
@@ -32,8 +32,8 @@ export const Resume = () => {
         title="Resume"
         description="Resume of Param Mehta — senior software engineer specialising in identity, frontend, and AI-native experiences."
       />
-      <ProjectContainer className={styles.resume}>
-        <ProjectHeader
+      <PageContainer className={styles.resume}>
+        <PageHeader
           title="Resume"
           description="Software engineer with 8+ years building identity, frontend, and AI-native experiences."
           breadcrumbs={[
@@ -41,8 +41,8 @@ export const Resume = () => {
             { label: 'Resume', href: '/resume' },
           ]}
         />
-        <ProjectSection padding="none" className={styles.section}>
-          <ProjectSectionContent>
+        <PageSection padding="none" className={styles.section}>
+          <PageSectionContent>
             <div className={styles.actions}>
               <Button
                 secondary
@@ -83,9 +83,9 @@ export const Resume = () => {
                 </div>
               )
             )}
-          </ProjectSectionContent>
-        </ProjectSection>
-      </ProjectContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
       <Footer />
     </>
   );
