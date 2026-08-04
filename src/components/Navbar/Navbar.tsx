@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { Icon, Monogram, tokens, Transition } from 'components';
+import { Icon, Wordmark, tokens, Transition } from 'components';
 import { useTheme } from 'components/ThemeProvider';
 import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
@@ -200,7 +200,7 @@ export const Navbar = () => {
         aria-label="Param Mehta, Developer"
         onClick={handleMobileNavClick}
       >
-        <Monogram highlight />
+        <Wordmark highlight />
       </RouterLink>
       <NavToggle onClick={() => dispatch({ type: 'toggleMenu' })} menuOpen={menuOpen} />
       <nav className={styles.nav}>

@@ -5,7 +5,7 @@ import {
   PageHeader,
   PageSection,
   PageSectionContent,
-} from 'layouts/Page';
+} from 'components/Page';
 import { useWindowSize } from 'hooks';
 import { media } from 'utils/style';
 import styles from './Resume.module.css';

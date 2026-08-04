@@ -29,10 +29,10 @@ Manages form input state with HTML5 constraint validation. Tracks dirty state, s
 
 ---
 
-## useFoucFix
+## usePreventFlash
 
 ```js
-useFoucFix();
+usePreventFlash();
 ```
 
 **Params:** none  
@@ -54,7 +54,7 @@ const { measureFps, fps, isLowFps } = useFps(true);
 
 **Returns:** `{ measureFps: () => void, fps: MutableRefObject<number>, isLowFps: MutableRefObject<boolean> }`
 
-Measures rendering frame rate. Call `measureFps()` inside an animation loop. Samples every 100ms, keeps a 9-entry sliding window, and flags `isLowFps` when all recent samples are below 60 FPS (clears when all exceed 70). Used by `DisplacementSphere` and `Model` for adaptive quality.
+Measures rendering frame rate. Call `measureFps()` inside an animation loop. Samples every 100ms, keeps a 9-entry sliding window, and flags `isLowFps` when all recent samples are below 60 FPS (clears when all exceed 70). Used by `HeroSphere` and `Model` for adaptive quality.
 
 > Not exported from the barrel file — import directly from `hooks/useFps`.
 

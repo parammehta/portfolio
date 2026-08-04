@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Post, postMarkdown } from 'layouts/Post';
+import { Post, postMarkdown } from 'pages/articles/_post';
 import { bundleMDX } from 'mdx-bundler';
 import { getMDXComponent } from 'mdx-bundler/client';
 import type { GetStaticPaths, GetStaticProps } from 'next';

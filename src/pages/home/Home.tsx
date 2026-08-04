@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Footer, Meta } from 'components';
-import { Intro } from 'layouts/Home/Intro';
-import { Profile } from 'layouts/Home/Profile';
-import { SectionHeader } from 'layouts/Home/SectionHeader';
-import { ExperienceGroup } from 'layouts/Home/ExperienceGroup';
-import { ExperienceSummary } from 'layouts/Home/ExperienceSummary';
-import { Skills } from 'layouts/Home/Skills';
+import { Intro } from './Intro';
+import { Profile } from './Profile';
+import { SectionHeader } from './SectionHeader';
+import { ExperienceGroup } from './ExperienceGroup';
+import { ExperienceSummary } from './ExperienceSummary';
+import { Skills } from './Skills';
 import logoWalmart from 'assets/Walmart_Global_Tech_logo.svg?url';
 const logoIntuit = '/logos/logo-intuit.svg';
 const logoRivian = '/logos/logo-rivian.svg';

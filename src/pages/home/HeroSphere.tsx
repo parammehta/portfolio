@@ -21,9 +21,9 @@ import {
 import type { IUniform } from 'three';
 import { media } from 'utils/style';
 import { cleanRenderer, cleanScene, removeLights } from 'utils/three';
-import styles from './DisplacementSphere.module.css';
-import fragShader from './displacementSphereFragment.glsl';
-import vertShader from './displacementSphereVertex.glsl';
+import styles from './HeroSphere.module.css';
+import fragShader from './heroSphere.frag.glsl';
+import vertShader from './heroSphere.vert.glsl';
 
 const springConfig = {
   stiffness: 30,
@@ -31,7 +31,7 @@ const springConfig = {
   mass: 2,
 };
 
-export const DisplacementSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
+export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   const theme = useTheme();
   const { themeId, colorWhite, rgbAccent } = theme as unknown as {
     themeId: string;

@@ -1,20 +1,20 @@
 import { forwardRef, useId, type SVGProps } from 'react';
 import { classes } from 'utils/style';
-import styles from './Monogram.module.css';
+import styles from './Wordmark.module.css';
 
-export interface MonogramProps extends SVGProps<SVGSVGElement> {
+export interface WordmarkProps extends SVGProps<SVGSVGElement> {
   highlight?: boolean;
 }
 
-export const Monogram = forwardRef<SVGSVGElement, MonogramProps>(
+export const Wordmark = forwardRef<SVGSVGElement, WordmarkProps>(
   ({ highlight, className, ...props }, ref) => {
     const id = useId();
-    const clipId = `${id}monogram-clip`;
+    const clipId = `${id}wordmark-clip`;
 
     return (
       <svg
         aria-hidden
-        className={classes(styles.monogram, className)}
+        className={classes(styles.wordmark, className)}
         width="46"
         height="29"
         viewBox="0 0 46 29"

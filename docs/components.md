@@ -57,7 +57,7 @@ Detects language from className (e.g., `language-js`). Renders a language label,
 
 ---
 
-## DecoderText
+## ScrambleReveal
 
 Animated text reveal that scrambles through Devanagari glyphs before settling on the target text.
 
@@ -227,7 +227,7 @@ Device types defined in `deviceModels.js`:
 
 ---
 
-## Monogram
+## Wordmark
 
 SVG logo/monogram with optional highlight.
 

@@ -1,6 +1,6 @@
 .intro {
-  /* The DisplacementSphere canvas is rendered 30% taller than the viewport
-     (see DisplacementSphere.js: height + height * 0.3) and anchored at the top,
+  /* The HeroSphere canvas is rendered 30% taller than the viewport
+     (see HeroSphere.tsx: height + height * 0.3) and anchored at the top,
      so it overflows this 100vh section by 30vh. Reserve that space with
      content-box padding so the Profile section starts below the canvas instead
      of the canvas bleeding onto it — without clipping the canvas or shifting

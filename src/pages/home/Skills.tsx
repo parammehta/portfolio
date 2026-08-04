@@ -1,6 +1,6 @@
 import { type RefObject } from 'react';
 import {
-  DecoderText,
+  ScrambleReveal,
   Heading,
   Link,
   List,
@@ -33,7 +33,7 @@ export const Skills = ({ id, visible, sectionRef }: SkillsProps) => (
             className={styles.title}
             data-visible={transVisible}
           >
-            <DecoderText text="Skills" start={transVisible} delay={300} />
+            <ScrambleReveal text="Skills" start={transVisible} delay={300} />
           </Heading>
 
           <div className={styles.block} data-visible={transVisible}>

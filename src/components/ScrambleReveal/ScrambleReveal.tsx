@@ -3,7 +3,7 @@ import { useReducedMotion, useSpring } from 'framer-motion';
 import { memo, useEffect, useRef } from 'react';
 import { delay } from 'utils/delay';
 import { classes } from 'utils/style';
-import styles from './DecoderText.module.css';
+import styles from './ScrambleReveal.module.css';
 
 // Standalone-renderable Devanagari only — no matras/conjuncts (they render
 // broken with a dotted-circle placeholder when shown in isolation).
@@ -50,7 +50,7 @@ function shuffle(content: string[], output: CharItem[], position: number): CharI
   });
 }
 
-interface DecoderTextProps {
+interface ScrambleRevealProps {
   text: string;
   start?: boolean;
   delay?: number;
@@ -58,8 +58,8 @@ interface DecoderTextProps {
   [key: string]: unknown;
 }
 
-export const DecoderText = memo(
-  ({ text, start = true, delay: startDelay = 0, className, ...rest }: DecoderTextProps) => {
+export const ScrambleReveal = memo(
+  ({ text, start = true, delay: startDelay = 0, className, ...rest }: ScrambleRevealProps) => {
     const output = useRef<CharItem[]>([{ type: CharType.Glyph, value: '' }]);
     const container = useRef<HTMLSpanElement>(null);
     const reduceMotion = useReducedMotion();

@@ -1,5 +1,5 @@
 import { type RefObject } from 'react';
-import { DecoderText, Divider, Heading, Section, Transition } from 'components';
+import { ScrambleReveal, Divider, Heading, Section, Transition } from 'components';
 import styles from './SectionHeader.module.css';
 
 interface SectionHeaderProps {
@@ -34,7 +34,7 @@ export const SectionHeader = ({ id, visible, sectionRef, eyebrow, title }: Secti
             className={styles.title}
             data-visible={transVisible}
           >
-            <DecoderText text={title} start={transVisible} delay={300} />
+            <ScrambleReveal text={title} start={transVisible} delay={300} />
           </Heading>
         </div>
       )}

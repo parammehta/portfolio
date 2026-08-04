@@ -34,10 +34,10 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 
 ```
 src/
-  components/   — reusable UI (Button, Navbar, Image, Model, etc.)
+  components/   — reusable UI (Button, Navbar, Image, Model, Page, etc.)
   hooks/        — custom React hooks
-  layouts/      — page-level layout components (Home, Experience, Post, Project)
-  pages/        — Next.js pages (*.page.js) and their co-located components
+  shell/        — app-wide chrome (global CSS, reducer, ScrollRestore)
+  pages/        — Next.js pages (*.page.js) and co-located route components
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder)

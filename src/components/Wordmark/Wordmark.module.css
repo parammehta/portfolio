@@ -1,4 +1,4 @@
-.monogram {
+.wordmark {
   fill: var(--colorTextTitle);
   transition: fill var(--durationL) ease;
 }
@@ -16,7 +16,7 @@
       opacity 0.1s ease var(--durationM);
   }
 
-  @nest :is(a:focus, a:hover, .monogram:hover) & {
+  @nest :is(a:focus, a:hover, .wordmark:hover) & {
     opacity: 1;
     transform: scale3d(1, 1, 1);
     transform-origin: bottom;

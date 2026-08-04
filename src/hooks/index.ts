@@ -1,6 +1,6 @@
 export * from './useAppContext';
 export * from './useFormInput';
-export * from './useFoucFix';
+export * from './usePreventFlash';
 export * from './useHasMounted';
 export * from './useInterval';
 export * from './useInViewport';

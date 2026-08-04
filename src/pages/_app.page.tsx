@@ -1,5 +1,5 @@
-import 'layouts/App/reset.css';
-import 'layouts/App/global.css';
+import 'shell/reset.css';
+import 'shell/global.css';
 
 import { Navbar } from 'components/Navbar';
 import { ThemeProvider } from 'components/ThemeProvider';
@@ -7,16 +7,16 @@ import { tokens } from 'components/ThemeProvider/theme';
 import { VisuallyHidden } from 'components/VisuallyHidden';
 import * as Fathom from 'fathom-client';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
-import { useFoucFix, useLocalStorage } from 'hooks';
-import styles from 'layouts/App/App.module.css';
-import { initialState, reducer } from 'layouts/App/reducer';
-import type { AppContextValue } from 'layouts/App/types';
+import { usePreventFlash, useLocalStorage } from 'hooks';
+import styles from 'shell/App.module.css';
+import { initialState, reducer } from 'shell/reducer';
+import type { AppContextValue } from 'shell/types';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, createContext, useEffect, useReducer } from 'react';
 import { msToNum } from 'utils/style';
-import { ScrollRestore } from '../layouts/App/ScrollRestore';
+import { ScrollRestore } from '../shell/ScrollRestore';
 
 export const AppContext = createContext<AppContextValue>({
   ...initialState,
@@ -36,7 +36,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { route, events, asPath } = useRouter();
   const canonicalRoute = route === '/' ? '' : `${asPath}`;
-  useFoucFix();
+  usePreventFlash();
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') return;
