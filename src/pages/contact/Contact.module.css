@@ -246,6 +246,7 @@
     transform: translate3d(0, var(--space3XL), 0);
   }
 
+  &[data-status='entering'],
   &[data-status='entered'] {
     transform: none;
     opacity: 1;
@@ -265,6 +266,7 @@
     transform: translate3d(0, var(--space3XL), 0);
   }
 
+  &[data-status='entering'],
   &[data-status='entered'] {
     transform: none;
     opacity: 1;
@@ -284,6 +286,7 @@
     transform: translate3d(0, var(--space3XL), 0);
   }
 
+  &[data-status='entering'],
   &[data-status='entered'] {
     opacity: 1;
 
