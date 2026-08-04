@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/parammehta/portfolio/compare/portfolio-v1.3.0...portfolio-v1.3.1) (2026-08-04)
+
+
+### Bug Fixes
+
+* **contact:** show success view after sending message ([#12](https://github.com/parammehta/portfolio/issues/12)) ([ff4c2a9](https://github.com/parammehta/portfolio/commit/ff4c2a93f90817fa01f296e436724f01e04ac574))
+
 ## [1.3.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.2.0...portfolio-v1.3.0) (2026-08-03)
 
 
