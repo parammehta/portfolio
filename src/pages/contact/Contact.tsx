@@ -228,7 +228,7 @@ export const Contact = () => {
             </form>
           )}
         </Transition>
-        <Transition unmount in={complete}>
+        <Transition unmount in={complete} timeout={msToNum(tokens.base.durationXL)}>
           {(visible: boolean, status: string) => (
             <div className={styles.complete} aria-live="polite">
               <Heading
