@@ -96,7 +96,6 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`.
 - **Static export only** — no `getServerSideProps` or API routes within the Next.js app.
 - **Page transitions** — `AnimatePresence mode="wait"` wraps page components with opacity fade.
 - **Theme flash prevention** — `_document.page.js` injects an inline script that reads localStorage before React hydrates, setting `data-theme` on `<body>` to avoid a flash of the wrong theme.
-- **FOUC fix** — `usePreventFlash` hook works around a Next.js bug where server-rendered stylesheets are removed too early during route transitions.
 
 ## Deployment Targets
 

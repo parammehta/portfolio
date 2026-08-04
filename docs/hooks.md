@@ -29,19 +29,6 @@ Manages form input state with HTML5 constraint validation. Tracks dirty state, s
 
 ---
 
-## usePreventFlash
-
-```js
-usePreventFlash();
-```
-
-**Params:** none  
-**Returns:** nothing (side-effect only)
-
-Workaround for a Next.js FOUC bug during route transitions (GitHub issue #17464). Uses a `MutationObserver` to prevent premature removal of server-rendered stylesheets. Called once in `_app.page.js`.
-
----
-
 ## useFps
 
 ```js

@@ -7,7 +7,7 @@ import { tokens } from 'components/ThemeProvider/theme';
 import { VisuallyHidden } from 'components/VisuallyHidden';
 import * as Fathom from 'fathom-client';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
-import { usePreventFlash, useLocalStorage } from 'hooks';
+import { useLocalStorage } from 'hooks';
 import styles from 'shell/App.module.css';
 import { initialState, reducer } from 'shell/reducer';
 import type { AppContextValue } from 'shell/types';
@@ -38,7 +38,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { route, events, asPath } = useRouter();
   const canonicalRoute = route === '/' ? '' : `${asPath}`;
-  usePreventFlash();
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') return;
