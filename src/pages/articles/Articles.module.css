@@ -13,7 +13,7 @@
 }
 
 .grid {
-  /* Mirrors the Project/Experience header top offset so Articles starts at the
+  /* Mirrors the page/experience header top offset so Articles starts at the
      same height as every other page. Owned here rather than on .header so both
      columns shift together. */
   --verticalPadding: calc(var(--space5XL) + var(--space3XL));

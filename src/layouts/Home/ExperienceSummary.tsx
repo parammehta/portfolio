@@ -2,7 +2,7 @@ import { type RefObject, useState } from 'react';
 import { Button, Heading, Section, Text, Transition } from 'components';
 import { deviceModels } from 'components/Model/deviceModels';
 import { useTheme } from 'components/ThemeProvider';
-import projectKatakana from 'assets/katakana-project.svg?url';
+import experienceDevanagari from 'assets/devanagari-experience.svg?url';
 import { useWindowSize } from 'hooks';
 import dynamic from 'next/dynamic';
 import { cssProps, media } from 'utils/style';
@@ -60,19 +60,19 @@ export const ExperienceSummary = ({
   const laptopSizes = `(max-width: ${media.tablet}px) 80vw, 40vw`;
   const descriptionArr = description.split('. ');
 
-  const renderKatakana = (device: string, visible: boolean) => (
+  const renderDevanagari = (device: string, visible: boolean) => (
     <svg
       aria-hidden="true"
-      width="750"
-      height="137"
-      viewBox="0 0 750 137"
+      width="900"
+      height="240"
+      viewBox="0 0 900 240"
       data-visible={visible}
       data-light={theme.themeId === 'light'}
       style={cssProps({ opacity: svgOpacity })}
       className={styles.svg}
       data-device={device}
     >
-      <use href={`${projectKatakana}#katakana-project`} />
+      <use href={`${experienceDevanagari}#devanagari-experience`} />
     </svg>
   );
 
@@ -109,7 +109,7 @@ export const ExperienceSummary = ({
     <div className={styles.preview}>
       {model.type === 'laptop' && (
         <>
-          {renderKatakana('laptop', visible)}
+          {renderDevanagari('laptop', visible)}
           <div className={styles.model} data-device="laptop">
             <Model
               alt={model.alt}
@@ -131,7 +131,7 @@ export const ExperienceSummary = ({
       )}
       {model.type === 'phone' && (
         <>
-          {renderKatakana('phone', visible)}
+          {renderDevanagari('phone', visible)}
           <div className={styles.model} data-device="phone">
             <Model
               alt={model.alt}

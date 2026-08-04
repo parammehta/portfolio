@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Breadcrumbs } from 'components/Breadcrumbs';
-import { ProjectHeader } from 'layouts/Project';
+import { PageHeader } from 'layouts/Page';
 import { StoryContainer } from '../../../.storybook/StoryContainer';
 
 const meta: Meta<typeof Breadcrumbs> = {
@@ -41,7 +41,7 @@ export const ThreeLevel: Story = {
 
 export const InPageHeader: Story = {
   render: () => (
-    <ProjectHeader
+    <PageHeader
       title="Resume"
       description="Software engineer with 8+ years building identity, frontend, and AI-native experiences."
       breadcrumbs={[
