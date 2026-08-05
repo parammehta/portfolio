@@ -7,11 +7,11 @@ import { useFps } from 'hooks/useFps';
 import {
   AmbientLight,
   DirectionalLight,
+  IcosahedronGeometry,
   Mesh,
   MeshPhongMaterial,
   PerspectiveCamera,
   Scene,
-  SphereGeometry,
   LinearSRGBColorSpace,
   UniformsUtils,
   Vector2,
@@ -23,7 +23,14 @@ import { media } from 'utils/style';
 import { cleanRenderer, cleanScene, removeLights } from 'utils/three';
 import styles from './HeroSphere.module.css';
 import fragShader from './heroSphere.frag.glsl';
-import vertShader from './heroSphere.vert.glsl';
+
+const RADIUS = 32;
+const OVERHANG = 0.2;
+// Mobile: sphere radius as a multiple of viewport height, and how far down the
+// viewport its lowest point reaches. Radius > coverage keeps the equator off
+// the top of the screen so only the lower dome is visible.
+const MOBILE_DOME_RADIUS = 0.7;
+const MOBILE_DOME_COVERAGE = 0.62;
 
 const springConfig = {
   stiffness: 30,
@@ -48,8 +55,10 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   const lights = useRef<(DirectionalLight | AmbientLight)[]>(null!);
   const uniforms = useRef<Record<string, IUniform>>(null!);
   const material = useRef<MeshPhongMaterial>(null!);
-  const geometry = useRef<SphereGeometry>(null!);
-  const sphere = useRef<Mesh>(null!);
+  const geometry = useRef<IcosahedronGeometry>(null!);
+  const polyhedron = useRef<Mesh>(null!);
+  const baseScale = useRef(1);
+  const baseRotationY = useRef(0);
   const reduceMotion = useReducedMotion();
   const isInViewport = useInViewport(canvasRef);
   const windowSize = useWindowSize();
@@ -62,13 +71,13 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     mouse.current = new Vector2(0.8, 0.5);
     renderer.current = new WebGLRenderer({
       canvas: canvasRef.current!,
-      antialias: false,
+      antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
       failIfMajorPerformanceCaveat: true,
     });
     renderer.current.setSize(innerWidth, innerHeight);
-    renderer.current.setPixelRatio(1);
+    renderer.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.current.outputColorSpace = LinearSRGBColorSpace;
 
     camera.current = new PerspectiveCamera(54, innerWidth / innerHeight, 0.1, 100);
@@ -76,26 +85,23 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
 
     scene.current = new Scene();
 
-    material.current = new MeshPhongMaterial();
+    material.current = new MeshPhongMaterial({ flatShading: true, shininess: 40 });
     material.current.onBeforeCompile = shader => {
       const [r, g, b] = (rgbAccent ?? '251 146 60').split(' ').map(v => parseInt(v) / 255);
       uniforms.current = UniformsUtils.merge([
         shader.uniforms,
-        { time: { value: 0 } },
         { accentColor: { value: new Vector3(r, g, b) } },
       ]);
 
       shader.uniforms = uniforms.current;
-      shader.vertexShader = vertShader;
       shader.fragmentShader = fragShader;
     };
 
     startTransition(() => {
-      geometry.current = new SphereGeometry(32, 128, 128);
-      sphere.current = new Mesh(geometry.current, material.current!);
-      sphere.current.position.z = 0;
-      (sphere.current as Mesh & { modifier: number }).modifier = Math.random();
-      scene.current!.add(sphere.current);
+      geometry.current = new IcosahedronGeometry(RADIUS, 1);
+      polyhedron.current = new Mesh(geometry.current, material.current!);
+      polyhedron.current.position.z = 0;
+      scene.current!.add(polyhedron.current);
     });
 
     return () => {
@@ -106,8 +112,8 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   }, []);
 
   useEffect(() => {
-    const dirLight = new DirectionalLight(colorWhite, themeId === 'light' ? 1.8 : 2.0);
-    const ambientLight = new AmbientLight(colorWhite, themeId === 'light' ? 2.7 : 1.2);
+    const dirLight = new DirectionalLight(colorWhite, themeId === 'light' ? 1.6 : 2.0);
+    const ambientLight = new AmbientLight(colorWhite, themeId === 'light' ? 2.0 : 1.6);
 
     dirLight.position.z = 200;
     dirLight.position.x = 100;
@@ -135,19 +141,41 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     camera.current!.aspect = width / adjustedHeight;
     camera.current!.updateProjectionMatrix();
 
-    if (reduceMotion) {
-      renderer.current!.render(scene.current!, camera.current!);
+    // Position half off the right edge at every aspect ratio
+    const vFov = (camera.current!.fov * Math.PI) / 180;
+    const visibleHeight = 2 * Math.tan(vFov / 2) * camera.current!.position.z;
+    const visibleWidth = visibleHeight * camera.current!.aspect;
+
+    // The canvas is rendered 30% taller than the viewport and top-aligned, so
+    // only this much of `visibleHeight` actually falls inside the viewport.
+    const viewportWorldHeight = visibleHeight / 1.3;
+
+    let scale = 1;
+    if (width <= media.mobile) {
+      // Big enough that the equator sits above the viewport and the sides
+      // bleed off — only the lower dome of the sphere is ever on screen.
+      scale = (viewportWorldHeight * MOBILE_DOME_RADIUS) / RADIUS;
+    } else if (width <= media.tablet) {
+      scale = 0.5;
+    }
+    baseScale.current = scale;
+    polyhedron.current!.scale.setScalar(scale);
+
+    const effectiveRadius = RADIUS * scale;
+    if (width <= media.mobile) {
+      // Centre horizontally, and sink the sphere so its lowest point lands at
+      // the vertical midpoint of the viewport — a dome covering the top half.
+      polyhedron.current!.position.x = 0;
+      polyhedron.current!.position.y =
+        visibleHeight / 2 - viewportWorldHeight * MOBILE_DOME_COVERAGE + effectiveRadius;
+    } else {
+      // Anchor to the top-right corner, cropped by both edges.
+      polyhedron.current!.position.x = visibleWidth / 2 - effectiveRadius * OVERHANG;
+      polyhedron.current!.position.y = visibleHeight / 2 - effectiveRadius * OVERHANG;
     }
 
-    if (width <= media.mobile) {
-      sphere.current!.position.x = 14;
-      sphere.current!.position.y = 10;
-    } else if (width <= media.tablet) {
-      sphere.current!.position.x = 18;
-      sphere.current!.position.y = 14;
-    } else {
-      sphere.current!.position.x = 22;
-      sphere.current!.position.y = 16;
+    if (reduceMotion) {
+      renderer.current!.render(scene.current!, camera.current!);
     }
   }, [reduceMotion, windowSize]);
 
@@ -158,8 +186,8 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
         y: event.clientY / window.innerHeight,
       };
 
-      rotationX.set(position.y / 2);
-      rotationY.set(position.x / 2);
+      rotationX.set(position.y / 4);
+      rotationY.set(position.x / 4);
     };
 
     if (!reduceMotion && isInViewport) {
@@ -177,13 +205,16 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     const animate = () => {
       animation = requestAnimationFrame(animate);
 
-      if (uniforms.current !== undefined) {
-        uniforms.current!.time.value = 0.00005 * (Date.now() - start.current);
-      }
+      const t = 0.001 * (Date.now() - start.current);
 
-      sphere.current!.rotation.z += 0.001;
-      sphere.current!.rotation.x = rotationX.get();
-      sphere.current!.rotation.y = rotationY.get();
+      baseRotationY.current += 0.0015;
+      polyhedron.current!.rotation.y = baseRotationY.current + rotationY.get();
+      polyhedron.current!.rotation.z += 0.0004;
+      polyhedron.current!.rotation.x = rotationX.get();
+
+      // Gentle breathing
+      const s = baseScale.current * (1 + 0.02 * Math.sin(t * 0.7));
+      polyhedron.current!.scale.setScalar(s);
 
       renderer.current!.render(scene.current!, camera.current!);
 
@@ -192,7 +223,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
       if (isLowFps.current) {
         renderer.current!.setPixelRatio(0.5);
       } else {
-        renderer.current!.setPixelRatio(1);
+        renderer.current!.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       }
     };
 
