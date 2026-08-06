@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.3.1...portfolio-v1.4.0) (2026-08-06)
+
+
+### Features
+
+* diverge project skeleton from template ([#14](https://github.com/parammehta/portfolio/issues/14)) ([167a9ee](https://github.com/parammehta/portfolio/commit/167a9ee918e91293e459ff8be2ea5c3778d3f712))
+
+
+### Bug Fixes
+
+* add build message to readme ([f1275db](https://github.com/parammehta/portfolio/commit/f1275db17c777b9e7f6a222dde6c5641f7018196))
+
 ## [1.3.1](https://github.com/parammehta/portfolio/compare/portfolio-v1.3.0...portfolio-v1.3.1) (2026-08-04)
 
 
