@@ -121,6 +121,8 @@ All commits use [Conventional Commits](https://www.conventionalcommits.org/):
 
 Optional scope in parens: `feat(navbar):`, `fix(contact):`. Keep the subject line under 72 characters, lowercase, no trailing period.
 
+**PR titles must use only `feat:`, `fix:`, or `chore:`** — those three cover everything that lands on `main`. Anything else (`docs:`, `style:`, `refactor:`, `test:`) is fine on individual commits inside the branch, but the PR title (which becomes the squash-merge commit and drives release-please's version bump + changelog entry) has to be one of the three. Use `chore:` as the catch-all for any change that isn't a user-visible feature or bug fix.
+
 These commit types also drive automated versioning and changelog generation — see [Releases](#releases).
 
 ## Guidelines for changes
