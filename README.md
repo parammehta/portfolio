@@ -49,5 +49,5 @@ CLOUDFLARE_TURNSTILE_SECRET=<your-secret> npm run deploy
 
 ## Notes
 
-- The rotating background sphere on the homepage is a Three.js shader; its color comes from the fragment shader in `src/layouts/Home/displacementSphereFragment.glsl`.
+- The rotating background sphere on the homepage is a Three.js shader; its color comes from the fragment shader in `src/pages/home/heroSphere.frag.glsl`.
 - The contact form is wired up to an AWS Lambda function in `functions/`; see `functions/serverless.yml` for its configuration.

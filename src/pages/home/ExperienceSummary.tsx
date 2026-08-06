@@ -55,7 +55,7 @@ export const ExperienceSummary = ({
   const { width } = useWindowSize();
   const titleId = `${id}-title`;
   const isMobile = width <= media.tablet;
-  const svgOpacity = theme.themeId === 'light' ? 0.7 : 1;
+  const svgOpacity = theme.themeId === 'light' ? 0.7 : 0.18;
   const phoneSizes = `(max-width: ${media.tablet}px) 30vw, 20vw`;
   const laptopSizes = `(max-width: ${media.tablet}px) 80vw, 40vw`;
   const descriptionArr = description.split('. ');

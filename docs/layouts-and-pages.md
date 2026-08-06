@@ -2,11 +2,11 @@
 
 ## Layout System
 
-Layouts in `src/layouts/` are page-level shells that compose components into full pages. Pages in `src/pages/` are thin entry points that render layouts.
+Route-specific components in `src/pages/` are page-level shells that compose components into full pages. Pages in `src/pages/` are thin entry points that render layouts.
 
 ```
 src/pages/index.page.js
-    └── src/layouts/Home/Home.js
+    └── src/pages/home/Home.js
             ├── Intro
             ├── Profile
             ├── ExperienceGroup (x3)
@@ -17,7 +17,7 @@ src/pages/index.page.js
 
 ---
 
-## App Shell (`src/layouts/App/`)
+## App Shell (`src/shell/`)
 
 ### _app.page.js
 
@@ -53,7 +53,7 @@ Custom Next.js Document. Sets up:
 
 ---
 
-## Home Page (`src/layouts/Home/`)
+## Home Page (`src/pages/home/`)
 
 ### Home.js
 
@@ -74,8 +74,8 @@ All experience content is declared inline in JSX props.
 ### Intro.js
 
 Hero section with:
-- `DisplacementSphere` (dynamically imported 3D background)
-- "Param Mehta" rendered with `DecoderText`
+- `HeroSphere` (dynamically imported 3D background)
+- "Param Mehta" rendered with `ScrambleReveal`
 - Rotating discipline words ("Leader", "Mentor", "Full-Stack", "Coffee") cycling every 5s via `useInterval`
 - Scroll indicator pointing to `/#profile`
 
@@ -84,7 +84,7 @@ Re-transitions the entire section when theme changes (keyed on `theme.themeId`).
 ### Profile.js
 
 "About Me" section with:
-- "Hi there" heading with `DecoderText`
+- "Hi there" heading with `ScrambleReveal`
 - Bio paragraphs with inline links
 - "Send me a message" button linking to `/contact`
 - Profile photo with responsive srcSet
@@ -108,7 +108,7 @@ Individual role card with:
 - Preview column: dynamically imported 3D device `Model` with screen textures
 - `alternate` prop flips the column order
 
-### DisplacementSphere.js
+### HeroSphere.js
 
 WebGL animated sphere using raw Three.js (no React Three Fiber):
 - `SphereGeometry` (32 radius, 128x128 segments)
@@ -120,18 +120,18 @@ WebGL animated sphere using raw Three.js (no React Three Fiber):
 
 ### SectionHeader.js
 
-Standalone section header with optional eyebrow tag (Divider + label) and `DecoderText` heading.
+Standalone section header with optional eyebrow tag (Divider + label) and `ScrambleReveal` heading.
 
 ### Skills.js
 
 Pure presentational section with:
-- "Skills" heading with `DecoderText`
+- "Skills" heading with `ScrambleReveal`
 - Tech table (Languages, Frameworks, Infrastructure, Domains, Soft Skills)
 - Development tools list with external links
 
 ---
 
-## Experience Detail (`src/layouts/Experience/`)
+## Experience Detail (`src/pages/experience/_shared/`)
 
 ### Experience.js
 
@@ -167,7 +167,7 @@ These are content-heavy, stateless components composing the Experience layout bu
 
 ---
 
-## Project Detail (`src/layouts/Project/`)
+## Project Detail (`src/components/Page/`)
 
 ### Project.js
 
@@ -175,7 +175,7 @@ Identical composable system to Experience.js but with `Project`-prefixed exports
 
 ---
 
-## Blog (`src/layouts/Post/`)
+## Blog (`src/pages/articles/_post/`)
 
 ### Post.js
 

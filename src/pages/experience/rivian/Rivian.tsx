@@ -18,7 +18,7 @@ import {
   ExperienceSectionHeading,
   ExperienceSectionText,
   ExperienceTextRow,
-} from 'layouts/Experience';
+} from 'pages/experience/_shared';
 import { Fragment } from 'react';
 import { media } from 'utils/style';
 import styles from './Rivian.module.css';

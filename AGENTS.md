@@ -17,7 +17,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 
 ## Node version
 
-**Node 24.12.0** is required (see `.nvmrc`). The shell default may be v16 — always ensure the correct version is on PATH before running any tooling. In Claude Code launch configs, the full nvm path is already set.
+**Node 24.12.0** is required (see `.nvmrc`). The shell default may be v16 — always ensure the correct version is on PATH before running any tooling. In Codex launch configs, the full nvm path is already set.
 
 ## Architecture
 
@@ -34,10 +34,10 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 
 ```
 src/
-  components/   — reusable UI (Button, Navbar, Image, Model, Page, etc.)
+  components/   — reusable UI (Button, Navbar, Image, Model, etc.)
   hooks/        — custom React hooks
-  shell/        — app-wide chrome (global CSS, reducer, ScrollRestore)
-  pages/        — Next.js pages (*.page.js) and co-located route components
+  layouts/      — page-level layout components (Home, Experience, Post, Project)
+  pages/        — Next.js pages (*.page.js) and their co-located components
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder)

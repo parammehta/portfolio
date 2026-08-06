@@ -84,6 +84,7 @@
   aspect-ratio: var(--aspectRatio);
   display: grid;
   position: relative;
+  z-index: 1;
 
   &[data-device='laptop'] {
     top: 6%;

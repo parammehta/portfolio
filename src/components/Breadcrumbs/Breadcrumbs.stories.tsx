@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Breadcrumbs } from 'components/Breadcrumbs';
-import { PageHeader } from 'layouts/Page';
+import { PageHeader } from 'components/Page';
 import { StoryContainer } from '../../../.storybook/StoryContainer';
 
 const meta: Meta<typeof Breadcrumbs> = {

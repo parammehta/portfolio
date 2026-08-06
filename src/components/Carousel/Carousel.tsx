@@ -20,8 +20,8 @@ import { resolveSrcFromSrcSet } from 'utils/image';
 import { cssProps } from 'utils/style';
 import { cleanRenderer, cleanScene, textureLoader } from 'utils/three';
 import styles from './Carousel.module.css';
-import fragment from './carouselFragment.glsl';
-import vertex from './carouselVertex.glsl';
+import fragment from './carousel.frag.glsl';
+import vertex from './carousel.vert.glsl';
 
 interface CarouselImage {
   src?: { src: string };

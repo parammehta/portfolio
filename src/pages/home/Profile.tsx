@@ -1,7 +1,7 @@
 import { Fragment, type RefObject, useState } from 'react';
 import {
   Button,
-  DecoderText,
+  ScrambleReveal,
   Divider,
   Heading,
   Image,
@@ -25,7 +25,7 @@ interface ProfileTextProps {
 const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
   <Fragment>
     <Heading className={styles.title} data-visible={visible} level={3} id={titleId}>
-      <DecoderText text="Hi there" start={visible} delay={500} />
+      <ScrambleReveal text="Hi there" start={visible} delay={500} />
     </Heading>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
       I&apos;m Param, a software engineer with 8+ years at the intersection of

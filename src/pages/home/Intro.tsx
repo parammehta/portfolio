@@ -1,6 +1,6 @@
 import { Fragment, type MouseEvent, type RefObject, useEffect, useState } from 'react';
 import ArrowDown from 'assets/arrow-down.svg';
-import { DecoderText, Heading, Section, Transition, VisuallyHidden } from 'components';
+import { ScrambleReveal, Heading, Section, Transition, VisuallyHidden } from 'components';
 import { tokens, useTheme } from 'components/ThemeProvider';
 import { AnimatePresence } from 'framer-motion';
 import { useInterval, usePrevious, useScrollToHash } from 'hooks';
@@ -9,8 +9,9 @@ import RouterLink from 'next/link';
 import { cssProps } from 'utils/style';
 import styles from './Intro.module.css';
 
-const DisplacementSphere = dynamic(() =>
-  import('layouts/Home/DisplacementSphere').then(mod => mod.DisplacementSphere)
+const HeroSphere = dynamic(
+  () => import('./HeroSphere').then(mod => mod.HeroSphere),
+  { ssr: false }
 );
 
 interface IntroProps {
@@ -65,10 +66,10 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
       <Transition in key={theme.themeId} timeout={3000}>
         {(visible: boolean, status: string) => (
           <Fragment>
-            <DisplacementSphere />
+            <HeroSphere />
             <header className={styles.text}>
               <h1 className={styles.name} data-visible={visible} id={titleId}>
-                <DecoderText text="Param Mehta" delay={300} />
+                <ScrambleReveal text="Param Mehta" delay={300} />
               </h1>
               <Heading level={1} as="h2" className={styles.title}>
                 <VisuallyHidden className={styles.label}>

@@ -30,8 +30,8 @@
       "utils/*": [
         "utils/*"
       ],
-      "layouts/*": [
-        "layouts/*"
+      "shell/*": [
+        "shell/*"
       ],
       "assets/*": [
         "assets/*"

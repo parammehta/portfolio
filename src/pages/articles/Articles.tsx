@@ -2,7 +2,7 @@ import Barcode from 'assets/barcode.svg';
 import {
   Breadcrumbs,
   Button,
-  DecoderText,
+  ScrambleReveal,
   Divider,
   Footer,
   Heading,
@@ -183,7 +183,7 @@ export const Articles = ({ posts, featured }: ArticlesProps) => {
         ]}
       />
       <Heading className={styles.heading} level={5} as="h1">
-        <DecoderText text="Latest articles" />
+        <ScrambleReveal text="Latest articles" />
       </Heading>
       <Barcode />
     </header>

@@ -3,7 +3,7 @@ import Script from 'next/script';
 import {
   Breadcrumbs,
   Button,
-  DecoderText,
+  ScrambleReveal,
   Divider,
   Footer,
   Heading,
@@ -150,7 +150,7 @@ export const Contact = () => {
                 as="h1"
                 style={getDelay(tokens.base.durationXS, initDelay, 0.3)}
               >
-                <DecoderText text="Say hello" start={status !== 'exited'} delay={300} />
+                <ScrambleReveal text="Say hello" start={status !== 'exited'} delay={300} />
               </Heading>
               <Divider
                 className={styles.divider}

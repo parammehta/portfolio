@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { DecoderText } from 'components/DecoderText';
+import { ScrambleReveal } from 'components/ScrambleReveal';
 import { Heading } from 'components/Heading';
 import { StoryContainer } from '../../../.storybook/StoryContainer';
 
 const meta = {
-  title: 'DecoderText',
-  component: DecoderText,
+  title: 'ScrambleReveal',
+  component: ScrambleReveal,
   tags: ['autodocs'],
   args: {
     text: 'Slick cyberpunk text',
   },
-} satisfies Meta<typeof DecoderText>;
+} satisfies Meta<typeof ScrambleReveal>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -19,7 +19,7 @@ export const Default: Story = {
   render: ({ text }) => (
     <StoryContainer>
       <Heading level={3}>
-        <DecoderText delay={0} text={text} />
+        <ScrambleReveal delay={0} text={text} />
       </Heading>
     </StoryContainer>
   ),

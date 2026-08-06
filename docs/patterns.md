@@ -144,8 +144,8 @@ All use `forwardRef` for ref forwarding.
 Three.js components are code-split with `next/dynamic`:
 
 ```jsx
-const DisplacementSphere = dynamic(() =>
-  import('layouts/Home/DisplacementSphere').then(mod => mod.DisplacementSphere)
+const HeroSphere = dynamic(() =>
+  import('./HeroSphere').then(mod => mod.HeroSphere)
 );
 
 const Model = dynamic(() =>
@@ -161,8 +161,8 @@ This keeps the initial bundle small since Three.js and 3D models are only loaded
 
 Every animated component checks `useReducedMotion()` from Framer Motion:
 
-- **DecoderText** — skips scramble animation, shows final text immediately
-- **DisplacementSphere** — renders a single static frame instead of animating
+- **ScrambleReveal** — skips scramble animation, shows final text immediately
+- **HeroSphere** — renders a single static frame instead of animating
 - **Carousel** — disables displacement transitions
 - **Model** — skips entry animations, sets positions directly
 - **Loader** — shows text instead of animated dots
@@ -187,7 +187,7 @@ function animate() {
 }
 ```
 
-Used by `DisplacementSphere` and `Model` to maintain smooth performance on lower-end devices.
+Used by `HeroSphere` and `Model` to maintain smooth performance on lower-end devices.
 
 ---
 

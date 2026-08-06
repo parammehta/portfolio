@@ -1,19 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Monogram } from 'components/Monogram';
+import { Wordmark } from 'components/Wordmark';
 import { StoryContainer } from '../../../.storybook/StoryContainer';
 
-const meta: Meta<typeof Monogram> = {
-  title: 'Monogram',
-  component: Monogram,
+const meta: Meta<typeof Wordmark> = {
+  title: 'Wordmark',
+  component: Wordmark,
   tags: ['autodocs'],
 };
 export default meta;
-type Story = StoryObj<typeof Monogram>;
+type Story = StoryObj<typeof Wordmark>;
 
 export const Default: Story = {
   render: () => (
     <StoryContainer>
-      <Monogram highlight />
+      <Wordmark highlight />
     </StoryContainer>
   ),
 };
@@ -21,7 +21,7 @@ export const Default: Story = {
 export const NoHighlight: Story = {
   render: () => (
     <StoryContainer>
-      <Monogram />
+      <Wordmark />
     </StoryContainer>
   ),
 };

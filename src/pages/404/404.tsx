@@ -1,6 +1,6 @@
 import notFoundPoster from 'assets/notfound.jpg';
 import notFoundVideo from 'assets/notfound.mp4';
-import { Button, DecoderText, Heading, Meta, Text, Transition } from 'components';
+import { Button, ScrambleReveal, Heading, Meta, Text, Transition } from 'components';
 import { Fragment } from 'react';
 import styles from './404.module.css';
 
@@ -31,7 +31,7 @@ export function Page404() {
                   as="h2"
                   level={3}
                 >
-                  <DecoderText text="Error: Redacted" start={visible} delay={300} />
+                  <ScrambleReveal text="Error: Redacted" start={visible} delay={300} />
                 </Heading>
                 <Text className={styles.description} data-visible={visible} as="p">
                   This page could not be found. It either doesn’t exist or was deleted. Or
