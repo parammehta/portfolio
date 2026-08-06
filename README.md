@@ -1,3 +1,5 @@
+[![Release & Deploy](https://github.com/parammehta/portfolio/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/parammehta/portfolio/actions/workflows/release-deploy.yml)
+
 # Param Mehta — Portfolio
 
 [![Site preview](/public/site-preview.png)](https://parammehta.com)
