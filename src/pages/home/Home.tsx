@@ -95,7 +95,7 @@ export const Home = () => {
   return (
     <div className={styles.home}>
       <Meta
-        title="Developer + Lead"
+        title="Developer + Leader"
         description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences at Intuit."
       />
       <Intro

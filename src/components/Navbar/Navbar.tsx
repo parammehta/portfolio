@@ -282,6 +282,7 @@ const NavbarIcons = ({ desktop }: { desktop?: boolean }) => (
         data-navbar-item={desktop || undefined}
         className={styles.navIconLink}
         aria-label={label}
+        title={label}
         href={url}
         target="_blank"
         rel="noopener noreferrer"

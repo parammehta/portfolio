@@ -53,6 +53,13 @@
   flex-direction: row-reverse;
   position: relative;
   top: calc(var(--spaceM) * -1);
+
+  /* Rotated content can visually overflow into the icons/toggle below on
+     short desktop viewports (transform doesn't affect layout). Tighten the
+     link spacing so the whole rail comfortably fits above ~700px height. */
+  @media (max-height: 820px) {
+    top: 0;
+  }
 }
 
 .navGroup {
@@ -71,6 +78,11 @@
   line-height: 1;
   display: inline-flex;
   align-items: center;
+
+  @media (max-height: 820px) {
+    padding: var(--spaceS) var(--spaceM);
+    font-size: calc((14 / 16) * 1rem);
+  }
 
   &:hover,
   &:active,
@@ -337,10 +349,15 @@
 }
 
 .mobileNavSubLink {
-  --headerNavFontSize: calc((16 / 16) * 1rem);
+  /* Sublinks stay centered like their parent; smaller/lighter type and tighter
+     spacing (vs. the top-level items' spaceL padding) do the grouping work. */
+  --headerNavFontSize: calc((14 / 16) * 1rem);
 
-  color: var(--colorTextLight);
-  padding: var(--spaceXS) var(--spaceL);
+  color: rgb(var(--rgbText) / 0.5);
+  padding: 2px var(--spaceL);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: var(--fontWeightRegular);
 
   &::after {
     right: calc(var(--space3XL) * 1.6);
