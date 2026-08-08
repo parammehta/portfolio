@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.4.0...portfolio-v1.5.0) (2026-08-08)
+
+
+### Features
+
+* add interactive architecture diagram and anatomy article ([#16](https://github.com/parammehta/portfolio/issues/16)) ([ba05b22](https://github.com/parammehta/portfolio/commit/ba05b22cd68bb002f9902d2f51b8b4456f370a1d))
+
 ## [1.4.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.3.1...portfolio-v1.4.0) (2026-08-06)
 
 
