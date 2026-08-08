@@ -1,5 +1,5 @@
 import { Children, type ComponentType, type HTMLAttributes, type ImgHTMLAttributes, type ReactNode } from 'react';
-import { Code, Heading, Icon, Link, List, ListItem, Text } from 'components';
+import { ArchitectureDiagram, Code, Heading, Icon, Link, List, ListItem, Text } from 'components';
 import styles from './PostMarkdown.module.css';
 
 interface PostHeadingLinkProps {
@@ -141,6 +141,14 @@ const Embed = ({ src }: EmbedProps) => {
   );
 };
 
+// Breaks out of the article's fixed content column so the diagram can use its
+// full natural width. `postBreakout` is a global class targeted from Post.module.css.
+const PostArchitectureDiagram = () => (
+  <div className="postBreakout">
+    <ArchitectureDiagram />
+  </div>
+);
+
 // MDX maps each tag to a component that receives that tag's own props.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const postMarkdown: Record<string, ComponentType<any>> = {
@@ -160,4 +168,5 @@ export const postMarkdown: Record<string, ComponentType<any>> = {
   img: PostImage,
   strong: PostStrong,
   Embed,
+  ArchitectureDiagram: PostArchitectureDiagram,
 };

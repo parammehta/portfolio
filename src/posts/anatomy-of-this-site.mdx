@@ -1,0 +1,145 @@
+---
+title: 'Anatomy of this site: from a commit to your browser to my inbox'
+abstract: A hop-by-hop tour of how this site actually runs — the three paths that matter. How a page reaches your browser, what happens when you submit the contact form, and how a single git push ships itself to production.
+date: '2026-08-06'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+I've already written about [why this site is static](/articles/static-first-architecture) — S3, CloudFront, no server on the request path. This is the companion piece: not _why_, but _exactly how it's wired_, service by service.
+
+There's really only one set of infrastructure here, but three different journeys run across it. Follow any one of them end to end and the whole system makes sense:
+
+1. **A visitor loads a page.**
+2. **A visitor submits the contact form.**
+3. **I push a commit and it ships itself.**
+
+Here's the whole thing in one picture. Pick a flow to trace it, or tap any box to see what it does — then let's walk each one in prose below.
+
+<ArchitectureDiagram />
+
+Let's walk each one.
+
+## Flow 1: a visitor loads a page
+
+There is no server rendering anything on demand. `next build` runs with `output: 'export'`, so every route becomes a plain HTML file at build time — `index.html`, `contact/index.html`, `articles/index.html`, one file per article, and so on. Those files, plus the hashed `_next/` JS and CSS bundles, live in an S3 bucket.
+
+When you request a page:
+
+- The request hits **CloudFront**, which serves the file from the edge location nearest you. Most requests never travel further than that.
+- On a cache miss, CloudFront pulls the file from the **S3 origin** once, then caches it at the edge.
+- The page's JavaScript boots the React app. **Fathom** logs the pageview entirely client-side — it never touches my infrastructure.
+
+That's the whole read path. The 3D hero sphere and device models are Three.js, decoded client-side with a Draco WASM decoder that ships in `public/draco/`. Everything the browser needs is a static asset sitting in the bucket.
+
+### What's actually in the bucket
+
+It's worth being concrete about what `aws s3 sync` uploads, because "a static site" hides a lot:
+
+- **The rendered site** — one `index.html` per route, the hashed `_next/` bundles, and generated `sitemap.xml` / `robots.txt` / `manifest.json`.
+- **Public assets, copied to the root** — the Draco decoder, per-article Open Graph share images, avatars and article banners, company logos, the résumé PDF, and the favicon and social-preview set.
+
+The build is just those two trees merged. No manifest, no server config — the file layout _is_ the routing.
+
+## Flow 2: a visitor submits the contact form
+
+This is the one part of the site that needs a backend, and it's deliberately kept off to the side so the site itself stays 100% static.
+
+The contact page posts to a separate API — `api.parammehta.com` — which is an **API Gateway** endpoint that proxies everything to a single **AWS Lambda**. The function is a small Express app wrapped with `serverless-http`:
+
+```yaml
+# functions/serverless.yml
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: '*'
+
+functions:
+  api:
+    handler: index.handler
+    architecture: arm64
+    environment:
+      CLOUDFLARE_TURNSTILE_SECRET: ${env:CLOUDFLARE_TURNSTILE_SECRET, ''}
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+```
+
+Note the IAM role: the function is allowed to do exactly two things — `ses:SendEmail` and `ses:SendRawEmail` — and nothing else.
+
+When a message comes in, it passes through three gates before an email is ever sent:
+
+- **A honeypot.** The form includes a hidden `name` field that real users never fill in. If it's populated, the request is almost certainly a bot, so the function returns `200` and silently does nothing. The bot thinks it succeeded; no email is sent.
+- **Sanitization.** The email and message are run through DOMPurify before they're used, so nothing hostile survives into the outgoing mail.
+- **Turnstile verification.** The browser solves a **Cloudflare Turnstile** challenge and sends the resulting token along with the form. The Lambda calls Cloudflare's `siteverify` endpoint with a server-side secret to confirm the token is genuine:
+
+```js
+const verifyRes = await fetch(
+  'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      secret: process.env.CLOUDFLARE_TURNSTILE_SECRET,
+      response: turnstileToken,
+    }),
+  }
+);
+```
+
+Only if all three gates pass does the Lambda hand the message to **Amazon SES**, which delivers it to my inbox. CORS is locked to the site's own origins, so the API won't answer form posts from anywhere else.
+
+There's a nice symmetry to Cloudflare showing up twice here: once as the **widget** in the browser that produces the token, and once as the **`siteverify` call** from the Lambda that validates it. They're two halves of the same check, on opposite ends of the request.
+
+Turnstile is also fully optional. If the secret isn't configured, verification is skipped and the honeypot still runs — which is what makes local development painless without any Cloudflare setup.
+
+## Flow 3: a commit ships itself
+
+The deploy path is the one I'm most fond of, because there's no deploy step. I don't run `npm run deploy`. I just write a commit.
+
+Everything hinges on [Conventional Commits](https://www.conventionalcommits.org/). When I push a `feat:` or `fix:` to `main`, a GitHub Actions workflow driven by [release-please](https://github.com/googleapis/release-please) takes over:
+
+1. release-please opens (or updates) a **Release PR** that bumps the version in `package.json` and regenerates `CHANGELOG.md`. The commit type decides the bump — `fix:` is a patch, `feat:` is a minor, a breaking change is a major.
+2. The workflow **auto-merges that one Release PR**:
+
+```yaml
+- name: Merge the Release PR
+  if: ${{ steps.release.outputs.prs_created == 'true' }}
+  env:
+    GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+  run: gh pr merge --squash "${{ fromJson(steps.release.outputs.pr).number }}" -R ${{ github.repository }}
+```
+
+3. That merge tags the release, publishes a GitHub Release, and triggers the **deploy job** — `next build`, then `aws s3 sync --delete`, then a CloudFront invalidation so the edge serves the new files immediately instead of the previously cached ones.
+
+There's one genuinely subtle detail hiding in that snippet: it uses a **personal access token** (`RELEASE_PLEASE_TOKEN`), not the default `GITHUB_TOKEN`. Merges made with the default token don't re-trigger workflows — so if I used it, the Release PR would merge and then nothing would happen. No tag, no deploy. The PAT is what lets the merge kick off the next run that actually ships the site.
+
+The invalidation matters more than it looks, too. CloudFront caches everything it serves, so without it a deploy can appear to do absolutely nothing for visitors until the cache TTL expires:
+
+```js
+// scripts/invalidate-cloudfront.js
+execSync(
+  `aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "/*"`,
+  { stdio: 'inherit' }
+);
+```
+
+One thing worth calling out: this only ships the **site**. The Lambda behind the contact form is deployed separately, out of band, with its own `npm run deploy:functions`. The release pipeline never touches it — the backend and the frontend have completely independent lifecycles, which is exactly what you want when one of them is a static bundle and the other holds a secret.
+
+## One system, three stories
+
+That's the whole thing. A CDN in front of a bucket for reads, a single locked-down Lambda off to the side for the one write path, and a commit convention that turns `git push` into a production deploy.
+
+None of these pieces are exotic. What I like is how little there is to operate: nothing to keep running, nothing to patch, nothing that pages me at 3am. The read path is files on a CDN. The write path is a function that can only send email. And the deploy path is a robot that reads my commit messages.
+
+If you want to poke at the real thing, the [source is on GitHub](https://github.com/parammehta/portfolio) — the README opens with a diagram of exactly these three flows.

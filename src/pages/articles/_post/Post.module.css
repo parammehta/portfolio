@@ -1,5 +1,5 @@
 .post {
-  --contentWidth: 740px;
+  --contentWidth: 960px;
   --gutterWidth: 100px;
   --mainColumn: 3;
 
@@ -8,12 +8,14 @@
   }
 
   @media (--mediaLaptop) {
-    --contentWidth: 680px;
+    /* Fluid: grows with the viewport up to 960px, floored at 760px so it never
+       clips at the narrow end of this tier (~1097px, where usable space is ~777px). */
+    --contentWidth: clamp(760px, calc(100vw - 380px), 960px);
     --gutterWidth: 60px;
   }
 
   @media (max-width: 1096px) {
-    --contentWidth: 660px;
+    --contentWidth: 700px;
     --gutterWidth: 50px;
   }
 
@@ -60,7 +62,7 @@
   flex-direction: column;
   padding-top: var(--space5XL);
   gap: var(--space2XL);
-  max-width: 800px;
+  max-width: 960px;
   grid-column: 3;
 
   @media (--mediaTablet) {
@@ -267,5 +269,11 @@
 
   & > * {
     grid-column: var(--mainColumn);
+  }
+
+  /* Let flagged figures (e.g. the architecture diagram) break out of the
+     content column and span the full grid so they get more room. */
+  & > :global(.postBreakout) {
+    grid-column: 1 / -1;
   }
 }

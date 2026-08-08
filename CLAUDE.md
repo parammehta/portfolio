@@ -22,8 +22,8 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 ## Architecture
 
 - **Framework**: Next.js with `output: 'export'` (static HTML, no SSR at runtime)
-- **Pages**: use `.page.js` extension (`pageExtensions` in `next.config.js`). Regular `.js` files in `src/pages/` are non-page helpers.
-- **Routing**: file-based via Next.js — `src/pages/index.page.js` → `/`, `src/pages/contact/index.page.js` → `/contact/`, etc.
+- **Pages**: use the `.page.tsx` (or `.page.ts`) extension — `pageExtensions` in `next.config.js` is `['page.tsx', 'page.ts', 'api.ts']`. Regular `.ts`/`.tsx` files in `src/pages/` are non-page helpers.
+- **Routing**: file-based via Next.js — `src/pages/index.page.tsx` → `/`, `src/pages/contact/index.page.tsx` → `/contact/`, etc. `trailingSlash: true`, so routes resolve as `route/index.html`.
 - **Styling**: CSS Modules (`.module.css`). camelCase class names (`selectorClassPattern: ^[a-z][a-zA-Z0-9]+$`).
 - **Imports**: `jsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
 - **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
@@ -37,7 +37,7 @@ src/
   components/   — reusable UI (Button, Navbar, Image, Model, Page, etc.)
   hooks/        — custom React hooks
   shell/        — app-wide chrome (global CSS, reducer, ScrollRestore)
-  pages/        — Next.js pages (*.page.js) and co-located route components
+  pages/        — Next.js pages (*.page.tsx) and co-located route components
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder)
@@ -128,6 +128,6 @@ These commit types also drive automated versioning and changelog generation — 
 ## Guidelines for changes
 
 - Keep the static-export constraint in mind — no `getServerSideProps`, no API routes in the Next.js app itself.
-- New pages must use the `.page.js` extension or Next.js won't pick them up.
+- New pages must use the `.page.tsx` (or `.page.ts`) extension or Next.js won't pick them up.
 - CSS class names must be camelCase to pass stylelint.
 - Do not commit `.env` — use `.env.example` as reference.
