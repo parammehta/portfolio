@@ -1,0 +1,282 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceM);
+  margin: var(--spaceXL) auto;
+  max-width: 960px;
+  font-family: var(--fontStack);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spaceM);
+  flex-wrap: wrap;
+}
+
+.controlsLabel {
+  font-family: var(--monoFontStack);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--rgbText) / 0.5);
+}
+
+.fit {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(var(--rgbText) / 0.1);
+  border-radius: 12px;
+  background: rgb(var(--rgbBackgroundLight));
+}
+
+.board {
+  position: relative;
+  transform-origin: top left;
+  background-image: radial-gradient(rgb(var(--rgbText) / 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 14px 14px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceS);
+  padding: var(--spaceM);
+  border: 1px solid rgb(var(--rgbText) / 0.1);
+  border-radius: 12px;
+  background: rgb(var(--rgbBackgroundLight));
+}
+
+.stackNode {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  background: rgb(var(--rgbBackground));
+  border: 1px solid rgb(var(--rgbText) / 0.14);
+  border-radius: 10px;
+  color: rgb(var(--rgbText));
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.2s ease;
+
+  &:hover {
+    border-color: rgb(var(--rgbText) / 0.4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(var(--rgbAccent));
+    outline-offset: 2px;
+  }
+}
+
+.edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.edge {
+  fill: none;
+  stroke: rgb(var(--rgbText) / 0.22);
+  stroke-width: 1.5;
+  transition:
+    stroke 0.2s ease,
+    opacity 0.25s ease;
+}
+
+.edgeDashed {
+  stroke-dasharray: 2 5;
+}
+
+.edgeActive {
+  stroke: rgb(var(--rgbAccent));
+  stroke-width: 2;
+}
+
+.edgeFlowing {
+  stroke-dasharray: 7 6;
+  animation: archMarch 0.7s linear infinite;
+}
+
+.edgeFaded {
+  opacity: 0.12;
+}
+
+.node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 11px 10px;
+  text-align: left;
+  background: rgb(var(--rgbBackground));
+  border: 1px solid rgb(var(--rgbText) / 0.14);
+  border-radius: 10px;
+  color: rgb(var(--rgbText));
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.2s ease,
+    transform 0.12s ease;
+
+  &:hover {
+    border-color: rgb(var(--rgbText) / 0.4);
+    transform: translate(-50%, -50%) translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(var(--rgbAccent));
+    outline-offset: 2px;
+  }
+}
+
+.nodeLit {
+  border-color: rgb(var(--rgbAccent));
+  box-shadow: 0 0 0 1px rgb(var(--rgbAccent));
+}
+
+.nodeDim {
+  opacity: 0.26;
+}
+
+.kicker {
+  font-family: var(--monoFontStack);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--rgbText) / 0.5);
+}
+
+.nodeName {
+  font-size: 0.85rem;
+  font-weight: var(--fontWeightMedium);
+  line-height: 1.2;
+  color: rgb(var(--rgbText));
+}
+
+.nodeSub {
+  font-family: var(--monoFontStack);
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: rgb(var(--rgbText) / 0.5);
+  word-break: break-word;
+}
+
+.panel {
+  border: 1px solid rgb(var(--rgbText) / 0.1);
+  border-radius: 12px;
+  padding: var(--spaceL) var(--spaceL);
+  background: rgb(var(--rgbBackgroundLight));
+  min-height: 72px;
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  font-weight: var(--fontWeightMedium);
+  color: rgb(var(--rgbText));
+}
+
+.panelTag {
+  font-family: var(--monoFontStack);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgb(var(--rgbAccent) / 0.15);
+  color: rgb(var(--rgbAccent));
+}
+
+.panelBody {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgb(var(--rgbText) / 0.8);
+}
+
+.steps {
+  counter-reset: step;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.step {
+  counter-increment: step;
+  position: relative;
+  padding-left: 1.9rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgb(var(--rgbText) / 0.75);
+}
+
+.step::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 1.35rem;
+  height: 1.35rem;
+  display: grid;
+  place-items: center;
+  font-family: var(--monoFontStack);
+  font-size: 0.72rem;
+  border-radius: 6px;
+  background: rgb(var(--rgbAccent) / 0.15);
+  color: rgb(var(--rgbAccent));
+}
+
+.stepName {
+  font-weight: var(--fontWeightMedium);
+  color: rgb(var(--rgbText));
+}
+
+.stepText {
+  color: rgb(var(--rgbText) / 0.75);
+}
+
+.inlineCode {
+  font-family: var(--monoFontStack);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgb(var(--rgbText) / 0.08);
+  color: rgb(var(--rgbText));
+}
+
+@keyframes archMarch {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edgeFlowing {
+    animation: none;
+  }
+
+  .node,
+  .edge {
+    transition: none;
+  }
+}

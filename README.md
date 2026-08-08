@@ -6,6 +6,46 @@
 
 My personal portfolio site. Built with [Next.js](https://nextjs.org/), [Three.js](https://threejs.org/), and [Framer Motion](https://www.framer.com/motion/). View the [live site](https://parammehta.com).
 
+## Architecture
+
+One set of infrastructure, three flows across it: a visitor loading a page, a visitor submitting the contact form, and a commit shipping itself to production. There's a full write-up in [Anatomy of this site](https://parammehta.com/articles/anatomy-of-this-site).
+
+```mermaid
+flowchart LR
+  subgraph client["Client"]
+    Visitor["Visitor browser"]
+    TS["Turnstile widget"]
+    Fathom["Fathom analytics"]
+  end
+
+  subgraph cicd["CI/CD"]
+    Dev["Developer"] -->|"push to main"| GH["GitHub Actions · release-please"]
+    GH -->|"auto-merge Release PR"| Build["Build job · next build"]
+  end
+
+  subgraph aws["AWS"]
+    CF["CloudFront CDN"]
+    S3[("S3 · site bucket")]
+    API["API Gateway"]
+    Lambda["Lambda · contact API"]
+    SES["Amazon SES"]
+    CF --> S3
+    API --> Lambda --> SES
+  end
+
+  CFV["Cloudflare · siteverify"]
+
+  Visitor -->|"GET page"| CF
+  Visitor -.->|"pageview"| Fathom
+  Visitor -.->|"token"| TS
+  Visitor -->|"POST /message"| API
+  Lambda -->|"verify token"| CFV
+  Build -->|"aws s3 sync --delete"| S3
+  Build -->|"invalidate /*"| CF
+```
+
+Solid arrows are request/deploy paths; dashed arrows are client-side side channels. The site (S3 + CloudFront) ships automatically on release; the contact-form Lambda is deployed separately (`npm run deploy:functions`).
+
 ## Install & run
 
 Make sure you have Node.js `24.12.0` installed (see `.nvmrc` — run `nvm use` if you use nvm). Install dependencies with:
