@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/parammehta/portfolio/compare/v1.5.1...v1.6.0) (2026-08-10)
+
+
+### Features
+
+* replace Fathom with Cloudflare Web Analytics ([#22](https://github.com/parammehta/portfolio/issues/22)) ([1063d29](https://github.com/parammehta/portfolio/commit/1063d296da65f100bee9ddfb056f2ebfc2fc4a09))
+
 ## [1.5.1](https://github.com/parammehta/portfolio/compare/v1.5.0...v1.5.1) (2026-08-10)
 
 
