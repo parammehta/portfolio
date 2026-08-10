@@ -36,7 +36,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 - **Imports**: `jsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
 - **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.
-- **Analytics**: Fathom (client-side, env var `NEXT_PUBLIC_FATHOM_ID`).
+- **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`.
 
 ## Project structure
 
@@ -144,7 +144,7 @@ Tags and release titles are plain `vX.Y.Z` (no component prefix) via `include-co
 See `.env.example`:
 - `NEXT_PUBLIC_WEBSITE_URL` — canonical site URL
 - `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions (`https://api.parammehta.com`)
-- `NEXT_PUBLIC_FATHOM_ID` / `NEXT_PUBLIC_FATHOM_URL` — analytics
+- `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` — Cloudflare Web Analytics beacon token (public); if unset, the beacon is never injected
 - `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key (public); if unset, the widget and check are skipped entirely (safe for local dev without Turnstile configured)
 
 The Lambda (`functions/`) also requires a secret at deploy time — pass it as an env var:

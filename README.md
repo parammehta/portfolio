@@ -15,7 +15,7 @@ flowchart LR
   subgraph client["Client"]
     Visitor["Visitor browser"]
     TS["Turnstile widget"]
-    Fathom["Fathom analytics"]
+    Analytics["Cloudflare Web Analytics"]
   end
 
   subgraph cicd["CI/CD"]
@@ -36,7 +36,7 @@ flowchart LR
   CFV["Cloudflare · siteverify"]
 
   Visitor -->|"GET page"| CF
-  Visitor -.->|"pageview"| Fathom
+  Visitor -.->|"pageview"| Analytics
   Visitor -.->|"token"| TS
   Visitor -->|"POST /message"| API
   Lambda -->|"verify token"| CFV

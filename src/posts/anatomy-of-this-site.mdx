@@ -28,7 +28,7 @@ When you request a page:
 
 - The request hits **CloudFront**, which serves the file from the edge location nearest you. Most requests never travel further than that.
 - On a cache miss, CloudFront pulls the file from the **S3 origin** once, then caches it at the edge.
-- The page's JavaScript boots the React app. **Fathom** logs the pageview entirely client-side — it never touches my infrastructure.
+- The page's JavaScript boots the React app. **Cloudflare Web Analytics** logs the pageview entirely client-side — it never touches my infrastructure.
 
 That's the whole read path. The 3D hero sphere and device models are Three.js, decoded client-side with a Draco WASM decoder that ships in `public/draco/`. Everything the browser needs is a static asset sitting in the bucket.
 

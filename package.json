@@ -47,7 +47,6 @@
     "typescript-eslint": "^8.65.0"
   },
   "dependencies": {
-    "fathom-client": "^3.7.2",
     "framer-motion": "^7.10.3",
     "mdx-bundler": "^9.2.1",
     "next": "^16.2.12",

@@ -7,8 +7,7 @@
 // Pin the public env to fixed test values; individual tests opt back in.
 process.env.NEXT_PUBLIC_WEBSITE_URL = 'https://test.parammehta.com';
 process.env.NEXT_PUBLIC_API_URL = 'https://api.test.parammehta.com';
-process.env.NEXT_PUBLIC_FATHOM_ID = '';
-process.env.NEXT_PUBLIC_FATHOM_URL = '';
+delete process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
 delete process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY;
 
 // jsdom has no WebGL context, so any component that spins up a Three.js
