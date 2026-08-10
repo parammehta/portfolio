@@ -103,16 +103,19 @@
     justify-content: center;
     padding: 0;
 
+    /* Brighten and scale the icon rather than painting a panel behind it. These
+       buttons sit on top of whatever the page is showing — the theme toggle
+       floats over the hero sphere — where a translucent surface reads as a
+       washed-out square. Brightening the existing colour keeps the affordance
+       legible on any backdrop, which the accent would not: it is the sphere's
+       own colour. Dropping the `transform: none` lets these scale on hover like
+       every other button; the panel was the only reason to opt out. */
     &:hover {
-      transform: none;
+      color: var(--colorTextTitle);
     }
 
     &::after {
       background: rgb(var(--rgbText) / 0);
-    }
-
-    &:hover::after {
-      background: rgb(var(--rgbText) / 0.1);
     }
   }
 
