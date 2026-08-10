@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/parammehta/portfolio/compare/v1.5.0...v1.5.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* page exit transition, navbar overlap, and icon button hover ([#19](https://github.com/parammehta/portfolio/issues/19)) ([c9c3909](https://github.com/parammehta/portfolio/commit/c9c3909d67a9db32c27ade63506d4bf9ae86de3d))
+
 ## [1.5.0](https://github.com/parammehta/portfolio/compare/portfolio-v1.4.0...portfolio-v1.5.0) (2026-08-08)
 
 
