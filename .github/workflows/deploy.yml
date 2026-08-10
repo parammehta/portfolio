@@ -13,8 +13,17 @@ permissions:
   contents: read
 
 jobs:
+  # Re-run the full CI suite (lint, types, unit, integration, build, e2e)
+  # against the released commit. The PR gate already ran it, but a release can
+  # also be cut manually via workflow_dispatch, and nothing should reach S3
+  # without the tests having passed on exactly these bytes.
+  verify:
+    name: Verify
+    uses: ./.github/workflows/ci.yml
+
   deploy:
     name: Build & Deploy
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
