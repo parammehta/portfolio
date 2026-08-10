@@ -15,6 +15,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 | Deploy site | `npm run deploy` |
 | Deploy Storybook | `npm run deploy:storybook` |
 | Deploy API functions | `npm run deploy:functions` |
+| Deploy analytics Worker | `npm run deploy:worker` |
 
 ## Node version
 
@@ -30,7 +31,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 - **Imports**: `jsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
 - **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.
-- **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`.
+- **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`. Custom events are POSTed to a Cloudflare Worker (`worker/`) that records them to a Workers Analytics Engine dataset; CF Web Analytics itself has no event API.
 
 ## Project structure
 
@@ -44,6 +45,7 @@ src/
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder)
 functions/      — serverless API functions (separate deploy via serverless framework)
+worker/         — Cloudflare Worker: custom-event sink to Analytics Engine (separate deploy via wrangler)
 scripts/        — build-time scripts (sitemap generation, draco copy, CloudFront invalidation)
 ```
 
@@ -99,6 +101,7 @@ See `.env.example`:
 - `NEXT_PUBLIC_WEBSITE_URL` — canonical site URL
 - `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions (`https://api.parammehta.com`)
 - `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` — Cloudflare Web Analytics beacon token (public); if unset, the beacon is never injected
+- `NEXT_PUBLIC_ANALYTICS_EVENTS_URL` — URL of the analytics Worker that receives custom events (public); if unset, `trackEvent` no-ops in prod
 - `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key (public); if unset, the widget and check are skipped entirely (safe for local dev without Turnstile configured)
 
 The Lambda (`functions/`) also requires a secret at deploy time — pass it as an env var:

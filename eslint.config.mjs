@@ -12,6 +12,7 @@ export default tseslint.config(
       'public/draco/**',
       'public/og/**',
       'functions/**',
+      'worker/**',
       'next-env.d.ts',
     ],
   },

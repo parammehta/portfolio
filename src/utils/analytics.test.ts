@@ -1,5 +1,6 @@
 import {
   cloudflareBeaconConfig,
+  createBeaconSink,
   setAnalyticsSink,
   trackEvent,
   type AnalyticsEvent,
@@ -41,6 +42,47 @@ describe('trackEvent', () => {
     trackEvent('contact_submit');
 
     expect(sink).not.toHaveBeenCalled();
+  });
+});
+
+describe('createBeaconSink', () => {
+  const url = 'https://analytics.example.com';
+
+  it('sends the event as JSON via sendBeacon when available', () => {
+    const sendBeacon = jest.fn().mockReturnValue(true);
+    Object.defineProperty(navigator, 'sendBeacon', {
+      configurable: true,
+      value: sendBeacon,
+    });
+
+    createBeaconSink(url)({ name: 'resume_open', props: { reason: 'x' } });
+
+    expect(sendBeacon).toHaveBeenCalledWith(
+      url,
+      JSON.stringify({ name: 'resume_open', props: { reason: 'x' } })
+    );
+  });
+
+  // When the user-agent queue is full sendBeacon returns false; we must not
+  // silently drop the event.
+  it('falls back to keepalive fetch when sendBeacon returns false', () => {
+    Object.defineProperty(navigator, 'sendBeacon', {
+      configurable: true,
+      value: jest.fn().mockReturnValue(false),
+    });
+    const fetchMock = jest.fn().mockResolvedValue({ status: 204 });
+    Object.defineProperty(globalThis, 'fetch', {
+      configurable: true,
+      writable: true,
+      value: fetchMock,
+    });
+
+    createBeaconSink(url)({ name: 'contact_submit' });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({ method: 'POST', keepalive: true })
+    );
   });
 });
 

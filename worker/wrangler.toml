@@ -1,0 +1,9 @@
+name = "portfolio-analytics"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Records one data point per custom event. Query via the Analytics Engine
+# GraphQL/SQL API using the dataset name below.
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "portfolio_events"
