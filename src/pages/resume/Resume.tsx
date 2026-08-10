@@ -7,6 +7,7 @@ import {
   PageSectionContent,
 } from 'components/Page';
 import { useWindowSize } from 'hooks';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { media } from 'utils/style';
 import styles from './Resume.module.css';
 
@@ -50,6 +51,7 @@ export const Resume = () => {
                 href={resumeUrl}
                 download="param-mehta-resume.pdf"
                 icon="arrowRight"
+                onClick={() => trackEvent(analyticsEvents.resumeDownload)}
               >
                 Download PDF
               </Button>
@@ -60,6 +62,7 @@ export const Resume = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 icon="link"
+                onClick={() => trackEvent(analyticsEvents.resumeOpen)}
               >
                 Open in new tab
               </Button>

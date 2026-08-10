@@ -10,7 +10,7 @@
 | Animation | Framer Motion (`framer-motion`) |
 | 3D | Three.js + three-stdlib (Draco GLTF loader) |
 | Blog | MDX via `mdx-bundler` |
-| Analytics | Fathom (client-side) |
+| Analytics | Cloudflare Web Analytics (client-side beacon) |
 | Contact API | AWS Lambda + API Gateway (REST), Node 20, `functions/` |
 | Email | AWS SES (`us-east-1`) |
 | Spam protection | Cloudflare Turnstile (managed widget) + honeypot field |

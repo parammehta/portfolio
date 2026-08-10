@@ -27,7 +27,7 @@ The Next.js custom App wrapper. Provides:
 - `LazyMotion` (Framer Motion with `domAnimation`)
 - `Navbar`
 - Page transitions (`AnimatePresence mode="wait"` with opacity fade)
-- Fathom analytics (production only)
+- Cloudflare Web Analytics beacon (production only)
 - Console Easter egg on mount
 
 ### reducer.js

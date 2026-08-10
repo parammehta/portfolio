@@ -113,14 +113,14 @@ const NODES: NodeDef[] = [
       'Cloudflare Turnstile, loaded client-side with a public site key. It issues a token submitted with the form. Left unset locally, the widget and the check are skipped entirely.',
   },
   {
-    id: 'fathom',
+    id: 'analytics',
     tier: 'client',
-    name: 'Fathom',
+    name: 'Cloudflare Analytics',
     sub: 'analytics · client',
     x: 28,
     y: 64,
     detail:
-      'Privacy-friendly analytics, entirely client-side. There is no server hop — it never touches the backend.',
+      'Cloudflare Web Analytics, loaded client-side as a beacon in SPA mode so it reports each route change on its own. Privacy-friendly and cookieless; there is no server hop — it never touches the backend. Left unset locally, the beacon is never injected.',
   },
   {
     id: 'cloudfront',
@@ -187,7 +187,7 @@ const NODES: NodeDef[] = [
 const EDGES: EdgeDef[] = [
   { from: 'browser', to: 'cloudfront', flow: 'serve' },
   { from: 'cloudfront', to: 's3site', flow: 'serve' },
-  { from: 'browser', to: 'fathom', flow: 'serve', dashed: true },
+  { from: 'browser', to: 'analytics', flow: 'serve', dashed: true },
   { from: 'browser', to: 'turnstile', flow: 'contact', dashed: true },
   { from: 'browser', to: 'apigw', flow: 'contact' },
   { from: 'apigw', to: 'lambda', flow: 'contact' },
@@ -205,7 +205,10 @@ const FLOW_STEPS: Record<Flow, Step[]> = {
     { node: 'browser', text: 'Browser requests a page from `parammehta.com`.' },
     { node: 'cloudfront', text: 'CloudFront serves the cached file from the nearest edge.' },
     { node: 's3site', text: 'On a cache miss it pulls the origin file from S3.' },
-    { node: 'fathom', text: 'Fathom logs the pageview entirely client-side.' },
+    {
+      node: 'analytics',
+      text: 'The Cloudflare beacon logs the pageview entirely client-side.',
+    },
   ],
   contact: [
     { node: 'browser', text: 'Visitor fills the form; Turnstile issues a token.' },

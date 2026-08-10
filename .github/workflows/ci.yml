@@ -70,8 +70,7 @@ jobs:
         env:
           NEXT_PUBLIC_WEBSITE_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_URL }}
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_FATHOM_ID: ${{ vars.NEXT_PUBLIC_FATHOM_ID }}
-          NEXT_PUBLIC_FATHOM_URL: ${{ vars.NEXT_PUBLIC_FATHOM_URL }}
+          NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN }}
           NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
       # The e2e job runs against these exact bytes rather than rebuilding.
       - uses: actions/upload-artifact@v4

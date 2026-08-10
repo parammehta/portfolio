@@ -17,6 +17,7 @@ import {
 import styles from './Contact.module.css';
 import { tokens } from 'components/ThemeProvider';
 import { useFormInput } from 'hooks';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, msToNum, numToMs } from 'utils/style';
 
 declare global {
@@ -72,6 +73,8 @@ export const Contact = () => {
 
     if (sending) return;
 
+    // Honeypot hit — show the success state to the bot, but don't report it as
+    // a real submission.
     if (name.value) {
       setComplete(true);
       return;
@@ -79,8 +82,11 @@ export const Contact = () => {
 
     if (process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && !turnstileToken) {
       setStatusError('Security check not complete. Please wait a moment and try again.');
+      trackEvent(analyticsEvents.contactError, { reason: 'turnstile_incomplete' });
       return;
     }
+
+    trackEvent(analyticsEvents.contactSubmit);
 
     try {
       setSending(true);
@@ -111,9 +117,11 @@ export const Contact = () => {
 
       setComplete(true);
       setSending(false);
+      trackEvent(analyticsEvents.contactSuccess);
     } catch (error) {
       setSending(false);
       setStatusError((error as Error).message);
+      trackEvent(analyticsEvents.contactError, { reason: 'request_failed' });
       window.turnstile?.reset(turnstileWidgetId.current!);
       setTurnstileToken('');
     }
