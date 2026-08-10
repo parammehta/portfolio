@@ -1,0 +1,106 @@
+name: CI
+
+# Runs on every PR into main, and on main itself so the branch always has a
+# known-good baseline. The job names here are what branch protection requires:
+#   Lint & types / Unit tests / Integration tests / Build / E2E tests
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint & types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run stylelint
+      - run: npm run typecheck
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit -- --ci
+
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:integration -- --ci
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_WEBSITE_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_URL }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FATHOM_ID: ${{ vars.NEXT_PUBLIC_FATHOM_ID }}
+          NEXT_PUBLIC_FATHOM_URL: ${{ vars.NEXT_PUBLIC_FATHOM_URL }}
+          NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
+      # The e2e job runs against these exact bytes rather than rebuilding.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-export
+          path: build/
+          retention-days: 1
+          include-hidden-files: true
+
+  e2e:
+    name: E2E tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: static-export
+          path: build/
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:only
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -72,3 +72,9 @@ public/og
 .serverless
 .next
 debug-storybook.log
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
