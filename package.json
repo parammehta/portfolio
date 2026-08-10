@@ -60,7 +60,7 @@
     "deploy": "aws s3 sync --delete build/ s3://parammehta-portfolio-site && node scripts/invalidate-cloudfront",
     "deploy:storybook": "aws s3 sync --delete build-storybook s3://parammehta-portfolio-storybook && node scripts/invalidate-cloudfront-storybook",
     "deploy:functions": "cd functions && npm run deploy",
-    "start": "next start",
+    "start": "npx serve@latest build",
     "test": "jest",
     "test:watch": "jest --watch",
     "storybook": "storybook dev -p 9009 -h localhost"

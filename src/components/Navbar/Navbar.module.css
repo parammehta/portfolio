@@ -54,10 +54,16 @@
   position: relative;
   top: calc(var(--spaceM) * -1);
 
-  /* Rotated content can visually overflow into the icons/toggle below on
-     short desktop viewports (transform doesn't affect layout). Tighten the
-     link spacing so the whole rail comfortably fits above ~700px height. */
-  @media (max-height: 820px) {
+  /* The list is rotated, so its unrotated *width* is the vertical space it
+     occupies — but a transform doesn't affect layout, so flexbox can't reserve
+     that space and the links visually overlap the icons below. Nothing here can
+     measure it, so the compact rules below (plus .navLink and .navIconLink)
+     shrink the rail enough to fit above the ~700px height where the mobile nav
+     takes over. Both worst cases were measured at 1280px wide: compact at 700px
+     tall needs 399px of the 432px between logo and icons, and full size just
+     above the breakpoint (941px tall) needs 565px of 632px. Raising the
+     breakpoint past 940px would overlap again — full size needs ~874px. */
+  @media (max-height: 940px) {
     top: 0;
   }
 }
@@ -79,9 +85,12 @@
   display: inline-flex;
   align-items: center;
 
-  @media (max-height: 820px) {
-    padding: var(--spaceS) var(--spaceM);
-    font-size: calc((14 / 16) * 1rem);
+  /* Horizontal padding runs along the rail once rotated, so trimming it buys
+     vertical room; the vertical padding stays put to keep the hit target as
+     wide as the rail. */
+  @media (max-height: 940px) {
+    padding: var(--spaceS);
+    font-size: calc((13 / 16) * 1rem);
   }
 
   &:hover,
@@ -247,6 +256,12 @@
   height: var(--space2XL);
   color: var(--colorTextLight);
   transition: color var(--durationM) var(--bezierFastoutSlowin);
+
+  /* Give some of the short-viewport budget back to the rotated link list. */
+  @media (max-height: 940px) {
+    width: var(--spaceXL);
+    height: var(--spaceXL);
+  }
 
   &:hover,
   &:focus,

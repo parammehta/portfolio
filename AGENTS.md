@@ -9,6 +9,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 | Dev server | `npm run dev` |
 | Storybook | `npm run storybook` (port 9009) |
 | Build (static export) | `npm run build` |
+| Preview the built site | `npm start` (serves `build/`; run `npm run build` first) |
 | Tests | `npm test` |
 | Tests (watch) | `npm run test:watch` |
 | Deploy site | `npm run deploy` |
@@ -25,6 +26,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 - **Pages**: use `.page.js` extension (`pageExtensions` in `next.config.js`). Regular `.js` files in `src/pages/` are non-page helpers.
 - **Routing**: file-based via Next.js — `src/pages/index.page.js` → `/`, `src/pages/contact/index.page.js` → `/contact/`, etc.
 - **Styling**: CSS Modules (`.module.css`). camelCase class names (`selectorClassPattern: ^[a-z][a-zA-Z0-9]+$`).
+- **CSS chunking**: `next.config.js` forces every stylesheet into a single chunk shared by all routes. Next otherwise gives each route its own chunk and unloads it the moment the next route commits — which leaves the outgoing page unstyled while it plays its exit animation, stretching it to full width. This depends on the webpack builder (the `--webpack` flag on `dev` and `build`); the `webpack()` hook is ignored under Turbopack, and dropping the flag silently brings the bug back.
 - **Imports**: `jsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
 - **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.

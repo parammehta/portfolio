@@ -41,6 +41,10 @@ Build-time scripts in `scripts/` run during webpack compilation:
 - `generate-sitemap.js` — generates `public/sitemap.xml`
 - `draco.js` — copies Draco decoder WASM to `public/draco/`
 
+`next.config.js` also collapses every stylesheet into a single CSS chunk shared by all routes (a `styles` `cacheGroup` on `optimization.splitChunks`). See [Rendering Strategy](#rendering-strategy) for why. It is cheaper than the per-route default here — merging drops the rules each route chunk duplicated, so one ~107KB (18KB gzipped) file replaces ~144KB across eleven, fetched once for the whole site.
+
+Both `dev` and `build` pass `--webpack`. That is load-bearing: the `webpack()` hook is ignored under Turbopack, so dropping the flag would silently discard the chunking above along with the SVG, shader, and asset loaders.
+
 ## Project Structure
 
 ```
@@ -94,7 +98,7 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`.
 ## Rendering Strategy
 
 - **Static export only** — no `getServerSideProps` or API routes within the Next.js app.
-- **Page transitions** — `AnimatePresence mode="wait"` wraps page components with opacity fade.
+- **Page transitions** — `AnimatePresence mode="wait"` wraps page components with opacity fade. This keeps the outgoing page mounted after the route commits, so it depends on the single shared CSS chunk from the [Build Pipeline](#build-pipeline): with per-route chunks Next unloads the outgoing route's styles on commit, and the exiting page loses its grid and `max-width` and stretches to full width. Long-standing Next issue [#17464](https://github.com/vercel/next.js/issues/17464).
 - **Theme flash prevention** — `_document.page.js` injects an inline script that reads localStorage before React hydrates, setting `data-theme` on `<body>` to avoid a flash of the wrong theme.
 
 ## Deployment Targets
