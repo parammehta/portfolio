@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/parammehta/portfolio/compare/v1.6.0...v1.7.0) (2026-08-10)
+
+
+### Features
+
+* record custom analytics events via a Cloudflare Worker ([#24](https://github.com/parammehta/portfolio/issues/24)) ([2176a4c](https://github.com/parammehta/portfolio/commit/2176a4c4787e314be50a64084552129a90ca6b20))
+
 ## [1.6.0](https://github.com/parammehta/portfolio/compare/v1.5.1...v1.6.0) (2026-08-10)
 
 
