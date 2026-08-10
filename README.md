@@ -72,6 +72,12 @@ To create a production build (static export):
 npm run build
 ```
 
+To preview that build locally — it's a static export, so this serves the generated files rather than running a Next.js server:
+
+```bash
+npm start
+```
+
 ## Deployment
 
 The site is hosted on AWS (S3 for the static site, Lambda for the contact form). You'll need an AWS account and the AWS CLI installed, and the S3 bucket names in `package.json`'s `deploy`/`deploy:storybook` scripts updated to your own.
