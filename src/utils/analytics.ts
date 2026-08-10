@@ -66,6 +66,35 @@ export function trackEvent(name: string, props?: AnalyticsEventProps): void {
 }
 
 /**
+ * A sink that ships events to the analytics Worker (Cloudflare Analytics
+ * Engine). Uses `navigator.sendBeacon` so the request survives the page
+ * navigations that some tracked interactions trigger (resume download, opening
+ * a link in a new tab); falls back to `fetch(..., { keepalive })`.
+ *
+ * The body is a plain JSON string, which `sendBeacon` sends as text/plain — a
+ * CORS "simple request", so no preflight. The Worker parses it as JSON.
+ */
+export function createBeaconSink(url: string): AnalyticsSink {
+  return ({ name, props }) => {
+    const body = JSON.stringify({ name, props });
+
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      // Returns false if the user-agent queue is full; fall through to fetch.
+      if (navigator.sendBeacon(url, body)) return;
+    }
+
+    void fetch(url, {
+      method: 'POST',
+      body,
+      keepalive: true,
+      headers: { 'Content-Type': 'text/plain' },
+    }).catch(() => {
+      // Fire-and-forget: a dropped analytics event is not worth surfacing.
+    });
+  };
+}
+
+/**
  * The `data-cf-beacon` payload for the Cloudflare beacon script.
  * `spa: true` makes the beacon report client-side route changes on its own.
  */

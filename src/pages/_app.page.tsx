@@ -15,7 +15,12 @@ import Head from 'next/head';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
 import { Fragment, createContext, useEffect, useReducer } from 'react';
-import { cloudflareBeaconConfig, cloudflareBeaconSrc } from 'utils/analytics';
+import {
+  cloudflareBeaconConfig,
+  cloudflareBeaconSrc,
+  createBeaconSink,
+  setAnalyticsSink,
+} from 'utils/analytics';
 import { msToNum } from 'utils/style';
 import { ScrollRestore } from '../shell/ScrollRestore';
 
@@ -45,6 +50,16 @@ const App = ({ Component, pageProps }: AppProps) => {
   // Unset token (local dev, CI, tests) means the script is never rendered.
   const analyticsToken = process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
   const analyticsEnabled = !!analyticsToken && process.env.NODE_ENV !== 'development';
+
+  // Route custom events to the analytics Worker (Cloudflare Analytics Engine).
+  // Unset URL or dev leaves the default sink (dev-log / prod no-op) in place.
+  useEffect(() => {
+    const eventsUrl = process.env.NEXT_PUBLIC_ANALYTICS_EVENTS_URL;
+    if (!eventsUrl || process.env.NODE_ENV === 'development') return;
+
+    setAnalyticsSink(createBeaconSink(eventsUrl));
+    return () => setAnalyticsSink(null);
+  }, []);
 
   useEffect(() => {
     if (!repoPromptLogged) {

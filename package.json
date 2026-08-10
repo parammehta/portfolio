@@ -72,7 +72,8 @@
     "test:e2e:only": "playwright test",
     "deploy": "aws s3 sync --delete build/ s3://parammehta-portfolio-site && node scripts/invalidate-cloudfront",
     "deploy:storybook": "aws s3 sync --delete build-storybook s3://parammehta-portfolio-storybook && node scripts/invalidate-cloudfront-storybook",
-    "deploy:functions": "cd functions && npm run deploy"
+    "deploy:functions": "cd functions && npm run deploy",
+    "deploy:worker": "cd worker && npm run deploy"
   },
   "browserslist": {
     "production": [
