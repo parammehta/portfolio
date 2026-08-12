@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/parammehta/portfolio/compare/v1.7.0...v1.7.1) (2026-08-12)
+
+
+### Bug Fixes
+
+* **ui:** minor bugs and fixes ([fb9f5aa](https://github.com/parammehta/portfolio/commit/fb9f5aa330ed5449230803f88fc0672f43c53bb6))
+
 ## [1.7.0](https://github.com/parammehta/portfolio/compare/v1.6.0...v1.7.0) (2026-08-10)
 
 
