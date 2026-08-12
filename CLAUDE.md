@@ -34,7 +34,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 - **Routing**: file-based via Next.js — `src/pages/index.page.tsx` → `/`, `src/pages/contact/index.page.tsx` → `/contact/`, etc. `trailingSlash: true`, so routes resolve as `route/index.html`.
 - **Styling**: CSS Modules (`.module.css`). camelCase class names (`selectorClassPattern: ^[a-z][a-zA-Z0-9]+$`).
 - **CSS chunking**: `next.config.js` forces every stylesheet into a single chunk shared by all routes. Next otherwise gives each route its own chunk and unloads it the moment the next route commits — which leaves the outgoing page unstyled while it plays its exit animation, stretching it to full width. This depends on the webpack builder (the `--webpack` flag on `dev` and `build`); the `webpack()` hook is ignored under Turbopack, and dropping the flag silently brings the bug back.
-- **Imports**: `jsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
+- **Imports**: `tsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
 - **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.
 - **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`. Custom events are POSTed to a Cloudflare Worker (`worker/`) that records them to a Workers Analytics Engine dataset; CF Web Analytics itself has no event API.
@@ -60,10 +60,10 @@ scripts/        — build-time scripts (sitemap generation, draco copy, CloudFro
 Each component lives in its own directory:
 ```
 src/components/Button/
-  Button.js          — component implementation
+  Button.tsx          — component implementation
   Button.module.css  — styles
-  Button.stories.js  — Storybook story
-  index.js           — re-export
+  Button.stories.tsx  — Storybook story
+  index.ts           — re-export
 ```
 
 ## Linting & formatting

@@ -16,7 +16,7 @@ import { useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
 import { useState, useEffect } from 'react';
 import { formatDate } from 'utils/date';
-import { classes, cssProps } from 'utils/style';
+import { cssProps } from 'utils/style';
 import styles from './Articles.module.css';
 
 interface ArticlesPostProps {
@@ -120,49 +120,6 @@ const ArticlesPost = ({
   );
 };
 
-interface SkeletonPostProps {
-  index?: number;
-}
-
-const SkeletonPost = ({ index }: SkeletonPostProps) => {
-  return (
-    <article
-      aria-hidden="true"
-      className={classes(styles.post, styles.skeleton)}
-      style={index !== undefined ? cssProps({ delay: index * 100 + 200 }) : undefined}
-    >
-      <div className={styles.postLink}>
-        <div className={styles.postDetails}>
-          <div aria-hidden className={styles.postDate}>
-            <Divider notchWidth="64px" notchHeight="8px" />
-            Coming soon...
-          </div>
-          <Heading
-            className={styles.skeletonBone}
-            as="h2"
-            level={4}
-            style={{ height: 24, width: '70%' }}
-          />
-          <Text
-            className={styles.skeletonBone}
-            size="s"
-            as="p"
-            style={{ height: 90, width: '100%' }}
-          />
-          <div className={styles.postFooter}>
-            <Button secondary iconHoverShift icon="chevronRight" as="div">
-              Read more
-            </Button>
-            <Text className={styles.timecode} size="s">
-              00:00:00:00
-            </Text>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-};
-
 interface ArticlesProps {
   posts: ArticlesPostProps[];
   featured: ArticlesPostProps;
@@ -195,11 +152,6 @@ export const Articles = ({ posts, featured }: ArticlesProps) => {
       {posts.map(({ slug, ...post }, index) => (
         <ArticlesPost key={slug} slug={slug} index={index} {...post} />
       ))}
-      {Array(2)
-        .fill(null)
-        .map((_, index) => (
-          <SkeletonPost key={index} />
-        ))}
     </div>
   );
 

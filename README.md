@@ -1,4 +1,4 @@
-[![Release & Deploy](https://github.com/parammehta/portfolio/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/parammehta/portfolio/actions/workflows/release-deploy.yml)
+[![Build & Deploy](https://github.com/parammehta/portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/parammehta/portfolio/actions/workflows/deploy.yml)
 
 # Param Mehta — Portfolio
 

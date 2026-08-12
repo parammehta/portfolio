@@ -94,19 +94,6 @@
   border-top: 1px solid rgb(var(--rgbText) / 0.1);
 }
 
-.skeleton {
-  filter: grayscale(1);
-  pointer-events: none;
-
-  & > * {
-    opacity: 0.3;
-  }
-}
-
-.skeletonBone {
-  background-color: rgb(var(--rgbText) / 0.2);
-}
-
 .post {
   --featuredPostPadding: var(--space5XL);
   --featuredPostClip: polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 0 100%);
