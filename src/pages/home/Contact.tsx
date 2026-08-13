@@ -186,17 +186,20 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
                 autoComplete="email"
                 label="Your Email"
                 type="email"
+                placeholder="you@example.com"
                 maxLength={512}
                 {...email}
               />
               <Input
                 required
                 multiline
+                maxRows={6}
                 className={styles.input}
                 data-status={status}
                 style={getDelay(tokens.base.durationS, initDelay)}
                 autoComplete="off"
                 label="Message"
+                placeholder="Tell me about a project, a role, or just say hi…"
                 maxLength={4096}
                 {...message}
               />

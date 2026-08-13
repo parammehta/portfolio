@@ -29,6 +29,18 @@
   overflow-x: hidden;
   outline: none;
 
+  /* The floating label rests over the field, so only reveal the placeholder
+     once the field is focused and the label has lifted out of the way. */
+  &::placeholder {
+    color: rgb(var(--rgbText) / 0.4);
+    opacity: 0;
+    transition: opacity var(--durationM) ease;
+  }
+
+  &:focus::placeholder {
+    opacity: 1;
+  }
+
   &:-internal-autofill-selected {
     -webkit-text-fill-color: var(--colorTextBody);
     box-shadow: 0 0 0 1000px rgb(var(--rgbText) / 0.1) inset;
