@@ -20,6 +20,10 @@
 }
 
 .rail {
+  /* align-self: start collapses the rail to its content height. Without it the
+     grid row is `1fr` (fills the panel), so the hairline below runs all the way
+     to the bottom of the viewport past the last tab. */
+  align-self: start;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -27,7 +31,7 @@
   gap: var(--spaceM);
   padding-left: var(--spaceL);
 
-  /* The full-height hairline the marker slides along. */
+  /* Hairline the marker slides along — sized to the rail's own height. */
   &::before {
     content: '';
     position: absolute;
