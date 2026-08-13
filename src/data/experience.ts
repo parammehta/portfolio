@@ -48,7 +48,7 @@ export const companies: Company[] = [
       },
       {
         id: 'intuit-design-system',
-        title: 'Software Engineer, Intuit Design System',
+        title: 'Senior Software Engineer, Intuit Design System',
         dateRange: 'Jul 2022 – Jan 2024',
         highlights: [
           'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
