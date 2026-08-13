@@ -63,6 +63,7 @@ export const Input = ({
     <div
       className={classes(styles.container, className)}
       data-error={!!error}
+      data-multiline={!!multiline}
       style={style}
       {...rest}
     >
@@ -71,6 +72,7 @@ export const Input = ({
           className={styles.label}
           data-focused={focused}
           data-filled={!!value}
+          data-placeholder={!!placeholder}
           id={labelId}
           htmlFor={inputId}
         >
