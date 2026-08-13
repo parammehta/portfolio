@@ -5,7 +5,6 @@ export interface NavLink {
   children?: NavLink[];
 }
 
-import { companies, companyHref } from 'data/experience';
 import type { IconName } from 'components/Icon/Icon';
 
 export interface SocialLink {
@@ -22,12 +21,8 @@ export const navLinks: NavLink[] = [
   {
     label: 'Experience',
     pathname: '/experience',
-    // Keeps the parent highlighted on the /experience/* detail routes too.
+    // Keeps the link highlighted on the /experience/* detail routes too.
     match: '/experience',
-    children: companies.map(company => ({
-      label: company.shortName,
-      pathname: companyHref(company.slug),
-    })),
   },
   {
     label: 'Skills',

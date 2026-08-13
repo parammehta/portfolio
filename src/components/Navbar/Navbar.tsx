@@ -182,13 +182,8 @@ export const Navbar = () => {
     return result || undefined;
   };
 
-  // Experience is a route now rather than a set of anchors on the home page, so
-  // the submenu opens anywhere under /experience — including the detail pages,
-  // which the old scroll-spy version could never do. Only above tablet, though:
-  // the rail's gutter is narrower below that and the open submenu would sit on
-  // top of the page's own content.
-  const inExperience = route.startsWith('/experience') && windowSize.width > media.tablet;
-
+  // NavGroup still supports children in the map below in case a future link
+  // gets a submenu — no current link uses it.
   const mobileItems = navLinks.flatMap(link => [
     { ...link, nested: false },
     ...(link.children ?? []).map(child => ({ ...child, nested: true })),
@@ -219,7 +214,6 @@ export const Navbar = () => {
                   label={link.label}
                   pathname={link.pathname}
                   isActive={isActive}
-                  forceOpen={inExperience}
                   // eslint-disable-next-line react/no-children-prop
                   children={link.children.map(child => ({
                     ...child,
