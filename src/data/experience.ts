@@ -38,7 +38,7 @@ export const companies: Company[] = [
     roles: [
       {
         id: 'intuit-identity',
-        title: 'Senior Software Engineer, Identity Authentication Experiences',
+        title: 'Staff Software Engineer, Identity Authentication Experiences',
         dateRange: 'Jan 2024 – Present',
         highlights: [
           'Led Passkeys across Intuit, shipping 8 cross-product launches and driving adoption from 10% to 26% of active customers',

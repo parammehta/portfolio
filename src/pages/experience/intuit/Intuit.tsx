@@ -21,7 +21,7 @@ import { Fragment } from 'react';
 import { media } from 'utils/style';
 import styles from './Intuit.module.css';
 
-const title = 'Senior Software Engineer at Intuit';
+const title = 'Staff Software Engineer at Intuit';
 const description =
   "Leading passkey adoption, cross-company identity integrations, and agentic AI/MCP prototyping for Intuit’s Identity Authentication Experiences team.";
 const roles = [

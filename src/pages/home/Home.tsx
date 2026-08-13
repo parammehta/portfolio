@@ -55,7 +55,7 @@ export const Home = () => {
     <div className={styles.home} data-scroll-container onScroll={handleScroll}>
       <Meta
         title="Developer + Leader"
-        description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences at Intuit."
+        description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences."
       />
       <Intro
         id="intro"

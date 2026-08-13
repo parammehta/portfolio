@@ -31,11 +31,11 @@ const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
     <Text className={styles.description} data-visible={visible} size="l" as="p">
       I&apos;m Param, a software engineer with 8+ years at the intersection of
       engineering, design, and AI. I live in the San Francisco Bay Area and work as a
-      senior software engineer at <Link href="https://www.intuit.com">Intuit</Link>, where
-      I build identity and authentication experiences, prototype AI-native patterns with
-      Claude and MCP, and maintain the Storybook environment Design and PM partners use to
-      sign off on live components before anything ships. If you&apos;re curious about the
-      tools and tech I use day to day, check out my <Link href="/skills">skills page</Link>.
+      software engineer, where I build identity experiences, prototype AI-native patterns
+      with apps like Codex, Claude, and MCP, and maintain the Storybook environment Design
+      and PM partners use to sign off on live components before anything ships. If
+      you&apos;re curious about the tools and tech I use day to day, check out my{' '}
+      <Link href="/skills">skills page</Link>.
     </Text>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
       In my spare time I play soccer ⚽, hike around 🧗🏼 and also play video games 🎮. I
