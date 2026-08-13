@@ -18,7 +18,7 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--spaceXL);
+  gap: var(--space2XL);
   margin-top: var(--space2XL);
   opacity: 0;
   transition: opacity var(--durationL) var(--bezierFastoutSlowin) 1.4s;
@@ -48,7 +48,80 @@
     margin-top: var(--spaceL);
     flex-direction: row;
     align-items: center;
+    gap: var(--spaceXL);
   }
+}
+
+/* Editorial underline links (no button chrome): the label carries an accent
+   underline that wipes in on hover/focus, and the accent arrow nudges in its
+   travel direction. */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spaceS);
+  font-size: calc((21 / 16) * 1rem);
+  font-weight: var(--fontWeightMedium);
+  line-height: 1;
+  color: var(--colorTextTitle);
+  text-decoration: none;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+
+  &:hover {
+    color: rgb(var(--rgbAccent));
+  }
+
+  @media (--mediaTablet) {
+    font-size: calc((19 / 16) * 1rem);
+  }
+
+  @media (--mediaMobileS) {
+    font-size: calc((17 / 16) * 1rem);
+  }
+}
+
+.ctaLabel {
+  position: relative;
+  padding-bottom: 6px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: rgb(var(--rgbAccent));
+    transform: scaleX(0);
+    transform-origin: left;
+
+    @media (--mediaUseMotion) {
+      transition: transform var(--durationM) var(--bezierFastoutSlowin);
+    }
+  }
+}
+
+.cta:hover .ctaLabel::after,
+.cta:focus-visible .ctaLabel::after {
+  transform: scaleX(1);
+}
+
+.ctaIcon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: rgb(var(--rgbAccent));
+
+  @media (--mediaUseMotion) {
+    transition: transform var(--durationM) var(--bezierFastoutSlowin);
+  }
+}
+
+.cta[data-arrow='down']:hover .ctaIcon {
+  transform: translateY(3px);
+}
+
+.cta[data-arrow='up-right']:hover .ctaIcon {
+  transform: translate(3px, -3px);
 }
 
 .text {

@@ -44,7 +44,7 @@ describe('home page', () => {
     );
     expect(screen.getByRole('link', { name: /get in touch/i })).toHaveAttribute(
       'href',
-      '/contact'
+      '/#contact'
     );
   });
 

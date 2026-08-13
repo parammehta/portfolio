@@ -12,8 +12,9 @@ test.describe('navigation', () => {
     await page.getByRole('navigation').getByRole('link', { name: 'Resume' }).click();
     await expect(page).toHaveURL(/\/resume\/?$/);
 
+    // Contact is a section of the home page now, reached by hash from any route.
     await page.getByRole('navigation').getByRole('link', { name: 'Contact' }).click();
-    await expect(page).toHaveURL(/\/contact\/?$/);
+    await expect(page).toHaveURL(/\/#contact$/);
     await expect(page.getByLabel('Your Email')).toBeVisible();
   });
 
@@ -85,12 +86,14 @@ test.describe('navigation', () => {
   });
 
   test('the contact form rejects an empty submission', async ({ page }) => {
-    await page.goto('/contact/');
+    await page.goto('/');
 
+    // The form is the last home pane; Playwright scrolls the submit button into
+    // view before clicking it.
     await page.getByRole('button', { name: /send message/i }).click();
 
     // Native constraint validation keeps us on the page with the form intact.
     await expect(page.getByLabel('Your Email')).toBeVisible();
-    await expect(page).toHaveURL(/\/contact\/?$/);
+    await expect(page).not.toHaveURL(/\/message/);
   });
 });

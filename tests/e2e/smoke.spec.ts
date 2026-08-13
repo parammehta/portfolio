@@ -6,7 +6,6 @@ const routes = [
   { path: '/', title: /Param Mehta/i },
   { path: '/resume/', title: /Resume/i },
   { path: '/articles/', title: /Articles/i },
-  { path: '/contact/', title: /Contact/i },
   { path: '/experience/', title: /Experience/i },
   { path: '/skills/', title: /Skills/i },
   { path: '/experience/intuit/', title: /Intuit/i },

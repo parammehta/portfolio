@@ -2,6 +2,7 @@ import { type UIEvent, useEffect, useRef, useState } from 'react';
 import { Meta } from 'components';
 import { Intro } from './Intro';
 import { Profile } from './Profile';
+import { Contact } from './Contact';
 
 import styles from './Home.module.css';
 
@@ -12,6 +13,7 @@ export const Home = () => {
   const [scrollIndicatorHidden, setScrollIndicatorHidden] = useState(false);
   const intro = useRef<HTMLElement>(null);
   const profile = useRef<HTMLElement>(null);
+  const contact = useRef<HTMLElement>(null);
 
   const isVisible = (ref: React.RefObject<HTMLElement | null>) =>
     visibleSections.includes(ref.current!);
@@ -67,6 +69,7 @@ export const Home = () => {
         visible={isVisible(profile)}
         id="profile"
       />
+      <Contact id="contact" sectionRef={contact} />
     </div>
   );
 };

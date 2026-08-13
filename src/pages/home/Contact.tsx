@@ -1,22 +1,19 @@
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { type FormEvent, type MouseEvent, type RefObject, useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import {
-  Breadcrumbs,
   Button,
   ScrambleReveal,
   Divider,
-  Footer,
   Heading,
   Icon,
   Input,
-  Meta,
   Section,
   Text,
   Transition,
 } from 'components';
 import styles from './Contact.module.css';
 import { tokens } from 'components/ThemeProvider';
-import { useFormInput } from 'hooks';
+import { useFormInput, useScrollToHash } from 'hooks';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, msToNum, numToMs } from 'utils/style';
 
@@ -33,8 +30,15 @@ declare global {
   }
 }
 
-export const Contact = () => {
+interface ContactProps {
+  id: string;
+  sectionRef?: RefObject<HTMLElement | null>;
+}
+
+export const Contact = ({ id, sectionRef }: ContactProps) => {
   const errorRef = useRef<HTMLDivElement>(null);
+  const scrollToHash = useScrollToHash();
+  const titleId = `${id}-title`;
   const email = useFormInput('');
   const message = useFormInput('');
   const [sending, setSending] = useState(false);
@@ -66,6 +70,11 @@ export const Contact = () => {
       }
     };
   }, [scriptLoaded]);
+
+  const handleBackToTop = (event: MouseEvent) => {
+    event.preventDefault();
+    scrollToHash('#intro');
+  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -136,18 +145,14 @@ export const Contact = () => {
           onLoad={() => setScriptLoaded(true)}
         />
       )}
-      <Meta
-        title="Contact"
-        description="Send me a message if you're interested in discussing a project, an opportunity, or just want to say hello."
-      />
-      <Section className={styles.contact}>
-        <Breadcrumbs
-          className={styles.breadcrumbs}
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Contact', href: '/contact' },
-          ]}
-        />
+      <Section
+        as="section"
+        className={styles.contact}
+        id={id}
+        ref={sectionRef}
+        aria-labelledby={titleId}
+        tabIndex={-1}
+      >
         <Transition unmount in={!complete} timeout={1600}>
           {(visible: boolean, status: string) => (
             <form className={styles.form} method="post" onSubmit={onSubmit}>
@@ -155,7 +160,8 @@ export const Contact = () => {
                 className={styles.title}
                 data-status={status}
                 level={3}
-                as="h1"
+                as="h2"
+                id={titleId}
                 style={getDelay(tokens.base.durationXS, initDelay, 0.3)}
               >
                 <ScrambleReveal text="Say hello" start={status !== 'exited'} delay={300} />
@@ -262,16 +268,16 @@ export const Contact = () => {
                 className={styles.completeButton}
                 data-status={status}
                 style={getDelay(tokens.base.durationM)}
-                href="/"
+                href="/#intro"
                 icon="chevronRight"
+                onClick={handleBackToTop}
               >
-                Back to Home
+                Back to top
               </Button>
             </div>
           )}
         </Transition>
       </Section>
-      <Footer />
     </>
   );
 };

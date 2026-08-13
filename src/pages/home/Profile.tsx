@@ -1,4 +1,4 @@
-import { Fragment, type RefObject, useState } from 'react';
+import { Fragment, type MouseEvent, type RefObject, useState } from 'react';
 import {
   Button,
   ScrambleReveal,
@@ -14,6 +14,7 @@ import profileDevanagari from 'assets/devanagari-profile.svg?url';
 import profileImgLarge from 'assets/profile-large.jpg';
 import profileImgPlaceholder from 'assets/profile-placeholder.jpg';
 import profileImg from 'assets/profile.jpg';
+import { useScrollToHash } from 'hooks';
 import { media } from 'utils/style';
 import styles from './Profile.module.css';
 
@@ -57,6 +58,12 @@ interface ProfileProps {
 export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
   const [focused, setFocused] = useState(false);
   const titleId = `${id}-title`;
+  const scrollToHash = useScrollToHash();
+
+  const handleContactClick = (event: MouseEvent) => {
+    event.preventDefault();
+    scrollToHash('#contact');
+  };
 
   return (
     <Section
@@ -78,8 +85,9 @@ export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
                 secondary
                 className={styles.button}
                 data-visible={visible}
-                href="/contact"
+                href="/#contact"
                 icon="send"
+                onClick={handleContactClick}
               >
                 Send me a message
               </Button>

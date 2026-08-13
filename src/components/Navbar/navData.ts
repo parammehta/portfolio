@@ -44,7 +44,7 @@ export const navLinks: NavLink[] = [
   },
   {
     label: 'Contact',
-    pathname: '/contact',
+    pathname: '/#contact',
   },
 ];
 
