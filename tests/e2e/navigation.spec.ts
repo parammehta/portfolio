@@ -40,8 +40,14 @@ test.describe('navigation', () => {
   // in the suite would catch a regression here, least of all on mobile.
   for (const path of ['/', '/experience/', '/skills/']) {
     test(`${path} fits the viewport without scrolling the document`, async ({ page }) => {
+      // `load` (goto's default), not `networkidle`: the home page's contact form
+      // loads the Turnstile script, so the network is never idle in CI where the
+      // site key is set. Two rAFs let CSS layout and the first paint settle,
+      // which is all the height measurement below needs.
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.evaluate(
+        () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      );
 
       const overflow = await page.evaluate(
         () => document.documentElement.scrollHeight - window.innerHeight

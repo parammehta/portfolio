@@ -2,8 +2,9 @@
   /* Third scroll-snap pane on the home page. One overlaid grid cell so the
      form and the success state cross-fade in place; `align-self: safe center`
      keeps them centred when they fit and falls back to top-aligned (rather than
-     clipping upward) when they don't, with the pane scrolling internally. */
-  /* position: relative so the form's absolutely-positioned descendants (the
+     clipping upward) when they don't, with the pane scrolling internally.
+
+     position: relative so the form's absolutely-positioned descendants (the
      ScrambleReveal's visually-hidden label, input labels) anchor here and are
      clipped by this pane, rather than escaping to the positioned app shell and
      stretching the document past the viewport. */
