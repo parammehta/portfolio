@@ -18,6 +18,7 @@ import Pause from './svg/pause.svg';
 import Play from './svg/play.svg';
 import Send from './svg/send.svg';
 import Skills from './svg/skills.svg';
+import Storybook from './svg/storybook.svg';
 import Twitter from './svg/twitter.svg';
 
 export const icons = {
@@ -39,6 +40,7 @@ export const icons = {
   play: Play,
   send: Send,
   skills: Skills,
+  storybook: Storybook,
   twitter: Twitter,
 };
 

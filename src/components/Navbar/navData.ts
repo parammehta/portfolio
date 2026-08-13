@@ -69,4 +69,9 @@ export const socialLinks: SocialLink[] = [
     url: 'https://github.com/parammehta',
     icon: 'github',
   },
+  {
+    label: 'Storybook',
+    url: 'https://storybook.parammehta.com',
+    icon: 'storybook',
+  },
 ];
