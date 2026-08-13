@@ -50,7 +50,7 @@ export const Walmart = () => {
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Experience', href: '/#experience' },
+            { label: 'Experience', href: '/experience' },
             { label: 'Walmart', href: '/experience/walmart' },
           ]}
         />

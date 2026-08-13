@@ -34,6 +34,38 @@ test.describe('navigation', () => {
     ).toBeVisible();
   });
 
+  // The whole point of the layout rework: these routes are sized to the
+  // viewport, so the document itself must never grow a scrollbar. Nothing else
+  // in the suite would catch a regression here, least of all on mobile.
+  for (const path of ['/', '/experience/', '/skills/']) {
+    test(`${path} fits the viewport without scrolling the document`, async ({ page }) => {
+      await page.goto(path);
+      await page.waitForLoadState('networkidle');
+
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollHeight - window.innerHeight
+      );
+      // A sub-pixel rounding difference is not a scrollbar.
+      expect(overflow).toBeLessThanOrEqual(1);
+    });
+  }
+
+  test('the navbar reaches the experience and skills routes', async ({ page }) => {
+    test.skip(
+      test.info().project.name === 'mobile',
+      'The navbar collapses behind a menu toggle on mobile; covered separately.'
+    );
+
+    await page.goto('/');
+
+    await page.getByRole('navigation').getByRole('link', { name: 'Experience' }).click();
+    await expect(page).toHaveURL(/\/experience\/?$/);
+    await expect(page.getByRole('tab', { name: 'Intuit' })).toBeVisible();
+
+    await page.getByRole('navigation').getByRole('link', { name: 'Skills' }).click();
+    await expect(page).toHaveURL(/\/skills\/?$/);
+  });
+
   test('the skip link jumps to main content', async ({ page }) => {
     await page.goto('/');
 

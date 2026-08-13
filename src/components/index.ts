@@ -23,4 +23,5 @@ export * from './Table';
 export * from './Text';
 export * from './ThemeProvider';
 export * from './Transition';
+export * from './ViewportPage';
 export * from './VisuallyHidden';

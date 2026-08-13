@@ -34,7 +34,7 @@ const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
       I build identity and authentication experiences, prototype AI-native patterns with
       Claude and MCP, and maintain the Storybook environment Design and PM partners use to
       sign off on live components before anything ships. If you&apos;re curious about the
-      tools and tech I use day to day, check out my <Link href="/#skills">skills page</Link>.
+      tools and tech I use day to day, check out my <Link href="/skills">skills page</Link>.
     </Text>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
       In my spare time I play soccer ⚽, hike around 🧗🏼 and also play video games 🎮. I

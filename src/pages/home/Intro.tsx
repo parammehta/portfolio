@@ -1,6 +1,6 @@
 import { Fragment, type MouseEvent, type RefObject, useEffect, useState } from 'react';
 import ArrowDown from 'assets/arrow-down.svg';
-import { ScrambleReveal, Heading, Section, Transition, VisuallyHidden } from 'components';
+import { Button, ScrambleReveal, Heading, Section, Transition, VisuallyHidden } from 'components';
 import { tokens, useTheme } from 'components/ThemeProvider';
 import { AnimatePresence } from 'framer-motion';
 import { useInterval, usePrevious, useScrollToHash } from 'hooks';
@@ -110,6 +110,14 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
                   </AnimatePresence>
                 </div>
               </Heading>
+              <div className={styles.actions} data-visible={visible}>
+                <Button iconHoverShift href="/resume" iconEnd="arrowRight">
+                  View Resume
+                </Button>
+                <Button secondary href="/contact" icon="send">
+                  Get in touch
+                </Button>
+              </div>
             </header>
             <RouterLink
               href="/#profile"

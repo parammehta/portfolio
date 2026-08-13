@@ -49,7 +49,7 @@ export const Intuit = () => {
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Experience', href: '/#experience' },
+            { label: 'Experience', href: '/experience' },
             { label: 'Intuit', href: '/experience/intuit' },
           ]}
         />

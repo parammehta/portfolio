@@ -1,26 +1,25 @@
 .profile {
-  width: 100vw;
-  min-height: 100vh;
-  margin-top: 60px;
-  margin-bottom: 40px;
+  /* This is a snap pane: its height comes from `.home > section` and vertical
+     margins would offset the snap point, so neither is set here. `100%` rather
+     than `100vw` because the scroll container's client width already excludes
+     the scrollbar — `100vw` would not, and would overflow horizontally. */
+  width: 100%;
   padding-top: 60px;
   padding-bottom: 40px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  overflow: hidden;
 
   @media (--mediaTablet) {
     padding-top: 50px;
     padding-right: 80px;
     padding-left: 160px;
-    height: auto;
-    margin-top: 40px;
-    margin-bottom: 20px;
   }
 
   @media (--mediaMobile) {
-    margin-top: 0;
-    padding-top: var(--space4XL);
-    overflow-x: hidden;
+    padding-top: var(--mobileNavOffset);
+    padding-bottom: var(--spaceXL);
   }
 
   @media (--mediaMobile), (--mediaMobileLS) {
@@ -44,6 +43,12 @@
   @media (--mediaTablet) {
     max-width: 600px;
     grid-template-columns: 100%;
+
+    /* Once the columns stack there is no room for both inside one viewport.
+       The photo is decorative, so it goes rather than the copy. */
+    & > .column:last-child {
+      display: none;
+    }
   }
 }
 
@@ -52,8 +57,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 40px;
   transform: translate3d(0, 0, 0);
+
+  @media (--mediaTablet) {
+    margin-bottom: 0;
+  }
 }
 
 .title {

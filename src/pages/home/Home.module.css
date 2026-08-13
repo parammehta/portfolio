@@ -1,3 +1,31 @@
 .home {
+  /* The home page is the scroll container, not the document. It has to live
+     here rather than on the app shell: `.page` in shell/App.module.css is keyed
+     per route inside AnimatePresence, so an inner scroller there would also
+     apply to /articles and break useParallax, which reads window.scrollY. */
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+
+  /* overflow-y: auto computes overflow-x from `visible` to `auto`, and
+     body { overflow-x: hidden } no longer covers content inside this box. */
   overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+
+  /* Mandatory snapping makes anything past the snapport unreachable — no
+     scrollbar, no way down. On short viewports, where the panes are most
+     likely to overflow despite the condensed layout, fall back to proximity
+     so the content stays reachable. */
+  @media (--mediaMobileLS) {
+    scroll-snap-type: y proximity;
+  }
+}
+
+.home > section {
+  /* 100% of the container, not 100dvh: if both resolved dvh independently, a
+     viewport resize mid-scroll would desync the snap points. */
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
