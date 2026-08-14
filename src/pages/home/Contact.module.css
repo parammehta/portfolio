@@ -1,53 +1,92 @@
 .contact {
-  --formHeight: 530px;
+  /* Third scroll-snap pane on the home page. Flex column so the form area can
+     grow while the footer is pinned to the bottom of the pane.
 
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: 100%;
-  justify-items: center;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+     position: relative so the form's absolutely-positioned descendants (the
+     ScrambleReveal's visually-hidden label, input labels) anchor here and are
+     clipped by this pane, rather than escaping to the positioned app shell and
+     stretching the document past the viewport. */
+  position: relative;
+  height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 
-  @media (--mediaMobile) {
-    padding-top: 0;
-  }
+  /* Backstop scroll for viewports too short to hold the whole form (e.g. once
+     the Turnstile widget loads). Note: no `overscroll-behavior: contain` here —
+     this pane sits inside the home page's scroll-snap container, and containing
+     the overscroll would trap the wheel at the form's top/bottom edges so you
+     could never scroll back out to the profile pane. Chaining is what lets the
+     snap container take over at the boundaries. */
+  overflow-y: auto;
 }
 
-/* Own row above the form so it stays put across the form/success states.
-   Shares the form's width so it lines up with the heading below it — this page
-   centres its column rather than using a page header, so the breadcrumb follows
-   that column. The top offsets still mirror the page/experience header. */
-.breadcrumbs {
-  grid-area: 1 / 1;
-  max-width: var(--maxWidthS);
-  width: 100%;
-  padding-top: calc(var(--space5XL) + var(--space3XL));
+.emailSide {
+  position: absolute;
+  left: calc(var(--spaceOuter) + var(--space2XL));
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--spaceL);
+  text-decoration: none;
+  font-size: calc((13 / 16) * 1rem);
+  letter-spacing: 0.12em;
+  color: rgb(var(--rgbText) / 0.5);
+  z-index: var(--zIndex1);
 
-  @media (--mediaLaptop) {
-    padding-top: var(--space5XL);
+  @media (--mediaUseMotion) {
+    transition: color var(--durationM) ease;
+  }
+
+  &:hover {
+    color: rgb(var(--rgbAccent));
+  }
+
+  &::after {
+    content: '';
+    height: 1px;
+    width: 48px;
+    background: currentColor;
+    opacity: 0.5;
+    flex-shrink: 0;
   }
 
   @media (--mediaTablet) {
-    padding-top: var(--space4XL);
-  }
-
-  @media (--mediaMobile) {
-    padding-top: var(--space5XL);
+    display: none;
   }
 }
 
+.formWrapper {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template: 1fr / 100%;
+  justify-items: center;
+  position: relative;
+  z-index: var(--zIndex3);
+  padding: var(--space3XL) 0;
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    padding-top: var(--mobileNavOffset);
+    padding-bottom: var(--spaceXL);
+  }
+}
+
+.footer {
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--spaceL);
+  padding-bottom: var(--spaceXL);
+}
+
 .form {
-  grid-area: 2 / 1;
+  grid-area: 1 / 1;
+  align-self: safe center;
   max-width: var(--maxWidthS);
   width: 100%;
-  padding: var(--space2XL) 0;
-
-  @media (--mediaMobile) {
-    padding: var(--spaceXL) 0 var(--space2XL);
-    align-self: flex-start;
-  }
 }
 
 .title {
@@ -223,7 +262,8 @@
 }
 
 .complete {
-  grid-area: 2 / 1;
+  grid-area: 1 / 1;
+  align-self: safe center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -354,12 +394,4 @@
 .formErrorIcon {
   flex: 0 0 auto;
   margin-right: var(--spaceS);
-}
-
-.footer {
-  opacity: 0;
-
-  &:global {
-    animation: fadeIn var(--durationL) ease var(--durationXL) forwards;
-  }
 }

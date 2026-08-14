@@ -50,7 +50,7 @@ export const Resume = () => {
                 iconHoverShift
                 href={resumeUrl}
                 download="param-mehta-resume.pdf"
-                icon="arrowRight"
+                icon="download"
                 onClick={() => trackEvent(analyticsEvents.resumeDownload)}
               >
                 Download PDF

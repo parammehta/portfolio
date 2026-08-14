@@ -24,9 +24,17 @@ export const ScrollRestore = () => {
     const targetElement = document.getElementById(hash);
 
     if (hash && targetElement) {
-      window.scrollTo(0, targetElement.offsetTop);
+      // scrollIntoView rather than window.scrollTo: the home page scrolls an
+      // inner container, where the document itself never scrolls and scrollTo
+      // would silently do nothing. This walks every scrollable ancestor, and
+      // `block: 'start'` lands exactly on a scroll-snap point.
+      targetElement.scrollIntoView({ block: 'start', behavior: 'auto' });
       targetElement.focus({ preventScroll: true });
     } else {
+      // Assigning scrollTop rather than calling scrollTo: same effect, and it
+      // works under jsdom, which doesn't implement Element.prototype.scrollTo.
+      const container = document.querySelector<HTMLElement>('[data-scroll-container]');
+      if (container) container.scrollTop = 0;
       window.scrollTo(0, 0);
       document.body.focus({ preventScroll: true });
     }

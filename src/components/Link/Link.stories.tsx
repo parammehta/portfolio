@@ -25,8 +25,8 @@ export const Default: Story = {
 export const InternalLink: Story = {
   render: () => (
     <StoryContainer style={{ fontSize: 18 }}>
-      <Link href="/#skills">Internal link (RouterLink)</Link>
-      <Link secondary href="/#skills">
+      <Link href="/skills">Internal link (RouterLink)</Link>
+      <Link secondary href="/skills">
         Secondary internal link
       </Link>
     </StoryContainer>

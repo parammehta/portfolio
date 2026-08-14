@@ -110,7 +110,83 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
                   </AnimatePresence>
                 </div>
               </Heading>
+              <div className={styles.actions} data-visible={visible}>
+                <RouterLink href="/resume" scroll={false} className={styles.cta} data-arrow="down">
+                  <span className={styles.ctaLabel}>View Resume</span>
+                  <svg
+                    className={styles.ctaIcon}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M12 4v10M8 12l4 4 4-4M6 19h12" />
+                  </svg>
+                </RouterLink>
+                <RouterLink
+                  href="/#contact"
+                  scroll={false}
+                  className={styles.cta}
+                  data-arrow="up-right"
+                  onClick={handleScrollClick}
+                >
+                  <span className={styles.ctaLabel}>Get in touch</span>
+                  <svg
+                    className={styles.ctaIcon}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M7 17L17 7M9 7h8v8" />
+                  </svg>
+                </RouterLink>
+              </div>
             </header>
+            <div className={styles.mobileActions} data-visible={visible}>
+              <RouterLink href="/resume" scroll={false} className={styles.cta} data-arrow="down">
+                <span className={styles.ctaLabel}>View Resume</span>
+                <svg
+                  className={styles.ctaIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M12 4v10M8 12l4 4 4-4M6 19h12" />
+                </svg>
+              </RouterLink>
+              <RouterLink
+                href="/#contact"
+                scroll={false}
+                className={styles.cta}
+                data-arrow="up-right"
+                onClick={handleScrollClick}
+              >
+                <span className={styles.ctaLabel}>Get in touch</span>
+                <svg
+                  className={styles.ctaIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </RouterLink>
+            </div>
             <RouterLink
               href="/#profile"
               className={styles.scrollIndicator}

@@ -1,8 +1,8 @@
-import { type HTMLAttributes, startTransition, useEffect, useRef } from 'react';
+import { type HTMLAttributes, startTransition, useEffect, useRef, useState } from 'react';
 import { useTheme } from 'components/ThemeProvider';
 import { Transition } from 'components';
 import { useReducedMotion, useSpring } from 'framer-motion';
-import { useInViewport, useWindowSize } from 'hooks';
+import { useInViewport } from 'hooks';
 import { useFps } from 'hooks/useFps';
 import {
   AmbientLight,
@@ -61,7 +61,11 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   const baseRotationY = useRef(0);
   const reduceMotion = useReducedMotion();
   const isInViewport = useInViewport(canvasRef);
-  const windowSize = useWindowSize();
+  // Measured off the pane rather than useWindowSize: that hook's iOS ruler
+  // reports the *large* viewport height, but the pane is sized in `dvh`, so on
+  // mobile the canvas would be 30% taller than intended and the dome maths
+  // below would place the sphere against the wrong height.
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const rotationX = useSpring(0, springConfig);
   const rotationY = useSpring(0, springConfig);
   const { measureFps, isLowFps } = useFps(isInViewport);
@@ -134,7 +138,26 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   }, [rgbAccent]);
 
   useEffect(() => {
-    const { width, height } = windowSize;
+    const parent = canvasRef.current?.parentElement;
+    if (!parent) return;
+
+    // offsetWidth/offsetHeight, not entry.contentRect: the pane is a Section
+    // with ~320px of horizontal padding, and the canvas is `inset: 0` so it
+    // covers the padding box. Measuring the content box would hand the renderer
+    // a width narrower than the canvas actually is — enough, on a ~1200px
+    // window, to fall under the tablet breakpoint and pick the wrong scale.
+    const resizeObserver = new ResizeObserver(() => {
+      setCanvasSize({ width: parent.offsetWidth, height: parent.offsetHeight });
+    });
+
+    resizeObserver.observe(parent);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const { width, height } = canvasSize;
+    if (!width || !height) return;
 
     const adjustedHeight = height + height * 0.3;
     renderer.current!.setSize(width, adjustedHeight);
@@ -177,7 +200,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     if (reduceMotion) {
       renderer.current!.render(scene.current!, camera.current!);
     }
-  }, [reduceMotion, windowSize]);
+  }, [reduceMotion, canvasSize]);
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {

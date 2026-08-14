@@ -20,17 +20,13 @@ export const navLinks: NavLink[] = [
   },
   {
     label: 'Experience',
-    pathname: '/#experience',
+    pathname: '/experience',
+    // Keeps the link highlighted on the /experience/* detail routes too.
     match: '/experience',
-    children: [
-      { label: 'Intuit', pathname: '/#experience-intuit', match: '/experience/intuit' },
-      { label: 'Rivian', pathname: '/#experience-rivian', match: '/experience/rivian' },
-      { label: 'Walmart', pathname: '/#experience-walmart', match: '/experience/walmart' },
-    ],
   },
   {
     label: 'Skills',
-    pathname: '/#skills',
+    pathname: '/skills',
   },
   {
     label: 'Resume',
@@ -43,7 +39,7 @@ export const navLinks: NavLink[] = [
   },
   {
     label: 'Contact',
-    pathname: '/contact',
+    pathname: '/#contact',
   },
 ];
 
@@ -67,5 +63,10 @@ export const socialLinks: SocialLink[] = [
     label: 'Github',
     url: 'https://github.com/parammehta',
     icon: 'github',
+  },
+  {
+    label: 'Storybook',
+    url: 'https://storybook.parammehta.com',
+    icon: 'storybook',
   },
 ];

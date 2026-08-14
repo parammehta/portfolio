@@ -51,7 +51,7 @@ export const Rivian = () => {
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Experience', href: '/#experience' },
+            { label: 'Experience', href: '/experience' },
             { label: 'Rivian', href: '/experience/rivian' },
           ]}
         />

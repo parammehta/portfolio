@@ -18,6 +18,9 @@ export interface InputProps {
   required?: boolean;
   maxLength?: number;
   type?: string;
+  placeholder?: string;
+  /** Multiline only: cap the auto-grow at this many rows, then scroll inside. */
+  maxRows?: number;
   onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   [key: string]: unknown;
 }
@@ -35,6 +38,8 @@ export const Input = ({
   required,
   maxLength,
   type,
+  placeholder,
+  maxRows,
   onChange,
   ...rest
 }: InputProps) => {
@@ -58,6 +63,7 @@ export const Input = ({
     <div
       className={classes(styles.container, className)}
       data-error={!!error}
+      data-multiline={!!multiline}
       style={style}
       {...rest}
     >
@@ -66,6 +72,7 @@ export const Input = ({
           className={styles.label}
           data-focused={focused}
           data-filled={!!value}
+          data-placeholder={!!placeholder}
           id={labelId}
           htmlFor={inputId}
         >
@@ -84,6 +91,8 @@ export const Input = ({
           required={required}
           maxLength={maxLength}
           type={type}
+          placeholder={placeholder}
+          {...(multiline ? { maxRows } : {})}
         />
         <div className={styles.underline} data-focused={focused} />
       </div>

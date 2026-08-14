@@ -182,9 +182,8 @@ export const Navbar = () => {
     return result || undefined;
   };
 
-  const experienceIds = ['experience', 'experience-intuit', 'experience-rivian', 'experience-walmart'];
-  const inExperience = route === '/' && experienceIds.includes(scrollActive!);
-
+  // NavGroup still supports children in the map below in case a future link
+  // gets a submenu — no current link uses it.
   const mobileItems = navLinks.flatMap(link => [
     { ...link, nested: false },
     ...(link.children ?? []).map(child => ({ ...child, nested: true })),
@@ -215,7 +214,6 @@ export const Navbar = () => {
                   label={link.label}
                   pathname={link.pathname}
                   isActive={isActive}
-                  forceOpen={inExperience}
                   // eslint-disable-next-line react/no-children-prop
                   children={link.children.map(child => ({
                     ...child,

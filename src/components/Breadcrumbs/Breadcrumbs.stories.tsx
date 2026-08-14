@@ -31,7 +31,7 @@ export const ThreeLevel: Story = {
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Experience', href: '/#experience' },
+          { label: 'Experience', href: '/experience' },
           { label: 'Intuit', href: '/experience/intuit' },
         ]}
       />

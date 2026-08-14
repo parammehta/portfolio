@@ -29,6 +29,12 @@
   overflow-x: hidden;
   outline: none;
 
+  /* A placeholder always lifts the label out of the way (see .label below), so
+     the placeholder text can stay visible without colliding with it. */
+  &::placeholder {
+    color: rgb(var(--rgbText) / 0.4);
+  }
+
   &:-internal-autofill-selected {
     -webkit-text-fill-color: var(--colorTextBody);
     box-shadow: 0 0 0 1000px rgb(var(--rgbText) / 0.1) inset;
@@ -86,9 +92,34 @@
   }
 
   &[data-filled='true'],
-  &[data-focused='true'] {
+  &[data-focused='true'],
+  &[data-placeholder='true'] {
     color: rgb(var(--rgbText) / 0.54);
     transform: scale(0.8) translateY(calc(var(--spaceL) * -1));
+  }
+}
+
+/* Multiline fields scroll, so an overlaid floating label gets run over by the
+   text. Stack the label above the textarea in normal flow instead — it never
+   overlaps the content, and the placeholder shows inside the field. */
+.container[data-multiline='true'] {
+  & .content {
+    flex-direction: column;
+  }
+
+  & .label {
+    position: static;
+    transform: none;
+    transform-origin: left top;
+    margin-bottom: var(--spaceXS);
+    color: rgb(var(--rgbText) / 0.54);
+    font-size: calc(var(--inputFontSize) * 0.8);
+    cursor: default;
+  }
+
+  /* The label now provides the top spacing the overlay padding used to. */
+  & .input {
+    padding-top: 0;
   }
 }
 
