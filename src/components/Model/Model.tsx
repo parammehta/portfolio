@@ -36,7 +36,7 @@ import { classes, cssProps, numToMs } from 'utils/style';
 import {
   cleanRenderer,
   cleanScene,
-  modelLoader,
+  getModelLoader,
   removeLights,
   textureLoader,
 } from 'utils/three';
@@ -425,7 +425,7 @@ const Device = ({
         textureLoader.loadAsync(
           typeof texture.placeholder === 'string' ? texture.placeholder : texture.placeholder.src
         ),
-        modelLoader.loadAsync(url),
+        getModelLoader().loadAsync(url),
       ]);
 
       modelGroup.current!.add(gltf.scene);

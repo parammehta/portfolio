@@ -18,6 +18,14 @@ test.describe('navigation', () => {
     await expect(page.getByLabel('Your Email')).toBeVisible();
   });
 
+  test('redirects the old /contact/ URL to the contact section', async ({ page }) => {
+    // /contact/ was a real route before the contact form moved onto the home
+    // page; it's still linked externally, so it redirects rather than 404ing.
+    await page.goto('/contact/');
+    await expect(page).toHaveURL(/\/#contact$/);
+    await expect(page.getByLabel('Your Email')).toBeVisible();
+  });
+
   test('opens and closes the mobile menu', async ({ page }) => {
     test.skip(
       test.info().project.name !== 'mobile',

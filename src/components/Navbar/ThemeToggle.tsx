@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
-import { Button } from 'components';
+import { Button } from 'components/Button';
 import { useAppContext } from 'hooks';
 import styles from './ThemeToggle.module.css';
 

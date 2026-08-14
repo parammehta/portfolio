@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react';
-import { Button, Icon, Text, Transition } from 'components';
+import { Button } from 'components/Button';
+import { Icon } from 'components/Icon';
+import { Text } from 'components/Text';
+import { Transition } from 'components/Transition';
 import { useTheme } from 'components/ThemeProvider';
 import styles from './Code.module.css';
 

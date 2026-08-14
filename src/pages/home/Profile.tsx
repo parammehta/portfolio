@@ -29,12 +29,10 @@ const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
       <ScrambleReveal text="Hi there" start={visible} delay={500} />
     </Heading>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
-      I&apos;m Param, a software engineer with 8+ years at the intersection of
-      engineering, design, and AI. I live in the San Francisco Bay Area and work as a
-      software engineer, where I build identity experiences, prototype AI-native patterns
-      with apps like Codex, Claude, and MCP, and maintain the Storybook environment Design
-      and PM partners use to sign off on live components before anything ships. If
-      you&apos;re curious about the tools and tech I use day to day, check out my{' '}
+      I&apos;m Param, a software engineer with 8+ years across engineering, design, and
+      AI. Based in the SF Bay Area, I build identity experiences and AI-native patterns,
+      and maintain the Storybook environment Design and PM partners use to sign off on
+      components. Curious what I use day to day? Check out my{' '}
       <Link href="/skills">skills page</Link>.
     </Text>
     <Text className={styles.description} data-visible={visible} size="l" as="p">

@@ -4,7 +4,17 @@
      per route inside AnimatePresence, so an inner scroller there would also
      apply to /articles and break useParallax, which reads window.scrollY. */
   height: 100vh;
-  height: 100dvh;
+
+  /* `100svh` (small viewport height), not `100dvh`: dvh tracks the *current*
+     browser-chrome state, and on mobile Safari/Chrome that state is the large,
+     toolbar-expanded one on first arrival at a pane — so a pane sized to dvh at
+     that moment is taller than what's actually visible, and content pinned
+     near its bottom (a button, the footer) renders below the visible area or
+     overlapping the pane above. svh is the guaranteed-visible floor: toolbars
+     showing is the smallest the viewport ever is, so every pane fits inside
+     what's on screen up front. The cost is unused space at the bottom once the
+     toolbar auto-hides — a much better failure mode than clipped content. */
+  height: 100svh;
   overflow-y: auto;
 
   /* overflow-y: auto computes overflow-x from `visible` to `auto`, and

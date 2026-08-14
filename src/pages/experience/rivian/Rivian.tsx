@@ -1,11 +1,13 @@
-import rivianBackground from 'assets/rivian-fleet-os-background.png';
+// These four are WebP data — the source files were mislabeled with a .png
+// extension for years; renamed to match their actual encoding.
+import rivianBackground from 'assets/rivian-fleet-os-background.webp';
 import rivianBackgroundPlaceholder from 'assets/rivian-fleet-os-background-placeholder.png';
 import rivianFleetScreen1 from 'assets/rivian-fleet-os-1.png';
 import rivianFleetMobileScreen1 from 'assets/rivian-fleet-os-mobile-1.png';
 import rivianFleetMobileScreen2 from 'assets/rivian-fleet-os-mobile-2.png';
-import rivianFleetScreen2 from 'assets/rivian-fleet-os-2.png';
-import rivianFleetScreen3 from 'assets/rivian-fleet-os-3.png';
-import rivianFleetScreen4 from 'assets/rivian-fleet-os-4.png';
+import rivianFleetScreen2 from 'assets/rivian-fleet-os-2.webp';
+import rivianFleetScreen3 from 'assets/rivian-fleet-os-3.webp';
+import rivianFleetScreen4 from 'assets/rivian-fleet-os-4.webp';
 import { Footer, Image, Meta } from 'components';
 import {
   ExperienceBackground,
