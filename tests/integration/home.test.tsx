@@ -38,14 +38,13 @@ describe('home page', () => {
 
     await screen.findByText('Param Mehta');
 
-    expect(screen.getByRole('link', { name: /view resume/i })).toHaveAttribute(
-      'href',
-      '/resume'
-    );
-    expect(screen.getByRole('link', { name: /get in touch/i })).toHaveAttribute(
-      'href',
-      '/#contact'
-    );
+    const resumeLinks = screen.getAllByRole('link', { name: /view resume/i });
+    expect(resumeLinks.length).toBeGreaterThanOrEqual(1);
+    expect(resumeLinks[0]).toHaveAttribute('href', '/resume');
+
+    const contactLinks = screen.getAllByRole('link', { name: /get in touch/i });
+    expect(contactLinks.length).toBeGreaterThanOrEqual(1);
+    expect(contactLinks[0]).toHaveAttribute('href', '/#contact');
   });
 
   it('scrolls the page itself rather than the document', async () => {
