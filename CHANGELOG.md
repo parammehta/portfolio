@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/parammehta/portfolio/compare/v1.7.1...v1.8.0) (2026-08-14)
+
+
+### Features
+
+* size pages to the viewport and split experience and skills into routes ([#28](https://github.com/parammehta/portfolio/issues/28)) ([fd8150b](https://github.com/parammehta/portfolio/commit/fd8150b5c80bf8f3238ef221e9f0ec74296cbdff))
+
 ## [1.7.1](https://github.com/parammehta/portfolio/compare/v1.7.0...v1.7.1) (2026-08-12)
 
 
