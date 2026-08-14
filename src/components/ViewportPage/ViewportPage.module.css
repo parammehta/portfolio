@@ -15,7 +15,7 @@
   }
 
   @media (--mediaMobile) {
-    padding-top: calc(var(--mobileNavOffset) - var(--spaceXL));
+    padding-top: var(--space2XL);
     padding-bottom: var(--spaceM);
   }
 
