@@ -78,6 +78,7 @@
   flex-shrink: 0;
   padding-top: var(--spaceL);
   padding-bottom: var(--spaceXL);
+  z-index: auto;
 }
 
 .form {
