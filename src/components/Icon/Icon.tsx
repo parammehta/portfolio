@@ -8,6 +8,7 @@ import ChevronRight from './svg/chevron-right.svg';
 import Close from './svg/close.svg';
 import Company from './svg/company.svg';
 import Copy from './svg/copy.svg';
+import Download from './svg/download.svg';
 import Error from './svg/error.svg';
 import Figma from './svg/figma.svg';
 import Github from './svg/github.svg';
@@ -30,6 +31,7 @@ export const icons = {
   chevronRight: ChevronRight,
   close: Close,
   copy: Copy,
+  download: Download,
   error: Error,
   figma: Figma,
   github: Github,
