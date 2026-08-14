@@ -1,8 +1,6 @@
 .contact {
-  /* Third scroll-snap pane on the home page. One overlaid grid cell so the
-     form and the success state cross-fade in place; `align-self: safe center`
-     keeps them centred when they fit and falls back to top-aligned (rather than
-     clipping upward) when they don't, with the pane scrolling internally.
+  /* Third scroll-snap pane on the home page. Flex column so the form area can
+     grow while the footer is pinned to the bottom of the pane.
 
      position: relative so the form's absolutely-positioned descendants (the
      ScrambleReveal's visually-hidden label, input labels) anchor here and are
@@ -11,9 +9,8 @@
   position: relative;
   height: 100%;
   width: 100%;
-  display: grid;
-  grid-template: 1fr / 100%;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
 
   /* Backstop scroll for viewports too short to hold the whole form (e.g. once
      the Turnstile widget loads). Note: no `overscroll-behavior: contain` here —
@@ -22,12 +19,65 @@
      could never scroll back out to the profile pane. Chaining is what lets the
      snap container take over at the boundaries. */
   overflow-y: auto;
+}
+
+.emailSide {
+  position: absolute;
+  left: calc(var(--spaceOuter) + var(--space2XL));
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--spaceL);
+  text-decoration: none;
+  font-size: calc((13 / 16) * 1rem);
+  letter-spacing: 0.12em;
+  color: rgb(var(--rgbText) / 0.5);
+  z-index: var(--zIndex1);
+
+  @media (--mediaUseMotion) {
+    transition: color var(--durationM) ease;
+  }
+
+  &:hover {
+    color: rgb(var(--rgbAccent));
+  }
+
+  &::after {
+    content: '';
+    height: 1px;
+    width: 48px;
+    background: currentColor;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  @media (--mediaTablet) {
+    display: none;
+  }
+}
+
+.formWrapper {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template: 1fr / 100%;
+  justify-items: center;
   padding: var(--space3XL) 0;
 
   @media (--mediaMobile), (--mediaMobileLS) {
     padding-top: var(--mobileNavOffset);
     padding-bottom: var(--spaceXL);
   }
+}
+
+.footer {
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--spaceL);
+  padding-bottom: var(--spaceXL);
 }
 
 .form {

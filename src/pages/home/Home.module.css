@@ -29,3 +29,50 @@
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
+
+.sectionDots {
+  position: fixed;
+  right: var(--spaceL);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceM);
+  z-index: var(--zIndex2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @media (--mediaMobile) {
+    display: none;
+  }
+}
+
+.dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(var(--rgbText) / 0.3);
+
+    @media (--mediaUseMotion) {
+      transition: background var(--durationM) ease, transform var(--durationM) ease;
+    }
+  }
+
+  &[data-active='true']::after {
+    background: rgb(var(--rgbAccent));
+    transform: scale(1.5);
+  }
+}

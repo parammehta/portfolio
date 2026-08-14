@@ -2,6 +2,7 @@ import { type FormEvent, type MouseEvent, type RefObject, useEffect, useRef, use
 import Script from 'next/script';
 import {
   Button,
+  Footer,
   ScrambleReveal,
   Divider,
   Heading,
@@ -153,6 +154,14 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
         aria-labelledby={titleId}
         tabIndex={-1}
       >
+        <a
+          href="mailto:param.mehta95@gmail.com"
+          className={styles.emailSide}
+          aria-label="Send email to param.mehta95@gmail.com"
+        >
+          param.mehta95@gmail.com
+        </a>
+        <div className={styles.formWrapper}>
         <Transition unmount in={!complete} timeout={1600}>
           {(visible: boolean, status: string) => (
             <form className={styles.form} method="post" onSubmit={onSubmit}>
@@ -280,6 +289,8 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
             </div>
           )}
         </Transition>
+        </div>
+        <Footer className={styles.footer} />
       </Section>
     </>
   );

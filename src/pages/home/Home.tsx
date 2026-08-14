@@ -8,12 +8,20 @@ import styles from './Home.module.css';
 
 const disciplines = ['Leader', 'Mentor', 'Full-Stack', 'Coffee ☕'];
 
+const pageSections = [
+  { id: 'intro', label: 'Intro' },
+  { id: 'profile', label: 'About' },
+  { id: 'contact', label: 'Contact' },
+];
+
 export const Home = () => {
   const [visibleSections, setVisibleSections] = useState<Element[]>([]);
   const [scrollIndicatorHidden, setScrollIndicatorHidden] = useState(false);
+  const [activeSection, setActiveSection] = useState(0);
   const intro = useRef<HTMLElement>(null);
   const profile = useRef<HTMLElement>(null);
   const contact = useRef<HTMLElement>(null);
+  const sectionRefs = [intro, profile, contact];
 
   const isVisible = (ref: React.RefObject<HTMLElement | null>) =>
     visibleSections.includes(ref.current!);
@@ -48,7 +56,13 @@ export const Home = () => {
   // panes are exactly one snapport tall, so an observer would be measuring a
   // degenerate boundary rect that engines disagree about.
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    setScrollIndicatorHidden(event.currentTarget.scrollTop > 0);
+    const { scrollTop, clientHeight } = event.currentTarget;
+    setScrollIndicatorHidden(scrollTop > 0);
+    setActiveSection(Math.round(scrollTop / clientHeight));
+  };
+
+  const scrollToSection = (index: number) => {
+    sectionRefs[index].current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -70,6 +84,17 @@ export const Home = () => {
         id="profile"
       />
       <Contact id="contact" sectionRef={contact} />
+      <nav className={styles.sectionDots} aria-label="Page sections">
+        {pageSections.map((section, index) => (
+          <button
+            key={section.id}
+            className={styles.dot}
+            data-active={activeSection === index}
+            onClick={() => scrollToSection(index)}
+            aria-label={`Go to ${section.label}`}
+          />
+        ))}
+      </nav>
     </div>
   );
 };
