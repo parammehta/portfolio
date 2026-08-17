@@ -13,15 +13,23 @@ import { DRACOLoader, GLTFLoader } from 'three-stdlib';
 // Enable caching for all loaders
 Cache.enabled = true;
 
-const dracoLoader = new DRACOLoader();
-const gltfLoader = new GLTFLoader();
-dracoLoader.setDecoderPath('/draco/');
-gltfLoader.setDRACOLoader(dracoLoader);
+let gltfLoader: GLTFLoader | undefined;
 
 /**
- * GLTF model loader configured with draco decoder
+ * GLTF model loader configured with the draco decoder. Constructed lazily on
+ * first use rather than at module scope, so importing this module has no
+ * side effect.
  */
-export const modelLoader: GLTFLoader = gltfLoader;
+export function getModelLoader(): GLTFLoader {
+  if (!gltfLoader) {
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+    gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+  }
+  return gltfLoader;
+}
+
 export const textureLoader: TextureLoader = new TextureLoader();
 
 /**

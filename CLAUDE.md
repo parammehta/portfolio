@@ -31,7 +31,7 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 
 - **Framework**: Next.js with `output: 'export'` (static HTML, no SSR at runtime)
 - **Pages**: use the `.page.tsx` (or `.page.ts`) extension — `pageExtensions` in `next.config.js` is `['page.tsx', 'page.ts', 'api.ts']`. Regular `.ts`/`.tsx` files in `src/pages/` are non-page helpers.
-- **Routing**: file-based via Next.js — `src/pages/index.page.tsx` → `/`, `src/pages/contact/index.page.tsx` → `/contact/`, etc. `trailingSlash: true`, so routes resolve as `route/index.html`.
+- **Routing**: file-based via Next.js — `src/pages/index.page.tsx` → `/`, `src/pages/resume/index.page.tsx` → `/resume/`, etc. `trailingSlash: true`, so routes resolve as `route/index.html`. The contact form lives on the home page as an `/#contact` section, not its own route; `src/pages/contact/index.page.tsx` exists only as a redirect stub for the old `/contact/` URL (still indexed/linked externally), which sends visitors on to `/#contact`.
 - **Styling**: CSS Modules (`.module.css`). camelCase class names (`selectorClassPattern: ^[a-z][a-zA-Z0-9]+$`).
 - **CSS chunking**: `next.config.js` forces every stylesheet into a single chunk shared by all routes. Next otherwise gives each route its own chunk and unloads it the moment the next route commits — which leaves the outgoing page unstyled while it plays its exit animation, stretching it to full width. This depends on the webpack builder (the `--webpack` flag on `dev` and `build`); the `webpack()` hook is ignored under Turbopack, and dropping the flag silently brings the bug back.
 - **Imports**: `tsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.

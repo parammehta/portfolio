@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, FocusEvent } from 'react';
 import RouterLink from 'next/link';
 import { msToNum } from 'utils/style';
-import { tokens } from 'components';
+import { tokens } from 'components/ThemeProvider';
 import { useId } from 'react';
 import styles from './Navbar.module.css';
 

@@ -7,8 +7,8 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <meta charSet="utf-8" />
-
+        {/* Next auto-injects a charset meta into every page's <head> when none
+            is declared via next/head, so a literal one here just duplicates it. */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="shortcut icon" href="/favicon.png" type="image/png" />
         <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { Icon, Wordmark, tokens, Transition } from 'components';
+import { Icon } from 'components/Icon';
+import { Wordmark } from 'components/Wordmark';
+import { tokens } from 'components/ThemeProvider';
+import { Transition } from 'components/Transition';
 import { useTheme } from 'components/ThemeProvider';
 import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';

@@ -1,4 +1,5 @@
-import { Button, Icon } from 'components';
+import { Button } from 'components/Button';
+import { Icon } from 'components/Icon';
 import type { ComponentPropsWithoutRef } from 'react';
 import styles from './NavToggle.module.css';
 

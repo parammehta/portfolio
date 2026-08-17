@@ -86,7 +86,7 @@ Re-transitions the entire section when theme changes (keyed on `theme.themeId`).
 "About Me" section with:
 - "Hi there" heading with `ScrambleReveal`
 - Bio paragraphs with inline links
-- "Send me a message" button linking to `/contact`
+- "Send me a message" button linking to `/#contact`
 - Profile photo with responsive srcSet
 - Decorative Devanagari SVG
 
@@ -190,16 +190,27 @@ Blog post layout with:
 
 ## Other Pages
 
-### Contact (`src/pages/contact/Contact.js`)
+> The rest of this document (and this file generally) predates the route
+> split that moved Skills and Experience off the single-scroll home page and
+> onto their own routes — several sections above still describe the old
+> `Home.js`/`ExperienceGroup.js`/`Skills.js` structure. Needs a fuller pass;
+> the note below is a narrow, verified fix to the Contact section only.
 
-Contact form with:
+### Contact (`src/pages/home/Contact.tsx`)
+
+Contact form, now a section on the home page (`/#contact`) rather than its
+own route:
 - Email input + message textarea (using `useFormInput`)
 - Hidden honeypot field for bot detection
 - POST to `NEXT_PUBLIC_API_URL/message`
 - Success/error states with animated transitions
 - Staggered form element entry animations
 
-### Resume (`src/pages/resume/Resume.js`)
+`src/pages/contact/index.page.tsx` still exists, but only as a redirect stub
+for the old `/contact/` URL — it sends visitors on to `/#contact` rather than
+rendering a form itself.
+
+### Resume (`src/pages/resume/Resume.tsx`)
 
 PDF resume viewer:
 - Iframe embed on desktop, text fallback on mobile/tablet
@@ -210,6 +221,20 @@ PDF resume viewer:
 
 - `index.page.js` — Blog listing page
 - `[slug].page.js` — Dynamic blog post route (MDX via `mdx-bundler`)
+
+### Skills (`src/pages/skills/Skills.tsx`)
+
+Own route (`/skills`), split out of the home page. Tables of languages,
+frameworks, infrastructure and tools, plus a linked list of the tooling used
+day to day. Uses `ViewportPage` (`components/ViewportPage`) for its
+breadcrumb/title shell — a different page-shell component from the
+`components/Page` one Resume uses.
+
+### Experience index (`src/pages/experience/ExperienceIndex.tsx`)
+
+Own route (`/experience`), also split out of the home page. A tabbed
+company switcher (Intuit / Rivian / Walmart) with a sliding rail marker that
+tracks the active tab, driven by `data/experience`. Also uses `ViewportPage`.
 
 ### 404 (`src/pages/404/`)
 

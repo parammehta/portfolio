@@ -19,7 +19,13 @@ const MAX_EMAIL_LENGTH = 512;
 const MAX_MESSAGE_LENGTH = 4096;
 const EMAIL = 'param.mehta95@gmail.com';
 const FROM_EMAIL = 'param.mehta95@gmail.com';
-const EMAIL_PATTERN = /(.+)@(.+){2,}\.(.+){2,}/;
+// The previous pattern, /(.+)@(.+){2,}\.(.+){2,}/, nested unbounded
+// quantifiers ((.+){2,}) — classic catastrophic backtracking (ReDoS) on a
+// crafted input, on top of being semantically wrong (the {2,} counts
+// repetitions of the *group*, not characters, so it didn't require what it
+// looked like it required). This is deliberately simple: it does not attempt
+// to fully validate email syntax, just reject obvious non-emails.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 app.use(helmet());
 app.use(express.json());

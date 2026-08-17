@@ -7,9 +7,18 @@
   padding-top: 60px;
   padding-bottom: 40px;
   display: flex;
-  align-items: center;
+
+  /* `safe center` (not plain `center`), with `overflow-y: auto` below: on short
+     viewports the bio content is taller than the pane, and plain `center`
+     distributes that overflow equally above and below the visible box with no
+     way to reach either end — the heading clips upward into the fixed navbar
+     and the "Send me a message" button clips off the bottom, unreachable.
+     `safe` falls back to start-alignment once content overflows, so the top
+     stays put and the excess is something you scroll to instead of losing.
+     Mirrors the same fix already applied to `.contact`'s form. */
+  align-items: safe center;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto;
 
   @media (--mediaTablet) {
     padding-top: 50px;

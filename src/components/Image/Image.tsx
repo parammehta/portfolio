@@ -1,4 +1,5 @@
-import { Button, Icon } from 'components';
+import { Button } from 'components/Button';
+import { Icon } from 'components/Icon';
 import { useTheme } from 'components/ThemeProvider';
 import { useReducedMotion } from 'framer-motion';
 import { useHasMounted, useInViewport } from 'hooks';

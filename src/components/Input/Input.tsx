@@ -1,6 +1,8 @@
 import React, { useId, useRef, useState } from 'react';
 import type { ChangeEvent, ElementType, FocusEvent } from 'react';
-import { Icon, tokens, Transition } from 'components';
+import { Icon } from 'components/Icon';
+import { tokens } from 'components/ThemeProvider';
+import { Transition } from 'components/Transition';
 import { classes, cssProps, msToNum } from 'utils/style';
 import styles from './Input.module.css';
 import { TextArea } from './TextArea';

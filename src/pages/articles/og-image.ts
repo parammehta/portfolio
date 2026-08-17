@@ -9,6 +9,18 @@ interface OgImageProps {
   timecode: string;
 }
 
+// Mixed into the cache key below so an edit to the OG template (markup or
+// styles) invalidates every cached card, not just ones whose props changed —
+// previously the key only covered title/date/banner/timecode.
+const templateHash = createHash('md5')
+  .update(
+    [
+      fs.readFileSync(path.join(process.cwd(), 'src/pages/articles/og-image.html'), 'utf-8'),
+      fs.readFileSync(path.join(process.cwd(), 'src/pages/articles/og-image.css'), 'utf-8'),
+    ].join('\0')
+  )
+  .digest('hex');
+
 export async function generateOgImage(props: OgImageProps): Promise<string> {
   const params = new URLSearchParams(props as unknown as Record<string, string>);
   const url = `file:${path.join(
@@ -16,9 +28,11 @@ export async function generateOgImage(props: OgImageProps): Promise<string> {
     `src/pages/articles/og-image.html?${params}`
   )}`;
 
-  const hash = createHash('md5').update(url).digest('hex');
+  const hash = createHash('md5').update(`${url}\0${templateHash}`).digest('hex');
   const ogImageDir = path.join(process.cwd(), `public/og`);
-  const imageName = `${hash}.png`;
+  // JPEG rather than PNG: these are photographic-density screenshots (banner
+  // image + text), and PNG was costing ~8x the bytes for no visual benefit.
+  const imageName = `${hash}.jpg`;
   const imagePath = `${ogImageDir}/${imageName}`;
   const publicPath = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/og/${imageName}`;
 
@@ -47,7 +61,7 @@ export async function generateOgImage(props: OgImageProps): Promise<string> {
   const page = await browser.newPage();
   await page.setViewport({ width: 1200, height: 630 });
   await page.goto(url, { waitUntil: 'networkidle0' });
-  const buffer = await page.screenshot();
+  const buffer = await page.screenshot({ type: 'jpeg', quality: 85 });
   await browser.close();
 
   fs.mkdirSync(ogImageDir, { recursive: true });

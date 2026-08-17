@@ -12,9 +12,8 @@ import {
   Text,
 } from 'components';
 import { useReducedMotion } from 'framer-motion';
-import { useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { formatDate } from 'utils/date';
 import { cssProps } from 'utils/style';
 import styles from './Articles.module.css';
@@ -125,10 +124,38 @@ interface ArticlesProps {
   featured: ArticlesPostProps;
 }
 
+// `.grid`'s single-column breakpoint (Articles.module.css's --singleColumnWidth).
+const singleColumnQuery = '(max-width: 1190px)';
+
+function subscribeToColumnQuery(callback: () => void) {
+  const mql = window.matchMedia(singleColumnQuery);
+  mql.addEventListener('change', callback);
+  return () => mql.removeEventListener('change', callback);
+}
+
+function getIsSingleColumnSnapshot(): boolean {
+  return window.matchMedia(singleColumnQuery).matches;
+}
+
+// Desktop, matching the static export's build-time render — this only
+// decides which of two DOM orders ships in the initial HTML/hydration pass;
+// CSS (`--singleColumnWidth`) is what actually makes mobile look right
+// regardless. Driving the client value through `useSyncExternalStore`, rather
+// than the plain-effect-based `useWindowSize`, means a mobile visitor gets
+// the correct DOM order in the same commit as hydration instead of a visible
+// reorder right after — `useWindowSize` seeds a guessed desktop width until
+// its resize listener fires, which very briefly renders the wrong of the two
+// structurally different layouts (list-then-featured vs. featured-first).
+function getServerSnapshot(): boolean {
+  return false;
+}
+
 export const Articles = ({ posts, featured }: ArticlesProps) => {
-  const { width } = useWindowSize();
-  const singleColumnWidth = 1190;
-  const isSingleColumn = width <= singleColumnWidth;
+  const isSingleColumn = useSyncExternalStore(
+    subscribeToColumnQuery,
+    getIsSingleColumnSnapshot,
+    getServerSnapshot
+  );
 
   const postsHeader = (
     <header className={styles.header}>
