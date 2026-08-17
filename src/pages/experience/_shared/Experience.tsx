@@ -5,11 +5,13 @@ import {
   Heading,
   Image,
   Section,
+  StructuredData,
   Text,
   Transition,
 } from 'components';
 import { tokens } from 'components/ThemeProvider';
 import { useParallax } from 'hooks';
+import { breadcrumbListSchema } from 'utils/structuredData';
 import { classes, cssProps, msToNum, numToMs } from 'utils/style';
 import styles from './Experience.module.css';
 
@@ -41,7 +43,12 @@ export function ExperienceHeader({
 }: ExperienceHeaderProps) {
   return (
     <Section className={classes(styles.header, className)} as="section">
-      {!!breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
+      {!!breadcrumbs?.length && (
+        <>
+          <Breadcrumbs items={breadcrumbs} />
+          <StructuredData schema={breadcrumbListSchema(breadcrumbs)} />
+        </>
+      )}
       <div
         className={styles.headerContent}
         style={cssProps({ initDelay: numToMs(initDelay) })}

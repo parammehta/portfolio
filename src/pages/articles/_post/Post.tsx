@@ -7,6 +7,7 @@ import {
   Image,
   Meta,
   Section,
+  StructuredData,
   Text,
   Transition,
 } from 'components';
@@ -16,6 +17,7 @@ import { useParallax, useScrollToHash } from 'hooks';
 import RouterLink from 'next/link';
 import { clamp } from 'utils/clamp';
 import { formatDate } from 'utils/date';
+import { blogPostingSchema, breadcrumbListSchema } from 'utils/structuredData';
 import { cssProps, msToNum, numToMs } from 'utils/style';
 import styles from './Post.module.css';
 
@@ -50,6 +52,12 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
     scrollToHash(event.currentTarget.href);
   };
 
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Articles', href: '/articles' },
+    { label: title, href: `/articles/${slug}` },
+  ];
+
   return (
     <article className={styles.post}>
       <Meta
@@ -60,14 +68,20 @@ export const Post = ({ children, title, date, abstract, banner, timecode, ogImag
         ogType="article"
         publishedTime={date}
       />
+      <StructuredData
+        schema={[
+          blogPostingSchema({
+            title,
+            description: abstract,
+            datePublished: date,
+            image: ogImage,
+            url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}/articles/${slug}/`,
+          }),
+          breadcrumbListSchema(breadcrumbItems),
+        ]}
+      />
       <Section className={styles.breadcrumbSection}>
-        <Breadcrumbs
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Articles', href: '/articles' },
-            { label: title, href: `/articles/${slug}` },
-          ]}
-        />
+        <Breadcrumbs items={breadcrumbItems} />
         {banner && (
           <div className={styles.banner} ref={imageRef}>
             <div className={styles.bannerImage}>

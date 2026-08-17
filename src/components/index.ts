@@ -19,6 +19,7 @@ export * from './Wordmark';
 export * from './Navbar';
 export * from './Section';
 export * from './SegmentedControl';
+export * from './StructuredData';
 export * from './Table';
 export * from './Text';
 export * from './ThemeProvider';

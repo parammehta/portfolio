@@ -1,5 +1,6 @@
 import { type UIEvent, useEffect, useRef, useState } from 'react';
-import { Meta } from 'components';
+import { Meta, StructuredData } from 'components';
+import { personSchema } from 'utils/structuredData';
 import { Intro } from './Intro';
 import { Profile } from './Profile';
 import { Contact } from './Contact';
@@ -71,6 +72,7 @@ export const Home = () => {
         title="Developer + Leader"
         description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences."
       />
+      <StructuredData schema={personSchema()} />
       <Intro
         id="intro"
         sectionRef={intro}
