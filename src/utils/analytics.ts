@@ -33,6 +33,7 @@ export const analyticsEvents = {
   contactError: 'contact_error',
   resumeDownload: 'resume_download',
   resumeOpen: 'resume_open',
+  designSystemOpen: 'design_system_open',
 } as const;
 
 const devSink: AnalyticsSink = ({ name, props }) => {

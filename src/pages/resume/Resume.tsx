@@ -11,6 +11,7 @@ import { media } from 'utils/style';
 import styles from './Resume.module.css';
 
 const resumeUrl = '/param-mehta-resume.pdf';
+const storybookUrl = 'https://storybook.parammehta.com';
 
 // Driven by matchMedia rather than `useWindowSize` (which seeds a guessed
 // 1280×800 until its resize listener fires): a mobile visitor could hit that
@@ -52,7 +53,7 @@ export const Resume = () => {
       <PageContainer className={styles.resume}>
         <PageHeader
           title="Resume"
-          description="Software engineer with 8+ years building identity, frontend, and AI-native experiences."
+          description="Software engineer with 8+ years building identity, frontend, and AI-native experiences — including the design system below."
           breadcrumbs={[
             { label: 'Home', href: '/' },
             { label: 'Resume', href: '/resume' },
@@ -81,6 +82,17 @@ export const Resume = () => {
                 onClick={() => trackEvent(analyticsEvents.resumeOpen)}
               >
                 Open in new tab
+              </Button>
+              <Button
+                secondary
+                iconHoverShift
+                href={storybookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon="storybook"
+                onClick={() => trackEvent(analyticsEvents.designSystemOpen)}
+              >
+                Design system
               </Button>
             </div>
 
