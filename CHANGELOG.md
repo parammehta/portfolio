@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.0](https://github.com/parammehta/portfolio/compare/v1.8.0...v1.9.0) (2026-08-17)
+
+
+### Features
+
+* add JSON-LD structured data for SEO ([#31](https://github.com/parammehta/portfolio/issues/31)) ([e70a80b](https://github.com/parammehta/portfolio/commit/e70a80bdecdbef2835f76981b10d9318fac23562))
+
+
+### Bug Fixes
+
+* site audit cleanup — CI, SEO, bundle size, mobile layout bugs ([#30](https://github.com/parammehta/portfolio/issues/30)) ([5039d0f](https://github.com/parammehta/portfolio/commit/5039d0fe81cbfd1e781d184d9bd2e226633de1a9))
+
 ## [1.8.0](https://github.com/parammehta/portfolio/compare/v1.7.1...v1.8.0) (2026-08-14)
 
 
