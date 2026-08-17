@@ -4,7 +4,7 @@ import { addons } from 'storybook/manager-api';
 addons.setConfig({
   theme: {
     ...themes.dark,
-    brandImage: 'https://parammehta.com/icon.svg',
+    brandImage: 'https://parammehta.com/wordmark.svg',
     brandTitle: 'Param Mehta Components',
     brandUrl: 'https://parammehta.com',
   },
