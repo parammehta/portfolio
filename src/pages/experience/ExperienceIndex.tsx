@@ -1,8 +1,26 @@
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
-import { Button, Divider, Heading, Meta, Text, ViewportPage } from 'components';
-import { TAB_HIGHLIGHT_LIMIT, companies, companyHref } from 'data/experience';
-import { cssProps } from 'utils/style';
+import intuitThumbnail from 'assets/intuit-background.png';
+import intuitThumbnailPlaceholder from 'assets/intuit-background-placeholder.png';
+import rivianThumbnail from 'assets/rivian-fleet-os-background.webp';
+import rivianThumbnailPlaceholder from 'assets/rivian-fleet-os-background-placeholder.png';
+import walmartThumbnail from 'assets/walmart-background.png';
+import walmartThumbnailPlaceholder from 'assets/walmart-background-placeholder.png';
+import { Button, Divider, Heading, Image, Meta, Text, ViewportPage } from 'components';
+import {
+  TAB_HIGHLIGHT_LIMIT,
+  TAB_TECH_LIMIT,
+  companies,
+  companyHref,
+  type CompanySlug,
+} from 'data/experience';
+import { cssProps, media } from 'utils/style';
 import styles from './ExperienceIndex.module.css';
+
+const thumbnails: Record<CompanySlug, { src: typeof intuitThumbnail; placeholder: typeof intuitThumbnailPlaceholder }> = {
+  intuit: { src: intuitThumbnail, placeholder: intuitThumbnailPlaceholder },
+  rivian: { src: rivianThumbnail, placeholder: rivianThumbnailPlaceholder },
+  walmart: { src: walmartThumbnail, placeholder: walmartThumbnailPlaceholder },
+};
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -107,6 +125,7 @@ export const ExperienceIndex = () => {
               id={`${id}-tab-${item.slug}`}
               aria-selected={index === currentIndex}
               aria-controls={`${id}-panel-${item.slug}`}
+              aria-label={item.shortName}
               tabIndex={index === currentIndex ? 0 : -1}
               ref={element => {
                 tabRefs.current[index] = element;
@@ -115,6 +134,9 @@ export const ExperienceIndex = () => {
               onClick={() => setCurrentIndex(index)}
             >
               {item.shortName}
+              <span className={styles.tabDate} aria-hidden>
+                {item.dateRange}
+              </span>
             </button>
           ))}
         </div>
@@ -126,6 +148,21 @@ export const ExperienceIndex = () => {
           aria-labelledby={`${id}-tab-${company.slug}`}
           tabIndex={0}
         >
+          {!!company.stats.length && (
+            <ul className={styles.stats}>
+              {company.stats.map(stat => (
+                <li className={styles.stat} key={stat.label}>
+                  <Text className={styles.statValue} as="div">
+                    {stat.value}
+                  </Text>
+                  <Text className={styles.statLabel} secondary as="div">
+                    {stat.label}
+                  </Text>
+                </li>
+              ))}
+            </ul>
+          )}
+
           {company.roles.map((role, index) => (
             <article className={styles.role} key={role.id}>
               {index > 0 && <Divider className={styles.divider} notch={false} light />}
@@ -142,10 +179,25 @@ export const ExperienceIndex = () => {
                   ))}
                 </ul>
               </Text>
+              <ul className={styles.techRow}>
+                {role.tech.slice(0, TAB_TECH_LIMIT).map(tech => (
+                  <li className={styles.techChip} key={tech}>
+                    {tech}
+                  </li>
+                ))}
+              </ul>
             </article>
           ))}
 
-          <div className={styles.action}>
+          <div className={styles.actionRow}>
+            <Image
+              className={styles.actionThumbnail}
+              src={thumbnails[company.slug].src}
+              placeholder={thumbnails[company.slug].placeholder}
+              alt=""
+              role="presentation"
+              sizes={`(max-width: ${media.mobile}px) 96px, 120px`}
+            />
             <Button iconHoverShift href={companyHref(company.slug)} iconEnd="arrowRight">
               See Details
             </Button>

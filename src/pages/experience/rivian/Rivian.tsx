@@ -49,7 +49,6 @@ export const Rivian = () => {
         <ExperienceHeader
           title={title}
           description={description}
-          url="https://www.rivian.com/fleet"
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },

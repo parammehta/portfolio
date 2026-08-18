@@ -15,6 +15,13 @@ export interface Role {
   dateRange: string;
   /** The /experience tab pane renders the first `TAB_HIGHLIGHT_LIMIT` of these. */
   highlights: string[];
+  /** Short tech tags for the /experience tab pane, named in this role's own highlights. */
+  tech: string[];
+}
+
+export interface CompanyStat {
+  value: string;
+  label: string;
 }
 
 export interface Company {
@@ -23,6 +30,10 @@ export interface Company {
   name: string;
   /** Tab rail and navbar submenu label. */
   shortName: string;
+  /** Rail subtext spanning this company's roles, newest role's start – oldest role's end. */
+  dateRange: string;
+  /** 2-3 headline numbers for the /experience tab pane, drawn from this company's highlights. */
+  stats: CompanyStat[];
   /** Newest role first. */
   roles: Role[];
 }
@@ -30,31 +41,44 @@ export interface Company {
 /** How many highlights a role shows on /experience before it costs vertical space we don't have. */
 export const TAB_HIGHLIGHT_LIMIT = 2;
 
+/** How many tech tags a role shows on /experience before it costs horizontal space we don't have. */
+export const TAB_TECH_LIMIT = 4;
+
 export const companies: Company[] = [
   {
     slug: 'intuit',
     name: 'Intuit',
     shortName: 'Intuit',
+    dateRange: 'Jul 2022 – Present',
+    stats: [
+      { value: '26%', label: 'passkey adoption' },
+      { value: '8', label: 'cross-product launches' },
+      { value: '100+', label: 'components shared' },
+      { value: '4', label: 'products powered' },
+    ],
     roles: [
       {
+        id: 'intuit-design-system',
+        title: 'Staff Software Engineer, Intuit Design System',
+        dateRange: 'Jul 2022 – Jan 2024',
+        highlights: [
+          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
+          'Built a theming layer so each product could apply its own brand on top of the same components',
+          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
+          'Built internal Figma plugins and piloted AI-assisted tooling to speed up the design-to-code handoff, wired components to GraphQL/REST endpoints with client-side instrumentation, and was the primary on-call contact owning production support and SLAs for the design system',
+        ],
+        tech: ['Design Systems', 'Figma Plugins', 'GraphQL', 'Storybook'],
+      },
+      {
         id: 'intuit-identity',
-        title: 'Staff Software Engineer, Identity Authentication Experiences',
+        title: 'Senior Software Engineer, Identity Authentication Experiences',
         dateRange: 'Jan 2024 – Present',
         highlights: [
           'Led Passkeys across Intuit, shipping 8 cross-product launches and driving adoption from 10% to 26% of active customers',
           'Architected the first cross-identity SSO pattern at Intuit for Amazon partnership integrations',
           "Currently leading the agentic AI track, building MCP-based agent authentication prototypes and running the org's AI-assisted engineering practice",
         ],
-      },
-      {
-        id: 'intuit-design-system',
-        title: 'Senior Software Engineer, Intuit Design System',
-        dateRange: 'Jul 2022 – Jan 2024',
-        highlights: [
-          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
-          'Built a theming layer so each product could apply its own brand on top of the same components',
-          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
-        ],
+        tech: ['Passkeys', 'SSO', 'MCP', 'Agentic AI'],
       },
     ],
   },
@@ -62,6 +86,11 @@ export const companies: Company[] = [
     slug: 'rivian',
     name: 'Rivian',
     shortName: 'Rivian',
+    dateRange: 'Jan 2022 – Jul 2022',
+    stats: [
+      { value: '4', label: 'engineers led' },
+      { value: '4', label: 'notification channels' },
+    ],
     roles: [
       {
         id: 'rivian-fleet-core',
@@ -72,6 +101,7 @@ export const companies: Company[] = [
           'Led a team of 4 engineers to ship a cross-platform notifications system (push, email, in-app inbox, Slack) for fleet management software',
           'Architected the event-driven pipeline using WebSockets, AWS SQS, and EventBridge, with a React frontend consuming a GraphQL API',
         ],
+        tech: ['React', 'GraphQL', 'WebSockets', 'AWS SQS'],
       },
     ],
   },
@@ -79,6 +109,12 @@ export const companies: Company[] = [
     slug: 'walmart',
     name: 'Walmart Global Tech',
     shortName: 'Walmart',
+    dateRange: 'Jun 2018 – Jan 2022',
+    stats: [
+      { value: '3.1M+', label: 'customers served' },
+      { value: '100K', label: 'registrants in 30 days' },
+      { value: '15%', label: 'faster page speed' },
+    ],
     roles: [
       {
         id: 'walmart-marketplace',
@@ -89,6 +125,7 @@ export const companies: Company[] = [
           'Built the seller ratings and reviews page, ranked the #1 feature in Q2 2021',
           'Architected end-to-end seller workflows across homepage, search, item page, cart, and checkout',
         ],
+        tech: ['GraphQL', 'React', 'TypeScript', 'Mobile Web', 'Next.js'],
       },
       {
         id: 'walmart-core-components',
@@ -98,6 +135,7 @@ export const companies: Company[] = [
           "Built and maintained 100+ reusable components used across Walmart.com, Sam's Club, and Marketplace",
           "Added a theming layer for different Walmart banners and owned the team's Storybook",
         ],
+        tech: ['TypeScript', 'Storybook', 'Theming'],
       },
       {
         id: 'walmart-baby-registry',
@@ -108,6 +146,7 @@ export const companies: Company[] = [
           'First team at Walmart to adopt TypeScript, earning the internal Tech Evangelist Award',
           'Optimized the PDP buy-box to improve page speed by 15%, generating a 30bps conversion rate lift',
         ],
+        tech: ['TypeScript', 'Performance'],
       },
     ],
   },
