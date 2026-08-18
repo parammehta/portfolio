@@ -46,7 +46,6 @@ export const Walmart = () => {
         <ExperienceHeader
           title={title}
           description={description}
-          url="https://www.walmart.com/"
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },
@@ -140,7 +139,8 @@ export const Walmart = () => {
               <ExperienceSectionText>
                 I redesigned the star-rating component for ADA compliance, reducing its
                 bundle size by 10% and improving rendering performance across the product
-                and purchase review flows it appeared in.
+                and purchase review flows it appeared in &mdash; built once and shipped
+                consistently across both the Walmart.com desktop site and mobile web.
               </ExperienceSectionText>
             </div>
             <div className={styles.sidebarImages}>

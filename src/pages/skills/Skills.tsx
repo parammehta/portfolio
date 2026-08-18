@@ -92,6 +92,10 @@ export const Skills = () => (
               <Link href="https://storybook.js.org/">Storybook</Link> for components in
               isolation.
             </ListItem>
+            <ListItem>
+              <Link href="https://www.figma.com/">Figma</Link>, including building
+              internal plugins to sync design tokens into code.
+            </ListItem>
           </List>
         </Text>
       </div>
