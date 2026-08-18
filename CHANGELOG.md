@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/parammehta/portfolio/compare/v1.9.0...v1.10.0) (2026-08-18)
+
+
+### Features
+
+* revamp experience page and reorder Intuit case study ([#33](https://github.com/parammehta/portfolio/issues/33)) ([d4025de](https://github.com/parammehta/portfolio/commit/d4025de6cdb4cd65f5fb57dcd8e280496610b258))
+
 ## [1.9.0](https://github.com/parammehta/portfolio/compare/v1.8.0...v1.9.0) (2026-08-17)
 
 
