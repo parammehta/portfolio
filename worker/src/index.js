@@ -307,8 +307,14 @@ async function verifyAccessJwt(request, env, url) {
   const aud = env.ACCESS_AUD;
   const isLocal = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
+  // Checked before the configured/unconfigured branches below, not just
+  // inside the "unconfigured" one — otherwise, once Access is actually
+  // configured (both vars set), `wrangler dev` starts requiring a real
+  // Cf-Access-Jwt-Assertion too, since wrangler.toml has no per-environment
+  // split between local and deployed vars.
+  if (isLocal) return { ok: true, email: 'local-dev', skipped: true };
+
   if (!teamDomain || !aud) {
-    if (isLocal) return { ok: true, email: 'local-dev', skipped: true };
     return { ok: false, reason: 'access not configured' };
   }
 
