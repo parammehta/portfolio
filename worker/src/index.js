@@ -351,39 +351,59 @@ function barList(rows, labelKey) {
     .join('')}</ul>`;
 }
 
+const SPARK_DAYS = 30;
+
+// toStartOfDay returns "2026-08-19 00:00:00"; only the date part is meaningful.
+function dayKey(value) {
+  return String(value ?? '').slice(0, 10);
+}
+
+/**
+ * Expands the query's sparse rows (it only returns days that *have* events)
+ * into one entry per day across the whole window, zero-filling the gaps.
+ * Without this the x-axis is an index, not a date: two days a week apart plot
+ * as adjacent points and a straight rising line, which reads as steady growth
+ * that never happened.
+ */
+function fillDailySeries(daily, days = SPARK_DAYS) {
+  const counts = new Map(daily.map(d => [dayKey(d.day), Number(d.n) || 0]));
+  const today = new Date();
+  const series = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - i));
+    const key = date.toISOString().slice(0, 10);
+    series.push({ day: key, n: counts.get(key) ?? 0 });
+  }
+  return series;
+}
+
 function sparkline(daily) {
   if (!daily.length) return '<p class="empty">No data yet.</p>';
+  const series = fillDailySeries(daily);
   const w = 720;
   const h = 160;
-  const max = Math.max(...daily.map(d => Number(d.n) || 0), 1);
-  const step = daily.length > 1 ? w / (daily.length - 1) : w;
-  const yFor = d => h - (Number(d.n) || 0) / max * (h - 20) - 10;
-  // A single data point can't form a polyline segment, so plot it as a flat
-  // line across the full width instead of a coordinate that renders nothing.
-  const coords =
-    daily.length > 1
-      ? daily.map((d, i) => [i * step, yFor(d)])
-      : [[0, yFor(daily[0])], [w, yFor(daily[0])]];
+  const max = Math.max(...series.map(d => d.n), 1);
+  const step = w / (series.length - 1);
+  const yFor = d => h - (d.n / max) * (h - 20) - 10;
+  const coords = series.map((d, i) => [i * step, yFor(d)]);
   const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
 
-  // A bare line has no numbers on it at all — add a hoverable marker (with a
-  // native tooltip) per day, plus a caption so the peak/latest are visible
-  // without needing to hover.
+  // A bare line has no numbers on it at all — mark the days that actually have
+  // events (hoverable, with a native tooltip), and caption the peak/latest so
+  // they're readable without hovering.
   const markers = coords
-    .map(([x, y], i) => {
-      const d = daily[i];
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor"><title>${esc(
-        `${num(d.n)} on ${d.day}`
-      )}</title></circle>`;
-    })
+    .map(([x, y], i) =>
+      series[i].n > 0
+        ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor"><title>${esc(
+            `${num(series[i].n)} on ${series[i].day}`
+          )}</title></circle>`
+        : ''
+    )
     .join('');
 
-  const peakIndex = daily.reduce(
-    (best, d, i) => (Number(d.n) > Number(daily[best].n) ? i : best),
-    0
-  );
-  const peak = daily[peakIndex];
-  const latest = daily[daily.length - 1];
+  const withEvents = series.filter(d => d.n > 0);
+  const peak = withEvents.reduce((best, d) => (d.n > best.n ? d : best), withEvents[0]);
+  const latest = withEvents[withEvents.length - 1];
   const caption = `<p class="spark-caption">Peak <strong>${num(peak.n)}</strong> on ${esc(
     peak.day
   )} · Latest <strong>${num(latest.n)}</strong> on ${esc(latest.day)}</p>`;
