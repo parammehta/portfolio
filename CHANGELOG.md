@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.4](https://github.com/parammehta/portfolio/compare/v1.11.3...v1.11.4) (2026-08-19)
+
+
+### Bug Fixes
+
+* prevent dashboard queries from breaking each other, add verify script ([#56](https://github.com/parammehta/portfolio/issues/56)) ([d88e074](https://github.com/parammehta/portfolio/commit/d88e074787f3ea4f76e6a5b5b602fab014caabff))
+
 ## [1.11.3](https://github.com/parammehta/portfolio/compare/v1.11.2...v1.11.3) (2026-08-19)
 
 
