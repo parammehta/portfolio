@@ -403,9 +403,13 @@ function barList(rows, labelKey) {
       // rendered popup is slow, inconsistent across browsers/OS, and doesn't
       // fire at all on touch. `.label-wrap` carries the tooltip so it isn't
       // clipped by `.label`'s own overflow:hidden (an element's ::after is
-      // still inside its own clipping box).
+      // still inside its own clipping box). `tabindex` makes it reachable by
+      // keyboard Tab and by tap-to-focus on touch (CSS ::after has no hover
+      // equivalent there); `aria-label` gives screen readers the untruncated
+      // text directly, since generated ::after content isn't reliably
+      // exposed to the accessibility tree.
       return `<li>
-        <span class="label-wrap tip" data-tip="${label}">
+        <span class="label-wrap tip" data-tip="${label}" aria-label="${label}" tabindex="0">
           <span class="label">${label}</span>
         </span>
         <span class="track"><span class="fill" style="width:${pct.toFixed(1)}%"></span></span>
