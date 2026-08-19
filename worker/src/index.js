@@ -307,8 +307,14 @@ async function verifyAccessJwt(request, env, url) {
   const aud = env.ACCESS_AUD;
   const isLocal = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
+  // Checked before the configured/unconfigured branches below, not just
+  // inside the "unconfigured" one — otherwise, once Access is actually
+  // configured (both vars set), `wrangler dev` starts requiring a real
+  // Cf-Access-Jwt-Assertion too, since wrangler.toml has no per-environment
+  // split between local and deployed vars.
+  if (isLocal) return { ok: true, email: 'local-dev', skipped: true };
+
   if (!teamDomain || !aud) {
-    if (isLocal) return { ok: true, email: 'local-dev', skipped: true };
     return { ok: false, reason: 'access not configured' };
   }
 
@@ -403,9 +409,13 @@ function barList(rows, labelKey) {
       // rendered popup is slow, inconsistent across browsers/OS, and doesn't
       // fire at all on touch. `.label-wrap` carries the tooltip so it isn't
       // clipped by `.label`'s own overflow:hidden (an element's ::after is
-      // still inside its own clipping box).
+      // still inside its own clipping box). `tabindex` makes it reachable by
+      // keyboard Tab and by tap-to-focus on touch (CSS ::after has no hover
+      // equivalent there); `aria-label` gives screen readers the untruncated
+      // text directly, since generated ::after content isn't reliably
+      // exposed to the accessibility tree.
       return `<li>
-        <span class="label-wrap tip" data-tip="${label}">
+        <span class="label-wrap tip" data-tip="${label}" aria-label="${label}" tabindex="0">
           <span class="label">${label}</span>
         </span>
         <span class="track"><span class="fill" style="width:${pct.toFixed(1)}%"></span></span>
@@ -450,19 +460,32 @@ function sparkline(daily) {
   const step = w / (series.length - 1);
   const yFor = d => h - (d.n / max) * (h - 20) - 10;
   const coords = series.map((d, i) => [i * step, yFor(d)]);
-  const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const pointsAttr = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
 
-  // A bare line has no numbers on it at all — mark the days that actually have
-  // events (hoverable, with a native tooltip), and caption the peak/latest so
-  // they're readable without hovering.
-  const markers = coords
+  // A bare line has no numbers on it at all — mark the days that actually
+  // have events, visually as an SVG dot and separately (below) as an HTML
+  // hover target, since SVG's own native <title> has the exact same
+  // unreliability as the HTML title attribute. Caption the peak/latest too,
+  // so they're readable without hovering at all.
+  const dots = coords
     .map(([x, y], i) =>
       series[i].n > 0
-        ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor"><title>${esc(
-            `${num(series[i].n)} on ${series[i].day}`
-          )}</title></circle>`
+        ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor" />`
         : ''
     )
+    .join('');
+
+  // CSS tooltip targets, positioned by percentage over the fixed-size SVG box
+  // (not inside the SVG — a generated ::after on an SVG shape doesn't
+  // position reliably across browsers the way it does on an HTML element).
+  const points = coords
+    .map(([x, y], i) => {
+      if (series[i].n === 0) return '';
+      const left = ((x / w) * 100).toFixed(2);
+      const top = ((y / h) * 100).toFixed(2);
+      const tip = esc(`${num(series[i].n)} on ${series[i].day}`);
+      return `<span class="spark-point tip" data-tip="${tip}" aria-label="${tip}" tabindex="0" style="left:${left}%;top:${top}%"></span>`;
+    })
     .join('');
 
   const withEvents = series.filter(d => d.n > 0);
@@ -472,10 +495,13 @@ function sparkline(daily) {
     peak.day
   )} · Latest <strong>${num(latest.n)}</strong> on ${esc(latest.day)}</p>`;
 
-  return `<svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
-    <polyline fill="none" stroke="currentColor" stroke-width="2" points="${points}" />
-    ${markers}
-  </svg>
+  return `<div class="spark-wrap">
+    <svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
+      <polyline fill="none" stroke="currentColor" stroke-width="2" points="${pointsAttr}" />
+      ${dots}
+    </svg>
+    ${points}
+  </div>
   ${caption}`;
 }
 
@@ -706,7 +732,16 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .panel h2 { margin:0 0 14px; font-size:15px; }
 .grid { display:grid; grid-template-columns:1fr; gap:20px; }
 @media (min-width:680px) { .grid { grid-template-columns:1fr 1fr; } .grid .panel:first-child, .grid .panel-wide { grid-column:1/-1; } }
+.spark-wrap { position:relative; width:100%; height:160px; }
 .spark { width:100%; height:160px; color:var(--accent); display:block; }
+/* .spark-point.tip (two classes) beats the base .tip's position:relative
+   (one class) on specificity regardless of source order — needed since this
+   element must stay position:absolute to sit over the chart by percentage. */
+.spark-point.tip {
+  position:absolute; width:16px; height:16px; margin:-8px 0 0 -8px;
+  border-radius:50%; cursor:default;
+}
+.spark-point.tip::after { left:50%; bottom:auto; top:-6px; margin-bottom:0; transform:translate(-50%,-100%); }
 .spark-caption { margin:8px 0 0; font-size:12px; color:var(--muted); }
 .spark-caption strong { color:var(--fg); font-weight:600; }
 .delta { font-weight:600; }
@@ -728,7 +763,11 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
   padding:4px 8px; border-radius:6px; font-size:12px; white-space:nowrap;
   opacity:0; pointer-events:none; transition:opacity .1s ease; z-index:10;
 }
-.tip:hover::after, .tip:focus-visible::after { opacity:1; }
+/* Plain :focus, not :focus-visible — tapping a tabindex="0" element on a
+   touch device satisfies :focus but not reliably :focus-visible across
+   browsers, and tap is the only way a touch user can reach this at all. */
+.tip:hover::after, .tip:focus::after { opacity:1; }
+.tip:focus { outline:2px solid var(--accent); outline-offset:2px; }
 .bars .track { background:var(--line); border-radius:5px; height:10px; overflow:hidden; }
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
 .bars .value { font-variant-numeric:tabular-nums; color:var(--muted); }
