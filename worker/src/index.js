@@ -41,6 +41,11 @@ const MAX_BODY_BYTES = 1024;
 
 const DATASET = 'portfolio_events';
 
+// Namespaces the visitor hash — see visitorId(). Not a secret (it only has to
+// stop the hash being a plain rainbow-table lookup of an IP+UA pair), but
+// changing it resets every visitor to "new".
+const VISITOR_SALT = 'portfolio-analytics-v1';
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -114,24 +119,62 @@ async function handleEvent(request, env) {
   const detailValue = props.label ?? props.company ?? props.tool ?? props.theme;
   const detail = typeof detailValue === 'string' ? detailValue.slice(0, 64) : '';
 
+  const referer = (request.headers.get('Referer') || '').slice(0, 256);
+
   // `writeDataPoint` is only bound in deployed/`wrangler dev` runs; guard so
   // a missing binding degrades to a no-op instead of a 500.
   env.ANALYTICS?.writeDataPoint({
     // A single index drives Analytics Engine sampling; bucket by event name.
     indexes: [name],
-    // Appended after country rather than inserted, so blob3/blob4 keep
-    // meaning the same for rows written before this field existed.
+    // Append-only: each new field goes on the end so blobN keeps meaning the
+    // same for rows written before that field existed.
     blobs: [
       name,
       reason,
-      (request.headers.get('Referer') || '').slice(0, 256),
+      referer,
       request.cf?.country || '',
       detail,
+      await visitorId(request),
+      pagePath(referer),
     ],
     doubles: [1],
   });
 
   return new Response(null, { status: 204, headers: cors });
+}
+
+/**
+ * A pseudonymous per-visitor id, so the dashboard can say "9 events from 2
+ * people" instead of just "9 events".
+ *
+ * The raw IP is never stored — it is hashed together with the user agent and
+ * a fixed salt, and only the first 16 hex chars are kept. The salt is fixed
+ * rather than daily-rotating (which is what Plausible/Fathom do) because a
+ * rotating salt makes every visitor look new the next day, and distinguishing
+ * new from returning is the entire point of this field. The tradeoff: the id
+ * is stable across days, so treat it as pseudonymous, not anonymous.
+ */
+async function visitorId(request) {
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+  const ua = request.headers.get('User-Agent') || '';
+  if (!ip && !ua) return '';
+
+  const data = new TextEncoder().encode(`${VISITOR_SALT}:${ip}:${ua}`);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(digest)]
+    .slice(0, 8)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/** The path of the page the event fired on, for the per-page breakdown. */
+function pagePath(referer) {
+  if (!referer) return '';
+  try {
+    return new URL(referer).pathname.slice(0, 64);
+  } catch {
+    return '';
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -183,6 +226,21 @@ export function dashboardQueries() {
     activity: `SELECT toDayOfWeek(timestamp) AS dow, toHour(timestamp) AS hour,
                       sum(_sample_interval) AS n
                FROM ${DATASET} GROUP BY dow, hour`,
+    // One row per visitor; new-vs-returning is derived in JS from whether the
+    // first and last event fall on the same day.
+    visitors: `SELECT blob6 AS visitor, min(timestamp) AS first_seen,
+                      max(timestamp) AS last_seen
+               FROM ${DATASET} WHERE blob6 != '' GROUP BY visitor`,
+    pages: `SELECT blob7 AS page, sum(_sample_interval) AS n
+            FROM ${DATASET} WHERE blob7 != '' GROUP BY page ORDER BY n DESC LIMIT 10`,
+    theme: `SELECT blob5 AS theme, sum(_sample_interval) AS n
+            FROM ${DATASET} WHERE blob1 = 'theme_toggle' AND blob5 != ''
+            GROUP BY theme ORDER BY n DESC`,
+    weekOverWeek: `SELECT
+                     sumIf(_sample_interval, timestamp > now() - INTERVAL '7' DAY) AS this_week,
+                     sumIf(_sample_interval, timestamp <= now() - INTERVAL '7' DAY
+                           AND timestamp > now() - INTERVAL '14' DAY) AS prev_week
+                   FROM ${DATASET}`,
   };
 }
 
@@ -417,18 +475,71 @@ function sparkline(daily) {
 
 function contactFunnel(totals) {
   const byEvent = Object.fromEntries(totals.map(r => [r.event, Number(r.n) || 0]));
+  // The CTA click is the top of the funnel: it's what gets someone to the form
+  // in the first place, so the interesting drop-off is clicked -> submitted.
+  const clicked = byEvent.profile_contact_click || 0;
   const submitted = byEvent.contact_submit || 0;
   const succeeded = byEvent.contact_success || 0;
   const failed = byEvent.contact_error || 0;
-  if (!submitted && !succeeded && !failed) return '<p class="empty">No data yet.</p>';
+  if (!clicked && !submitted && !succeeded && !failed) {
+    return '<p class="empty">No data yet.</p>';
+  }
 
-  const rate = submitted ? `${((succeeded / submitted) * 100).toFixed(0)}%` : '—';
   const rows = [
+    { label: 'CTA clicked', n: clicked },
     { label: 'Submitted', n: submitted },
     { label: 'Succeeded', n: succeeded },
     { label: 'Failed', n: failed },
   ];
-  return `${barList(rows, 'label')}<p class="muted" style="margin:10px 0 0;font-size:12px;">Success rate: ${rate}</p>`;
+  const pct = (a, b) => (b ? `${((a / b) * 100).toFixed(0)}%` : '—');
+  return `${barList(rows, 'label')}<p class="muted" style="margin:10px 0 0;font-size:12px;">
+    Click → submit: <strong>${pct(submitted, clicked)}</strong> ·
+    Submit → success: <strong>${pct(succeeded, submitted)}</strong>
+  </p>`;
+}
+
+function visitorStats(visitors) {
+  if (!visitors.length) return '<p class="empty">No data yet.</p>';
+  // "Returning" = seen on more than one calendar day. A visitor whose whole
+  // history is a single session counts as new.
+  const returning = visitors.filter(v => dayKey(v.first_seen) !== dayKey(v.last_seen)).length;
+  const fresh = visitors.length - returning;
+  return `${barList(
+    [
+      { label: 'New', n: fresh },
+      { label: 'Returning', n: returning },
+    ],
+    'label'
+  )}<p class="muted" style="margin:10px 0 0;font-size:12px;">
+    <strong>${num(visitors.length)}</strong> unique ${
+      visitors.length === 1 ? 'visitor' : 'visitors'
+    } · returning = seen on more than one day
+  </p>`;
+}
+
+function weekOverWeek(rows) {
+  const row = rows[0];
+  if (!row) return '<p class="empty">No data yet.</p>';
+  const current = Number(row.this_week) || 0;
+  const previous = Number(row.prev_week) || 0;
+
+  let delta;
+  if (!previous) {
+    delta = current ? '<span class="delta up">first week with data</span>' : '—';
+  } else {
+    const change = ((current - previous) / previous) * 100;
+    const dir = change >= 0 ? 'up' : 'down';
+    const arrow = change >= 0 ? '▲' : '▼';
+    delta = `<span class="delta ${dir}">${arrow} ${Math.abs(change).toFixed(0)}%</span>`;
+  }
+
+  return `${barList(
+    [
+      { label: 'This week', n: current },
+      { label: 'Previous week', n: previous },
+    ],
+    'label'
+  )}<p class="muted" style="margin:10px 0 0;font-size:12px;">Week over week: ${delta}</p>`;
 }
 
 const HEAT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -495,6 +606,10 @@ function dashboardPage({
   countries,
   interactions,
   activity,
+  visitors,
+  pages,
+  theme,
+  weekOverWeek: wow,
   errors,
   auth,
 }) {
@@ -547,6 +662,10 @@ function dashboardPage({
     <section class="panel"><h2>Top referrers</h2>${panel(errors, 'referrers', () => barList(referrers, 'referer'))}</section>
     <section class="panel"><h2>Top countries</h2>${panel(errors, 'countries', () => barList(countries, 'country'))}</section>
     <section class="panel panel-wide"><h2>Top interactions</h2>${panel(errors, 'interactions', () => barList(interactions, 'interaction'))}</section>
+    <section class="panel"><h2>Visitors</h2>${panel(errors, 'visitors', () => visitorStats(visitors))}</section>
+    <section class="panel"><h2>Week over week</h2>${panel(errors, 'weekOverWeek', () => weekOverWeek(wow))}</section>
+    <section class="panel"><h2>Top pages</h2>${panel(errors, 'pages', () => barList(pages, 'page'))}</section>
+    <section class="panel"><h2>Theme preference</h2>${panel(errors, 'theme', () => barList(theme, 'theme'))}</section>
     <section class="panel"><h2>Contact funnel</h2>${panel(errors, 'totals', () => contactFunnel(totals))}</section>
   </div>
 
@@ -584,6 +703,9 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .spark { width:100%; height:160px; color:var(--accent); display:block; }
 .spark-caption { margin:8px 0 0; font-size:12px; color:var(--muted); }
 .spark-caption strong { color:var(--fg); font-weight:600; }
+.delta { font-weight:600; }
+.delta.up { color:#30a46c; }
+.delta.down { color:#e5484d; }
 .bars { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
 .bars li { display:grid; grid-template-columns:minmax(90px,50%) 1fr auto; align-items:center; gap:10px; font-size:13px; }
 .bars .label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

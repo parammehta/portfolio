@@ -17,9 +17,23 @@ is Cloudflare infrastructure.
 - Rejects any event name not on the allowlist (kept in sync with
   `analyticsEvents` in `src/utils/analytics.ts`).
 - Writes `blob1=name`, `blob2=reason`, `blob3=referer`, `blob4=country`,
-  `double1=1`, indexed by event name (the sampling key).
+  `blob5=detail`, `blob6=visitor`, `blob7=page`, `double1=1`, indexed by event
+  name (the sampling key). The blob list is **append-only** — a new field goes
+  on the end so existing rows keep their meaning.
 - Serves a protected `GET /dashboard` that charts the events (see
   [Query the data](#query-the-data)).
+
+### About `blob6` (visitor)
+
+So the dashboard can say "9 events from 2 people" rather than just "9 events".
+The raw IP is **never stored**: it is hashed (SHA-256) together with the user
+agent and a fixed salt, and only the first 16 hex chars are kept.
+
+The salt is fixed rather than daily-rotating — the rotating-salt approach
+(Plausible, Fathom) makes every visitor look new the next day, which would
+defeat the new-vs-returning split this field exists for. The tradeoff is that
+the id is stable across days, so treat it as **pseudonymous, not anonymous**.
+Changing `VISITOR_SALT` in `src/index.js` resets every visitor to "new".
 
 ## Deploy
 
@@ -100,6 +114,20 @@ WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10;
 -- note: this SQL dialect has no concat() or || — use format() with {} placeholders
 SELECT format('{}: {}', blob1, blob5) AS interaction, sum(_sample_interval) AS n
 FROM portfolio_events WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15;
+
+-- unique visitors (blob6); new vs returning is derived from first_seen/last_seen
+SELECT blob6 AS visitor, min(timestamp) AS first_seen, max(timestamp) AS last_seen
+FROM portfolio_events WHERE blob6 != '' GROUP BY visitor;
+
+-- events per page (blob7 = path of the page the event fired on)
+SELECT blob7 AS page, sum(_sample_interval) AS n FROM portfolio_events
+WHERE blob7 != '' GROUP BY page ORDER BY n DESC LIMIT 10;
+
+-- week over week (sumIf works; there is no FILTER clause)
+SELECT sumIf(_sample_interval, timestamp > now() - INTERVAL '7' DAY) AS this_week,
+       sumIf(_sample_interval, timestamp <= now() - INTERVAL '7' DAY
+             AND timestamp > now() - INTERVAL '14' DAY) AS prev_week
+FROM portfolio_events;
 ```
 
 > `sum(_sample_interval)` un-samples the counts; plain `count()` is fine at low
