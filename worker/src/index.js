@@ -22,6 +22,14 @@ const ALLOWED_EVENTS = new Set([
   'contact_error',
   'resume_download',
   'resume_open',
+  'design_system_open',
+  'nav_link_click',
+  'social_link_click',
+  'theme_toggle',
+  'profile_contact_click',
+  'experience_tab_select',
+  'experience_details_click',
+  'skills_tool_link_click',
 ]);
 
 const ALLOWED_ORIGINS = new Set([
@@ -100,17 +108,24 @@ async function handleEvent(request, env) {
     payload.props && typeof payload.props === 'object' ? payload.props : {};
   const reason =
     typeof props.reason === 'string' ? props.reason.slice(0, 64) : '';
+  // A single free-text field for whichever prop identifies *what* was
+  // clicked (nav/social label, experience company, skills tool link).
+  const detailValue = props.label ?? props.company ?? props.tool;
+  const detail = typeof detailValue === 'string' ? detailValue.slice(0, 64) : '';
 
   // `writeDataPoint` is only bound in deployed/`wrangler dev` runs; guard so
   // a missing binding degrades to a no-op instead of a 500.
   env.ANALYTICS?.writeDataPoint({
     // A single index drives Analytics Engine sampling; bucket by event name.
     indexes: [name],
+    // Appended after country rather than inserted, so blob3/blob4 keep
+    // meaning the same for rows written before this field existed.
     blobs: [
       name,
       reason,
       (request.headers.get('Referer') || '').slice(0, 256),
       request.cf?.country || '',
+      detail,
     ],
     doubles: [1],
   });
@@ -144,7 +159,7 @@ async function handleDashboard(request, env, url) {
   }
 
   try {
-    const [totals, daily, referrers, countries] = await Promise.all([
+    const [totals, daily, referrers, countries, interactions] = await Promise.all([
       runQuery(
         env,
         `SELECT blob1 AS event, sum(_sample_interval) AS n
@@ -166,9 +181,16 @@ async function handleDashboard(request, env, url) {
         `SELECT blob4 AS country, sum(_sample_interval) AS n
          FROM ${DATASET} WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10`
       ),
+      runQuery(
+        env,
+        `SELECT concat(blob1, ': ', blob5) AS interaction, sum(_sample_interval) AS n
+         FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`
+      ),
     ]);
 
-    return htmlResponse(dashboardPage({ totals, daily, referrers, countries, auth }));
+    return htmlResponse(
+      dashboardPage({ totals, daily, referrers, countries, interactions, auth })
+    );
   } catch (error) {
     return htmlResponse(errorPage('Query failed', String(error.message || error)), 502);
   }
@@ -322,7 +344,7 @@ function sparkline(daily) {
   </svg>`;
 }
 
-function dashboardPage({ totals, daily, referrers, countries, auth }) {
+function dashboardPage({ totals, daily, referrers, countries, interactions, auth }) {
   const grandTotal = totals.reduce((sum, r) => sum + (Number(r.n) || 0), 0);
   return `<!doctype html>
 <html lang="en"><head>
@@ -362,6 +384,7 @@ function dashboardPage({ totals, daily, referrers, countries, auth }) {
     <section class="panel"><h2>By event</h2>${barList(totals, 'event')}</section>
     <section class="panel"><h2>Top referrers</h2>${barList(referrers, 'referer')}</section>
     <section class="panel"><h2>Top countries</h2>${barList(countries, 'country')}</section>
+    <section class="panel"><h2>Top interactions</h2>${barList(interactions, 'interaction')}</section>
   </div>
 
   <footer>Rendered ${new Date().toISOString()} · counts are sampling-adjusted</footer>
