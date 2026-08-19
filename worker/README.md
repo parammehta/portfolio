@@ -78,6 +78,10 @@ SELECT blob3 AS referer, sum(_sample_interval) AS n FROM portfolio_events
 WHERE blob3 != '' GROUP BY referer ORDER BY n DESC LIMIT 10;
 SELECT blob4 AS country, sum(_sample_interval) AS n FROM portfolio_events
 WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10;
+
+-- top interactions (blob5 = the label/company/tool prop on click events)
+SELECT concat(blob1, ': ', blob5) AS interaction, sum(_sample_interval) AS n
+FROM portfolio_events WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15;
 ```
 
 > `sum(_sample_interval)` un-samples the counts; plain `count()` is fine at low

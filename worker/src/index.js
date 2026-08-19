@@ -22,6 +22,14 @@ const ALLOWED_EVENTS = new Set([
   'contact_error',
   'resume_download',
   'resume_open',
+  'design_system_open',
+  'nav_link_click',
+  'social_link_click',
+  'theme_toggle',
+  'profile_contact_click',
+  'experience_tab_select',
+  'experience_details_click',
+  'skills_tool_link_click',
 ]);
 
 const ALLOWED_ORIGINS = new Set([
@@ -100,17 +108,25 @@ async function handleEvent(request, env) {
     payload.props && typeof payload.props === 'object' ? payload.props : {};
   const reason =
     typeof props.reason === 'string' ? props.reason.slice(0, 64) : '';
+  // A single free-text field for whichever prop identifies *what* was
+  // clicked (nav/social label, experience company, skills tool link, or the
+  // resulting theme on a theme_toggle).
+  const detailValue = props.label ?? props.company ?? props.tool ?? props.theme;
+  const detail = typeof detailValue === 'string' ? detailValue.slice(0, 64) : '';
 
   // `writeDataPoint` is only bound in deployed/`wrangler dev` runs; guard so
   // a missing binding degrades to a no-op instead of a 500.
   env.ANALYTICS?.writeDataPoint({
     // A single index drives Analytics Engine sampling; bucket by event name.
     indexes: [name],
+    // Appended after country rather than inserted, so blob3/blob4 keep
+    // meaning the same for rows written before this field existed.
     blobs: [
       name,
       reason,
       (request.headers.get('Referer') || '').slice(0, 256),
       request.cf?.country || '',
+      detail,
     ],
     doubles: [1],
   });
@@ -144,7 +160,7 @@ async function handleDashboard(request, env, url) {
   }
 
   try {
-    const [totals, daily, referrers, countries] = await Promise.all([
+    const [totals, daily, referrers, countries, interactions, activity] = await Promise.all([
       runQuery(
         env,
         `SELECT blob1 AS event, sum(_sample_interval) AS n
@@ -166,9 +182,22 @@ async function handleDashboard(request, env, url) {
         `SELECT blob4 AS country, sum(_sample_interval) AS n
          FROM ${DATASET} WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10`
       ),
+      runQuery(
+        env,
+        `SELECT concat(blob1, ': ', blob5) AS interaction, sum(_sample_interval) AS n
+         FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`
+      ),
+      runQuery(
+        env,
+        `SELECT toDayOfWeek(timestamp) AS dow, toHour(timestamp) AS hour,
+                sum(_sample_interval) AS n
+         FROM ${DATASET} GROUP BY dow, hour`
+      ),
     ]);
 
-    return htmlResponse(dashboardPage({ totals, daily, referrers, countries, auth }));
+    return htmlResponse(
+      dashboardPage({ totals, daily, referrers, countries, interactions, activity, auth })
+    );
   } catch (error) {
     return htmlResponse(errorPage('Query failed', String(error.message || error)), 502);
   }
@@ -323,7 +352,67 @@ function sparkline(daily) {
   </svg>`;
 }
 
-function dashboardPage({ totals, daily, referrers, countries, auth }) {
+function contactFunnel(totals) {
+  const byEvent = Object.fromEntries(totals.map(r => [r.event, Number(r.n) || 0]));
+  const submitted = byEvent.contact_submit || 0;
+  const succeeded = byEvent.contact_success || 0;
+  const failed = byEvent.contact_error || 0;
+  if (!submitted && !succeeded && !failed) return '<p class="empty">No data yet.</p>';
+
+  const rate = submitted ? `${((succeeded / submitted) * 100).toFixed(0)}%` : '—';
+  const rows = [
+    { label: 'Submitted', n: submitted },
+    { label: 'Succeeded', n: succeeded },
+    { label: 'Failed', n: failed },
+  ];
+  return `${barList(rows, 'label')}<p class="muted" style="margin:10px 0 0;font-size:12px;">Success rate: ${rate}</p>`;
+}
+
+const HEAT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+function heatmap(activity) {
+  if (!activity.length) return '<p class="empty">No data yet.</p>';
+
+  // toDayOfWeek is 1 (Mon) .. 7 (Sun); toHour is 0..23.
+  const grid = Array.from({ length: 7 }, () => Array(24).fill(0));
+  let max = 1;
+  for (const row of activity) {
+    const day = Number(row.dow);
+    const hour = Number(row.hour);
+    const n = Number(row.n) || 0;
+    if (day >= 1 && day <= 7 && hour >= 0 && hour <= 23) {
+      grid[day - 1][hour] = n;
+      if (n > max) max = n;
+    }
+  }
+
+  const headerCells = Array.from(
+    { length: 24 },
+    (_, h) => `<div class="heat-hourlabel">${h % 4 === 0 ? h : ''}</div>`
+  ).join('');
+
+  const rows = grid
+    .map((hours, d) => {
+      const cells = hours
+        .map(n => {
+          // Mirrors --accent (#f5842a); the CSS var can't be read from here.
+          const bg = n > 0 ? `rgba(245,132,42,${(0.15 + 0.85 * (n / max)).toFixed(2)})` : 'var(--line)';
+          return `<div class="heat-cell" style="background:${bg}" title="${esc(
+            `${n} on ${HEAT_DAYS[d]}`
+          )}"></div>`;
+        })
+        .join('');
+      return `<div class="heat-row"><div class="heat-daylabel">${HEAT_DAYS[d]}</div>${cells}</div>`;
+    })
+    .join('');
+
+  return `<div class="heatmap">
+    <div class="heat-row heat-header"><div class="heat-daylabel"></div>${headerCells}</div>
+    ${rows}
+  </div>`;
+}
+
+function dashboardPage({ totals, daily, referrers, countries, interactions, activity, auth }) {
   const grandTotal = totals.reduce((sum, r) => sum + (Number(r.n) || 0), 0);
   return `<!doctype html>
 <html lang="en"><head>
@@ -359,10 +448,17 @@ function dashboardPage({ totals, daily, referrers, countries, auth }) {
     ${sparkline(daily)}
   </section>
 
+  <section class="panel">
+    <h2>Activity by day &amp; hour</h2>
+    ${heatmap(activity)}
+  </section>
+
   <div class="grid">
     <section class="panel"><h2>By event</h2>${barList(totals, 'event')}</section>
     <section class="panel"><h2>Top referrers</h2>${barList(referrers, 'referer')}</section>
     <section class="panel"><h2>Top countries</h2>${barList(countries, 'country')}</section>
+    <section class="panel"><h2>Top interactions</h2>${barList(interactions, 'interaction')}</section>
+    <section class="panel"><h2>Contact funnel</h2>${contactFunnel(totals)}</section>
   </div>
 
   <footer>Rendered ${new Date().toISOString()} · counts are sampling-adjusted</footer>
@@ -404,5 +500,10 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
 .bars .value { font-variant-numeric:tabular-nums; color:var(--muted); }
 .empty { color:var(--muted); margin:0; }
+.heatmap { display:flex; flex-direction:column; gap:3px; overflow-x:auto; }
+.heat-row { display:grid; grid-template-columns:34px repeat(24,minmax(14px,1fr)); gap:3px; align-items:center; }
+.heat-daylabel { font-size:11px; color:var(--muted); }
+.heat-hourlabel { font-size:9px; color:var(--muted); text-align:center; }
+.heat-cell { aspect-ratio:1; border-radius:3px; }
 footer { color:var(--muted); font-size:12px; margin-top:28px; }
 `;
