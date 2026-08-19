@@ -2,6 +2,7 @@ import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
 import { Button } from 'components/Button';
 import { useAppContext } from 'hooks';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './ThemeToggle.module.css';
 
 interface ThemeToggleProps extends ComponentPropsWithoutRef<typeof Button> {
@@ -14,6 +15,7 @@ export const ThemeToggle = ({ isMobile, ...rest }: ThemeToggleProps) => {
   const maskId = `${id}theme-toggle-mask`;
 
   const handleClick = () => {
+    trackEvent(analyticsEvents.themeToggle);
     dispatch({ type: 'toggleTheme' });
   };
 
