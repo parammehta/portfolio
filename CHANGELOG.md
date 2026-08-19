@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.2](https://github.com/parammehta/portfolio/compare/v1.12.1...v1.12.2) (2026-08-19)
+
+
+### Bug Fixes
+
+* recover 3 orphaned commits, make tooltips keyboard/touch accessible ([#67](https://github.com/parammehta/portfolio/issues/67)) ([6127cf9](https://github.com/parammehta/portfolio/commit/6127cf9ad7dc43d23a68df9773e8189ff37fcafd))
+
 ## [1.12.1](https://github.com/parammehta/portfolio/compare/v1.12.0...v1.12.1) (2026-08-19)
 
 
