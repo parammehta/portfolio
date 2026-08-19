@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.3](https://github.com/parammehta/portfolio/compare/v1.11.2...v1.11.3) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** use format() not concat() for the interactions query ([#55](https://github.com/parammehta/portfolio/issues/55)) ([99cae3c](https://github.com/parammehta/portfolio/commit/99cae3cfa2f35c162bea43b8d6a3617316647ce4))
+
 ## [1.11.2](https://github.com/parammehta/portfolio/compare/v1.11.1...v1.11.2) (2026-08-19)
 
 
