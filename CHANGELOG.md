@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.2](https://github.com/parammehta/portfolio/compare/v1.11.1...v1.11.2) (2026-08-19)
+
+
+### Bug Fixes
+
+* accept all site analytics events, add dashboard graphs ([#52](https://github.com/parammehta/portfolio/issues/52)) ([76b36c4](https://github.com/parammehta/portfolio/commit/76b36c45d0cfaa28297c5145ce5411a408042279))
+
 ## [1.11.1](https://github.com/parammehta/portfolio/compare/v1.11.0...v1.11.1) (2026-08-19)
 
 
