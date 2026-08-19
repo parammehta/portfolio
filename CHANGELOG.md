@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/parammehta/portfolio/compare/v1.12.0...v1.12.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** replace native title tooltips with real CSS tooltips ([#65](https://github.com/parammehta/portfolio/issues/65)) ([b519941](https://github.com/parammehta/portfolio/commit/b51994172a8ddb1a54fb90f2420bf2b2203bffb2))
+
 ## [1.12.0](https://github.com/parammehta/portfolio/compare/v1.11.6...v1.12.0) (2026-08-19)
 
 
