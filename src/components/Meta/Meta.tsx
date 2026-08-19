@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 const siteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL;
 const name = 'Param Mehta';
@@ -10,10 +11,25 @@ interface MetaProps {
   description?: string;
   prefix?: string;
   ogImage?: string;
+  ogType?: 'website' | 'article';
+  /** ISO date string; only rendered when `ogType` is `'article'`. */
+  publishedTime?: string;
 }
 
-export const Meta = ({ title, description, prefix = name, ogImage = defaultOgImage }: MetaProps) => {
+export const Meta = ({
+  title,
+  description,
+  prefix = name,
+  ogImage = defaultOgImage,
+  ogType = 'website',
+  publishedTime,
+}: MetaProps) => {
   const titleText = [prefix, title].filter(Boolean).join(' | ');
+  // Mirrors the canonical-link logic in _app.page.tsx, so og:url always
+  // matches the page's own canonical rather than the site root.
+  const { route, asPath } = useRouter();
+  const canonicalRoute = route === '/' ? '' : asPath;
+  const pageUrl = `${siteUrl}${canonicalRoute}`;
 
   return (
     <Head>
@@ -29,9 +45,12 @@ export const Meta = ({ title, description, prefix = name, ogImage = defaultOgIma
 
       <meta property="og:title" content={titleText} />
       <meta property="og:site_name" content={name} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={siteUrl} />
+      <meta property="og:type" content={ogType} />
+      <meta property="og:url" content={pageUrl} />
       <meta property="og:description" content={description} />
+      {ogType === 'article' && publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )}
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:description" content={description} />

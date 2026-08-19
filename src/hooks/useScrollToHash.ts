@@ -16,11 +16,17 @@ export function useScrollToHash() {
 
       targetElement?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
 
+      // The home page scrolls an inner container rather than the document, and
+      // scroll events don't bubble — listening on window there would never fire,
+      // so `onDone` would never run and the hash would never reach the URL.
+      const scroller: HTMLElement | Window =
+        targetElement?.closest<HTMLElement>('[data-scroll-container]') ?? window;
+
       const handleScroll = () => {
         clearTimeout(scrollTimeout.current);
 
         scrollTimeout.current = setTimeout(() => {
-          window.removeEventListener('scroll', handleScroll);
+          scroller.removeEventListener('scroll', handleScroll);
 
           if (window.location.pathname === route) {
             onDone?.();
@@ -29,10 +35,10 @@ export function useScrollToHash() {
         }, 50);
       };
 
-      window.addEventListener('scroll', handleScroll);
+      scroller.addEventListener('scroll', handleScroll);
 
       return () => {
-        window.removeEventListener('scroll', handleScroll);
+        scroller.removeEventListener('scroll', handleScroll);
         clearTimeout(scrollTimeout.current);
       };
     },

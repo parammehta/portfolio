@@ -30,15 +30,15 @@ export default meta;
 type Story = StoryObj<typeof NavGroup>;
 
 const defaultChildren = [
-  { label: 'Intuit', pathname: '/#experience-intuit', isActive: undefined },
-  { label: 'Rivian', pathname: '/#experience-rivian', isActive: undefined },
-  { label: 'Walmart', pathname: '/#experience-walmart', isActive: undefined },
+  { label: 'Intuit', pathname: '/experience/intuit', isActive: undefined },
+  { label: 'Rivian', pathname: '/experience/rivian', isActive: undefined },
+  { label: 'Walmart', pathname: '/experience/walmart', isActive: undefined },
 ];
 
 export const Closed: Story = {
   args: {
     label: 'Experience',
-    pathname: '/#experience',
+    pathname: '/experience',
     children: defaultChildren,
     isActive: undefined,
     forceOpen: false,
@@ -48,7 +48,7 @@ export const Closed: Story = {
 export const Open: Story = {
   args: {
     label: 'Experience',
-    pathname: '/#experience',
+    pathname: '/experience',
     children: defaultChildren,
     isActive: undefined,
     forceOpen: true,
@@ -58,11 +58,11 @@ export const Open: Story = {
 export const ScrollActiveChild: Story = {
   args: {
     label: 'Experience',
-    pathname: '/#experience',
+    pathname: '/experience',
     children: [
-      { label: 'Intuit', pathname: '/#experience-intuit', isActive: undefined },
-      { label: 'Rivian', pathname: '/#experience-rivian', isActive: 'page' },
-      { label: 'Walmart', pathname: '/#experience-walmart', isActive: undefined },
+      { label: 'Intuit', pathname: '/experience/intuit', isActive: undefined },
+      { label: 'Rivian', pathname: '/experience/rivian', isActive: 'page' },
+      { label: 'Walmart', pathname: '/experience/walmart', isActive: undefined },
     ],
     isActive: undefined,
     forceOpen: true,

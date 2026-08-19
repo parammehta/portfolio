@@ -1,4 +1,4 @@
-import { Fragment, type RefObject, useState } from 'react';
+import { Fragment, type MouseEvent, type RefObject, useState } from 'react';
 import {
   Button,
   ScrambleReveal,
@@ -14,6 +14,7 @@ import profileDevanagari from 'assets/devanagari-profile.svg?url';
 import profileImgLarge from 'assets/profile-large.jpg';
 import profileImgPlaceholder from 'assets/profile-placeholder.jpg';
 import profileImg from 'assets/profile.jpg';
+import { useScrollToHash } from 'hooks';
 import { media } from 'utils/style';
 import styles from './Profile.module.css';
 
@@ -28,13 +29,11 @@ const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
       <ScrambleReveal text="Hi there" start={visible} delay={500} />
     </Heading>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
-      I&apos;m Param, a software engineer with 8+ years at the intersection of
-      engineering, design, and AI. I live in the San Francisco Bay Area and work as a
-      senior software engineer at <Link href="https://www.intuit.com">Intuit</Link>, where
-      I build identity and authentication experiences, prototype AI-native patterns with
-      Claude and MCP, and maintain the Storybook environment Design and PM partners use to
-      sign off on live components before anything ships. If you&apos;re curious about the
-      tools and tech I use day to day, check out my <Link href="/#skills">skills page</Link>.
+      I&apos;m Param, a software engineer with 8+ years across engineering, design, and
+      AI. Based in the SF Bay Area, I build identity experiences and AI-native patterns,
+      and maintain the Storybook environment Design and PM partners use to sign off on
+      components. Curious what I use day to day? Check out my{' '}
+      <Link href="/skills">skills page</Link>.
     </Text>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
       In my spare time I play soccer ⚽, hike around 🧗🏼 and also play video games 🎮. I
@@ -57,6 +56,12 @@ interface ProfileProps {
 export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
   const [focused, setFocused] = useState(false);
   const titleId = `${id}-title`;
+  const scrollToHash = useScrollToHash();
+
+  const handleContactClick = (event: MouseEvent) => {
+    event.preventDefault();
+    scrollToHash('#contact');
+  };
 
   return (
     <Section
@@ -78,8 +83,9 @@ export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
                 secondary
                 className={styles.button}
                 data-visible={visible}
-                href="/contact"
+                href="/#contact"
                 icon="send"
+                onClick={handleContactClick}
               >
                 Send me a message
               </Button>

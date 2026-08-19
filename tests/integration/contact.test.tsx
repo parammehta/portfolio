@@ -1,7 +1,13 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Contact from 'pages/contact/index.page';
+import Home from 'pages/index.page';
 import { renderPage } from './renderPage';
+
+// The contact form now lives as the third pane of the home page rather than on
+// its own route, so it's exercised through the whole home page here.
+jest.mock('pages/home/HeroSphere', () => ({
+  HeroSphere: () => <canvas data-testid="hero-sphere" />,
+}));
 
 // Turnstile is skipped when NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY is unset,
 // which is the case in tests — same code path as a local dev run without it.
@@ -15,7 +21,7 @@ const fillAndSubmit = async (
   await user.click(screen.getByRole('button', { name: /send message/i }));
 };
 
-describe('contact page', () => {
+describe('contact form on the home page', () => {
   beforeEach(() => {
     global.fetch = jest.fn();
   });
@@ -24,14 +30,13 @@ describe('contact page', () => {
     jest.resetAllMocks();
   });
 
-  it('renders the form inside the app shell', () => {
-    renderPage(Contact, { route: '/contact' });
+  it('renders the form as a section of the home page', () => {
+    renderPage(Home, { route: '/' });
 
     expect(screen.getByLabelText('Your Email')).toBeRequired();
     expect(screen.getByLabelText('Message')).toBeRequired();
-    // The shell's navbar plus the page's own breadcrumb trail.
-    expect(screen.getAllByRole('navigation').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    // The pane the navbar's /#contact link scrolls to.
+    expect(document.getElementById('contact')).toBeInTheDocument();
   });
 
   it('posts the message to the API and shows the success state', async () => {
@@ -41,7 +46,7 @@ describe('contact page', () => {
       json: async () => ({}),
     });
 
-    renderPage(Contact, { route: '/contact' });
+    renderPage(Home, { route: '/' });
     await fillAndSubmit(user);
 
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
@@ -64,7 +69,7 @@ describe('contact page', () => {
       json: async () => ({ error: 'Something went wrong' }),
     });
 
-    renderPage(Contact, { route: '/contact' });
+    renderPage(Home, { route: '/' });
     await fillAndSubmit(user);
 
     expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
@@ -73,7 +78,7 @@ describe('contact page', () => {
   it('silently completes without calling the API when the honeypot is filled', async () => {
     const user = userEvent.setup();
 
-    renderPage(Contact, { route: '/contact' });
+    renderPage(Home, { route: '/' });
     await user.type(screen.getByLabelText('Name'), 'spam bot');
     await fillAndSubmit(user);
 
@@ -88,7 +93,7 @@ describe('contact page', () => {
     window.turnstile = { render: () => 'id', remove: () => {}, reset: () => {} };
 
     try {
-      renderPage(Contact, { route: '/contact' });
+      renderPage(Home, { route: '/' });
       await fillAndSubmit(user);
 
       expect(await screen.findByText(/security check not complete/i)).toBeInTheDocument();

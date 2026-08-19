@@ -7,7 +7,12 @@
 
 .page {
   grid-area: 1 / 1;
-  min-height: 100lvh;
+
+  /* `dvh`, not `lvh`: `lvh` is the toolbar-hidden height, so on mobile it would
+     force the document taller than the visual viewport and give the
+     viewport-locked routes a stray scrollbar on top of their own. */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .skip {

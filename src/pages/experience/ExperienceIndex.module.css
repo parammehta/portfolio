@@ -1,0 +1,299 @@
+.layout {
+  height: 100%;
+  max-width: var(--maxWidthXL);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  column-gap: var(--space3XL);
+
+  @media (--mediaLaptop) {
+    grid-template-columns: 200px 1fr;
+    column-gap: var(--space2XL);
+  }
+
+  /* Below tablet there isn't room for a rail beside the content, so it becomes
+     a horizontal strip above it. */
+  @media (--mediaTablet) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    row-gap: var(--spaceL);
+  }
+}
+
+.rail {
+  /* align-self: start collapses the rail to its content height. Without it the
+     grid row is `1fr` (fills the panel), so the hairline below runs all the way
+     to the bottom of the viewport past the last tab. */
+  align-self: start;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spaceM);
+  padding-left: var(--spaceL);
+
+  /* Hairline the marker slides along — sized to the rail's own height. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 2px;
+    background: rgb(var(--rgbText) / 0.15);
+  }
+
+  @media (--mediaTablet) {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spaceL);
+    padding-left: 0;
+    padding-bottom: var(--spaceM);
+    overflow-x: auto;
+
+    &::before {
+      inset: auto 0 0;
+      width: auto;
+      height: 2px;
+    }
+  }
+}
+
+.marker {
+  position: absolute;
+  left: 0;
+  top: var(--top);
+  width: 2px;
+  height: var(--height);
+  background: rgb(var(--rgbAccent));
+  opacity: 0;
+  transition:
+    transform var(--durationM) var(--bezierFastoutSlowin),
+    top var(--durationM) var(--bezierFastoutSlowin),
+    height var(--durationM) var(--bezierFastoutSlowin),
+    opacity var(--durationS) ease;
+
+  &[data-visible='true'] {
+    opacity: 1;
+  }
+
+  /* Horizontal rail: the marker underlines the tab instead, so it tracks the
+     tab's left/width rather than its top/height. */
+  @media (--mediaTablet) {
+    top: auto;
+    bottom: 0;
+    left: var(--left);
+    width: var(--width);
+    height: 2px;
+    transition:
+      left var(--durationM) var(--bezierFastoutSlowin),
+      width var(--durationM) var(--bezierFastoutSlowin),
+      opacity var(--durationS) ease;
+  }
+
+  @media (--mediaReduceMotion) {
+    transition-property: opacity;
+  }
+}
+
+.tab {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: var(--spaceXS) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: inherit;
+  font-size: var(--fontSizeBodyM);
+  font-weight: var(--fontWeightMedium);
+  color: rgb(var(--rgbText) / 0.5);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: color var(--durationS) ease;
+
+  &:hover {
+    color: rgb(var(--rgbText) / 0.8);
+  }
+
+  &[aria-selected='true'] {
+    color: var(--colorTextTitle);
+  }
+}
+
+.tabDate {
+  font-size: var(--fontSizeBodyXS);
+  font-weight: var(--fontWeightRegular);
+  color: rgb(var(--rgbText) / 0.4);
+
+  @media (--mediaTablet) {
+    display: none;
+  }
+}
+
+.panel {
+  min-width: 0;
+  min-height: 0;
+  max-width: var(--maxWidthL);
+
+  /* Backstop: roles are capped to two highlights each so all three Walmart
+     entries fit a desktop viewport, but a short or zoomed viewport should
+     scroll here rather than lose content. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.role {
+  &:not(:first-of-type) {
+    margin-top: var(--spaceL);
+
+    @media (--mediaMobile), (--mediaMobileLS) {
+      margin-top: var(--spaceM);
+    }
+  }
+}
+
+.divider {
+  margin-bottom: var(--spaceL);
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-bottom: var(--spaceM);
+  }
+}
+
+.roleTitle {
+  margin-bottom: var(--spaceXS);
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    font-size: var(--fontSizeBodyL);
+  }
+}
+
+.dateRange {
+  margin-bottom: var(--spaceM);
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-bottom: var(--spaceS);
+    font-size: var(--fontSizeBodyS);
+  }
+}
+
+.highlights {
+  & ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spaceS);
+    padding-left: var(--spaceL);
+    margin: 0;
+  }
+
+  /* Walmart's three roles only fit a phone viewport at one highlight each.
+     Dropping the second here rather than in the component keeps the markup
+     identical between server and client — no hydration mismatch in the export.
+     The full list is on the company's detail page behind See Details. */
+  @media (--mediaMobile), (--mediaMobileLS) {
+    font-size: var(--fontSizeBodyS);
+
+    & li:nth-child(n + 2) {
+      display: none;
+    }
+  }
+
+  & li {
+    position: relative;
+    list-style: none;
+    color: var(--colorTextBody);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(var(--spaceL) * -1);
+      top: 0.55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgb(var(--rgbAccent));
+    }
+  }
+}
+
+.stats {
+  display: flex;
+  gap: var(--space2XL);
+  list-style: none;
+  margin: 0 0 var(--spaceL);
+  padding: 0;
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    display: none;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: var(--fontSizeBodyL);
+  font-weight: var(--fontWeightMedium);
+  color: rgb(var(--rgbAccent));
+}
+
+.statLabel {
+  font-size: var(--fontSizeBodyXS);
+}
+
+.techRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spaceXS);
+  list-style: none;
+  margin: var(--spaceS) 0 0;
+  padding: 0;
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    display: none;
+  }
+}
+
+.techChip {
+  padding: 3px var(--spaceS);
+  border-radius: var(--space2XL);
+  font-size: var(--fontSizeBodyXS);
+  color: rgb(var(--rgbAccent));
+  background: rgb(var(--rgbAccent) / 0.15);
+  white-space: nowrap;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spaceL);
+  margin-top: var(--spaceXL);
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-top: var(--spaceM);
+  }
+}
+
+.actionThumbnail {
+  flex-shrink: 0;
+  width: 120px;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--spaceXS);
+  overflow: hidden;
+
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    display: none;
+  }
+}

@@ -19,7 +19,10 @@ body {
   background-color: rgb(var(--rgbBackground));
   transition: background var(--durationM) ease;
   color: var(--colorTextBody);
-  width: 100vw;
+
+  /* `100%`, not `100vw`: `100vw` includes the classic scrollbar, so the page
+     would sit ~7px off-centre on routes that scroll and not on ones that don't. */
+  width: 100%;
   overflow-x: hidden;
 
   &:focus {

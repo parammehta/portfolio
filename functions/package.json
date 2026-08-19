@@ -2,6 +2,7 @@
   "name": "functions",
   "description": "Serverless functions for parammehta.com using AWS lambda",
   "scripts": {
+    "lint": "eslint .",
     "deploy": "serverless deploy --stage production",
     "deploy:api": "serverless deploy function --function api --stage production",
     "deploy:headers": "serverless deploy function --function headers --stage production"

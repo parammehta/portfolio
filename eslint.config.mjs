@@ -7,6 +7,7 @@ export default tseslint.config(
   {
     ignores: [
       '.next/**',
+      '.claude/**',
       'build/**',
       'build-storybook/**',
       'public/draco/**',

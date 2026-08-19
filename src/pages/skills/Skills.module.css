@@ -1,0 +1,59 @@
+.inner {
+  width: 100%;
+  max-width: var(--maxWidthL);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--space3XL);
+  align-items: start;
+
+  @media (--mediaLaptop) {
+    column-gap: var(--space2XL);
+  }
+
+  /* Side by side is what keeps both blocks inside one viewport on desktop.
+     Once there isn't room for two columns, stack and lean on the condensed
+     copy instead. */
+  @media (--mediaTablet) {
+    grid-template-columns: 1fr;
+    row-gap: var(--spaceL);
+  }
+}
+
+.block {
+  min-width: 0;
+
+  /* Both blocks have to share a phone viewport, so below tablet the type and
+     the table's row padding tighten up rather than the content being cut. */
+  @media (--mediaTablet) {
+    font-size: var(--fontSizeBodyS);
+
+    & td,
+    & th {
+      padding-top: var(--spaceXS);
+      padding-bottom: var(--spaceXS);
+      padding-right: var(--spaceM);
+      font-size: var(--fontSizeBodyS);
+    }
+  }
+}
+
+.blockHeading {
+  margin-bottom: var(--spaceL);
+  color: rgb(var(--rgbPrimary));
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-bottom: var(--spaceS);
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceS);
+
+  @media (--mediaTablet) {
+    gap: 0;
+    font-size: var(--fontSizeBodyS);
+  }
+}

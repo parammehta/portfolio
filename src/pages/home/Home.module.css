@@ -1,3 +1,88 @@
 .home {
+  /* The home page is the scroll container, not the document. It has to live
+     here rather than on the app shell: `.page` in shell/App.module.css is keyed
+     per route inside AnimatePresence, so an inner scroller there would also
+     apply to /articles and break useParallax, which reads window.scrollY. */
+  height: 100vh;
+
+  /* `100svh` (small viewport height), not `100dvh`: dvh tracks the *current*
+     browser-chrome state, and on mobile Safari/Chrome that state is the large,
+     toolbar-expanded one on first arrival at a pane — so a pane sized to dvh at
+     that moment is taller than what's actually visible, and content pinned
+     near its bottom (a button, the footer) renders below the visible area or
+     overlapping the pane above. svh is the guaranteed-visible floor: toolbars
+     showing is the smallest the viewport ever is, so every pane fits inside
+     what's on screen up front. The cost is unused space at the bottom once the
+     toolbar auto-hides — a much better failure mode than clipped content. */
+  height: 100svh;
+  overflow-y: auto;
+
+  /* overflow-y: auto computes overflow-x from `visible` to `auto`, and
+     body { overflow-x: hidden } no longer covers content inside this box. */
   overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+
+  /* Mandatory snapping makes anything past the snapport unreachable — no
+     scrollbar, no way down. On short viewports, where the panes are most
+     likely to overflow despite the condensed layout, fall back to proximity
+     so the content stays reachable. */
+  @media (--mediaMobileLS) {
+    scroll-snap-type: y proximity;
+  }
+}
+
+.home > section {
+  /* 100% of the container, not 100dvh: if both resolved dvh independently, a
+     viewport resize mid-scroll would desync the snap points. */
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.sectionDots {
+  position: fixed;
+  right: var(--spaceL);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceM);
+  z-index: var(--zIndex2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @media (--mediaMobile) {
+    display: none;
+  }
+}
+
+.dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(var(--rgbText) / 0.3);
+
+    @media (--mediaUseMotion) {
+      transition: background var(--durationM) ease, transform var(--durationM) ease;
+    }
+  }
+
+  &[data-active='true']::after {
+    background: rgb(var(--rgbAccent));
+    transform: scale(1.5);
+  }
 }

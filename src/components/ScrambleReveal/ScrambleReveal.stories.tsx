@@ -8,7 +8,7 @@ const meta = {
   component: ScrambleReveal,
   tags: ['autodocs'],
   args: {
-    text: 'Slick cyberpunk text',
+    text: 'Say hello',
   },
 } satisfies Meta<typeof ScrambleReveal>;
 

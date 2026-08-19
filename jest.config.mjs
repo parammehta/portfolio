@@ -9,6 +9,9 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironment: 'jest-environment-jsdom',
   moduleDirectories: ['node_modules', '<rootDir>/src'],
+  // Keep transient git worktrees (release automation) out of the haste map,
+  // otherwise their copies of __mocks__ trigger duplicate-mock warnings.
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
   moduleNameMapper: {
     '\\.(woff|woff2|eot|ttf|otf|mp4|hdr|glb|glsl)$': '<rootDir>/__mocks__/fileMock.js',
   },

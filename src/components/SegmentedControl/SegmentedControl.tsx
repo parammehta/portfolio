@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import type { KeyboardEvent, ReactNode, RefObject } from 'react';
-import { VisuallyHidden } from 'components';
+import { VisuallyHidden } from 'components/VisuallyHidden';
 import { cssProps } from 'utils/style';
 import styles from './SegmentedControl.module.css';
 

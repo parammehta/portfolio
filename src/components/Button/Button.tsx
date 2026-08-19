@@ -1,5 +1,7 @@
 import { forwardRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from 'react';
-import { Icon, Loader, Transition } from 'components';
+import { Icon } from 'components/Icon';
+import { Loader } from 'components/Loader';
+import { Transition } from 'components/Transition';
 import type { icons } from 'components/Icon';
 import RouterLink from 'next/link';
 import { classes } from 'utils/style';

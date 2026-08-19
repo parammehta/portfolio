@@ -21,12 +21,12 @@ import { Fragment } from 'react';
 import { media } from 'utils/style';
 import styles from './Intuit.module.css';
 
-const title = 'Senior Software Engineer at Intuit';
+const title = 'Staff Software Engineer at Intuit';
 const description =
-  "Leading passkey adoption, cross-company identity integrations, and agentic AI/MCP prototyping for Intuit’s Identity Authentication Experiences team.";
+  'Built and scaled the Intuit Design System — 100+ components, Figma plugins, and AI-assisted tooling adopted across QuickBooks, TurboTax, Credit Karma, and Mailchimp — before leading passkey adoption and agentic AI prototyping for Intuit’s Identity Authentication Experiences team.';
 const roles = [
-  'Identity & Auth',
   'Design Systems',
+  'Identity & Auth',
   'AI/MCP Prototyping',
   'Team Leadership',
 ];
@@ -45,38 +45,14 @@ export const Intuit = () => {
         <ExperienceHeader
           title={title}
           description={description}
-          url="https://www.intuit.com"
           roles={roles}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Experience', href: '/#experience' },
+            { label: 'Experience', href: '/experience' },
             { label: 'Intuit', href: '/experience/intuit' },
           ]}
         />
-        <ExperienceSection padding="top">
-          <ExperienceSectionColumns centered className={styles.columns}>
-            <div className={styles.sidebarImages}>
-              <Image
-                reveal
-                className={styles.sidebarImage}
-                srcSet={[intuitPasskeyEnrollment]}
-                placeholder={intuitPasskeyEnrollment}
-                alt="A confirmation screen after enrolling a passkey, showing sign-in with face, fingerprint, or PIN."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-              <Image
-                reveal
-                delay={100}
-                className={styles.sidebarImage}
-                srcSet={[intuitMdlVerification]}
-                placeholder={intuitMdlVerification}
-                alt="An identity verification screen using a digital driver's license from a phone wallet."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-            </div>
-          </ExperienceSectionColumns>
-        </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection padding="top" light>
           <ExperienceSectionContent>
             <ExperienceImage
               srcSet={[intuitDesignSystem]}
@@ -103,10 +79,42 @@ export const Intuit = () => {
                 component-first, Storybook-driven habits I carried into the Identity org
                 afterward.
               </ExperienceSectionText>
+              <ExperienceSectionText>
+                Beyond the components themselves, I built internal Figma plugins that
+                synced design tokens and component specs directly from Figma into the
+                library, and piloted AI-assisted tooling to speed up the design-to-code
+                handoff for partner teams. Components pulled configuration from GraphQL
+                and REST endpoints with client-side instrumentation to track adoption, and
+                I was the primary on-call point of contact for the design system, owning
+                production support and SLAs for the products built on top of it.
+              </ExperienceSectionText>
             </ExperienceTextRow>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
+          <ExperienceSectionColumns centered className={styles.columns}>
+            <div className={styles.sidebarImages}>
+              <Image
+                reveal
+                className={styles.sidebarImage}
+                srcSet={[intuitPasskeyEnrollment]}
+                placeholder={intuitPasskeyEnrollment}
+                alt="A confirmation screen after enrolling a passkey, showing sign-in with face, fingerprint, or PIN."
+                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
+              />
+              <Image
+                reveal
+                delay={100}
+                className={styles.sidebarImage}
+                srcSet={[intuitMdlVerification]}
+                placeholder={intuitMdlVerification}
+                alt="An identity verification screen using a digital driver's license from a phone wallet."
+                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
+              />
+            </div>
+          </ExperienceSectionColumns>
+        </ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceTextRow>
               <ExperienceSectionHeading>
@@ -153,7 +161,7 @@ export const Intuit = () => {
             </div>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection>
           <ExperienceSectionContent>
             <ExperienceImage
               srcSet={[intuitIdentityConsole]}
@@ -182,7 +190,7 @@ export const Intuit = () => {
             </ExperienceTextRow>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceTextRow>
               <ExperienceSectionHeading>
@@ -204,7 +212,7 @@ export const Intuit = () => {
             </ExperienceTextRow>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection>
           <ExperienceSectionContent>
             <ExperienceTextRow>
               <ExperienceSectionHeading>

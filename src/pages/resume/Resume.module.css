@@ -1,7 +1,3 @@
-.resume {
-  --maxWidthL: var(--maxWidthM);
-}
-
 .section {
   padding-top: var(--space2XL);
   padding-bottom: var(--space4XL);

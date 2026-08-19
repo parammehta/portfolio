@@ -8,6 +8,7 @@ import ChevronRight from './svg/chevron-right.svg';
 import Close from './svg/close.svg';
 import Company from './svg/company.svg';
 import Copy from './svg/copy.svg';
+import Download from './svg/download.svg';
 import Error from './svg/error.svg';
 import Figma from './svg/figma.svg';
 import Github from './svg/github.svg';
@@ -18,6 +19,7 @@ import Pause from './svg/pause.svg';
 import Play from './svg/play.svg';
 import Send from './svg/send.svg';
 import Skills from './svg/skills.svg';
+import Storybook from './svg/storybook.svg';
 import Twitter from './svg/twitter.svg';
 
 export const icons = {
@@ -29,6 +31,7 @@ export const icons = {
   chevronRight: ChevronRight,
   close: Close,
   copy: Copy,
+  download: Download,
   error: Error,
   figma: Figma,
   github: Github,
@@ -39,6 +42,7 @@ export const icons = {
   play: Play,
   send: Send,
   skills: Skills,
+  storybook: Storybook,
   twitter: Twitter,
 };
 

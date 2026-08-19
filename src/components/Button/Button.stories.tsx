@@ -70,8 +70,8 @@ export const Loader: Story = {
 export const WithInternalLink: Story = {
   render: () => (
     <StoryContainer>
-      <Button href="/#skills">Internal link (RouterLink)</Button>
-      <Button href="/#skills" secondary>
+      <Button href="/skills">Internal link (RouterLink)</Button>
+      <Button href="/skills" secondary>
         Secondary internal link
       </Button>
     </StoryContainer>

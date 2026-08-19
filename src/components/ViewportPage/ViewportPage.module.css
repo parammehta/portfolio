@@ -1,0 +1,80 @@
+.page {
+  /* Exactly one viewport: the shell never scrolls, only regions inside it can.
+     `dvh` rather than `vh`/`lvh` because those resolve to the toolbar-hidden
+     height on mobile, which would push content past the visual viewport. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(var(--space5XL) + var(--space3XL));
+  padding-bottom: var(--space2XL);
+
+  @media (--mediaLaptop) {
+    padding-top: var(--space5XL);
+  }
+
+  @media (--mediaTablet) {
+    padding-top: var(--space4XL);
+  }
+
+  @media (--mediaMobile) {
+    padding-top: var(--space5XL);
+    padding-bottom: var(--spaceM);
+  }
+
+  @media (max-width: 820px) and (max-height: 420px) {
+    padding-top: var(--spaceXL);
+    padding-bottom: var(--spaceM);
+  }
+}
+
+.breadcrumbs {
+  flex: 0 0 auto;
+  margin-bottom: var(--spaceXL);
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-bottom: var(--spaceM);
+  }
+}
+
+.title {
+  flex: 0 0 auto;
+  margin-bottom: var(--space2XL);
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: var(--bezierFastoutSlowin);
+  transition-duration: var(--durationXL);
+
+  @media (--mediaUseMotion) {
+    transition-property: transform, opacity;
+    transform: translate3d(0, var(--spaceM), 0);
+  }
+
+  &[data-visible='true'] {
+    transform: none;
+    opacity: 1;
+  }
+
+  @media (--mediaTablet) {
+    margin-bottom: var(--spaceXL);
+  }
+
+  @media (--mediaMobile), (--mediaMobileLS) {
+    margin-bottom: var(--spaceM);
+  }
+}
+
+.content {
+  /* min-height: 0 lets a flex child with its own overflow actually shrink
+     instead of forcing the shell taller than the viewport. */
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+
+  /* Backstop only. Each page condenses its content to fit, so on any viewport
+     we actually target this never engages — but clipping content outright is
+     worse than a scrollbar on a viewport nobody anticipated. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

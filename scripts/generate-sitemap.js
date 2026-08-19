@@ -10,8 +10,10 @@ function addPage(page) {
     .replace('/index', '/');
   const route = path === '/index' ? '' : path;
 
-  // Exclude 404 page and generated `[]` pages
-  if (route.includes('[') || route.includes('404')) return;
+  // Exclude the 404 page, generated `[]` pages, and `/contact` — that route
+  // is now a noindex redirect stub to `/#contact`, not a real page. `route`
+  // carries a trailing slash by this point (e.g. '/contact/'), hence startsWith.
+  if (route.includes('[') || route.includes('404') || route.startsWith('/contact')) return;
 
   return `  <url>
     <loc>${`${process.env.NEXT_PUBLIC_WEBSITE_URL}${route}`}</loc>
@@ -28,8 +30,9 @@ async function addPost(post) {
   const path = post.replace('src/posts', '/articles').replace('.mdx', '');
 
   return `  <url>
-    <loc>${`${process.env.NEXT_PUBLIC_WEBSITE_URL}${path}`}</loc>
+    <loc>${`${process.env.NEXT_PUBLIC_WEBSITE_URL}${path}/`}</loc>
     <changefreq>monthly</changefreq>
+    <lastmod>${frontmatter.date}</lastmod>
   </url>`;
 }
 

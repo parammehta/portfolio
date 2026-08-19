@@ -32,6 +32,26 @@ jobs:
       - run: npm run stylelint
       - run: npm run typecheck
 
+  # Not one of the required status checks (see the job-name comment above) —
+  # functions/ deploys separately from the site and previously had no CI at
+  # all. Added as a non-blocking signal rather than a gate, since the lint
+  # config here was passing vacuously (a bad ecmaVersion made it fail to
+  # parse the files at all) until that got fixed alongside this job.
+  functions-lint:
+    name: Functions lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - run: npm ci
+        working-directory: functions
+      - run: npm run lint
+        working-directory: functions
+
   unit:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -70,7 +90,12 @@ jobs:
         env:
           NEXT_PUBLIC_WEBSITE_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_URL }}
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN }}
+          # Deliberately NOT NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN: setting it
+          # here injects the Cloudflare beacon into this build, and the beacon's
+          # RUM request gets CORS-blocked against the e2e job's 127.0.0.1 origin,
+          # which the e2e console-error assertion then flags as a failure. This
+          # build only feeds e2e, never a real deploy — the actual production
+          # build (deploy.yml) sets the token so analytics ships to prod.
           NEXT_PUBLIC_ANALYTICS_EVENTS_URL: ${{ vars.NEXT_PUBLIC_ANALYTICS_EVENTS_URL }}
           NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
       # The e2e job runs against these exact bytes rather than rebuilding.

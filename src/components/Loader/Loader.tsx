@@ -1,4 +1,5 @@
-import { Text, VisuallyHidden } from 'components';
+import { Text } from 'components/Text';
+import { VisuallyHidden } from 'components/VisuallyHidden';
 import { useReducedMotion } from 'framer-motion';
 import { useHasMounted } from 'hooks';
 import { type ComponentPropsWithoutRef } from 'react';
