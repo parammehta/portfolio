@@ -159,9 +159,16 @@ async function handleDashboard(request, env, url) {
     );
   }
 
-  // Named rather than a fixed-order array so a bad query fails only its own
-  // panel — see runDashboardQueries.
-  const queries = {
+  const { data, errors } = await runDashboardQueries(env, dashboardQueries());
+  return htmlResponse(dashboardPage({ ...data, errors, auth }));
+}
+
+// Named rather than a fixed-order array so a bad query fails only its own
+// panel — see runDashboardQueries. Exported (not inlined in handleDashboard)
+// so `npm run verify` can run every query against the live SQL API without
+// duplicating them — see scripts/verify-queries.mjs.
+export function dashboardQueries() {
+  return {
     totals: `SELECT blob1 AS event, sum(_sample_interval) AS n
               FROM ${DATASET} GROUP BY event ORDER BY n DESC`,
     daily: `SELECT toStartOfDay(timestamp) AS day, sum(_sample_interval) AS n
@@ -177,9 +184,6 @@ async function handleDashboard(request, env, url) {
                       sum(_sample_interval) AS n
                FROM ${DATASET} GROUP BY dow, hour`,
   };
-
-  const { data, errors } = await runDashboardQueries(env, queries);
-  return htmlResponse(dashboardPage({ ...data, errors, auth }));
 }
 
 /**
