@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/parammehta/portfolio/compare/v1.10.0...v1.10.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* show tech chips on mobile experience page ([#43](https://github.com/parammehta/portfolio/issues/43)) ([15540a0](https://github.com/parammehta/portfolio/commit/15540a077b027923ddb5e931575a440fb4e70ca8))
+
 ## [1.10.0](https://github.com/parammehta/portfolio/compare/v1.9.0...v1.10.0) (2026-08-18)
 
 
