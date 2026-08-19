@@ -17,5 +17,5 @@ dataset = "portfolio_events"
 # localhost `wrangler dev`). See worker/README.md for the Access setup.
 [vars]
 ACCOUNT_ID = "2b3e10900a534b6fb7e855e199717511"
-# ACCESS_TEAM_DOMAIN = "yourteam.cloudflareaccess.com"
-# ACCESS_AUD = "<application-audience-tag>"
+ACCESS_TEAM_DOMAIN = "parammehta.cloudflareaccess.com"
+ACCESS_AUD = "d8eb0f678505028e88ce16356ed9d3e3bcca9beaf4e930afe13ebdf7a3aa8758"
