@@ -399,9 +399,15 @@ function barList(rows, labelKey) {
     .map(r => {
       const pct = ((Number(r.n) || 0) / max) * 100;
       const label = esc(r[labelKey] || '—');
-      // `title` gives a full-text tooltip for labels the column truncates.
+      // A CSS tooltip, not the native `title` attribute — `title`'s browser-
+      // rendered popup is slow, inconsistent across browsers/OS, and doesn't
+      // fire at all on touch. `.label-wrap` carries the tooltip so it isn't
+      // clipped by `.label`'s own overflow:hidden (an element's ::after is
+      // still inside its own clipping box).
       return `<li>
-        <span class="label" title="${label}">${label}</span>
+        <span class="label-wrap tip" data-tip="${label}">
+          <span class="label">${label}</span>
+        </span>
         <span class="track"><span class="fill" style="width:${pct.toFixed(1)}%"></span></span>
         <span class="value">${num(r.n)}</span>
       </li>`;
@@ -708,7 +714,21 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .delta.down { color:#e5484d; }
 .bars { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
 .bars li { display:grid; grid-template-columns:minmax(90px,50%) 1fr auto; align-items:center; gap:10px; font-size:13px; }
-.bars .label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.label-wrap { min-width:0; }
+.bars .label { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* CSS-only tooltip — not the native title attribute, which renders slowly,
+   inconsistently across browsers/OS, and not at all on touch. .tip sits on
+   a wrapper (not the truncated .label itself) so the popup isn't clipped by
+   that element's own overflow:hidden. */
+.tip { position:relative; }
+.tip::after {
+  content:attr(data-tip);
+  position:absolute; left:0; bottom:100%; margin-bottom:6px;
+  background:var(--fg); color:var(--bg);
+  padding:4px 8px; border-radius:6px; font-size:12px; white-space:nowrap;
+  opacity:0; pointer-events:none; transition:opacity .1s ease; z-index:10;
+}
+.tip:hover::after, .tip:focus-visible::after { opacity:1; }
 .bars .track { background:var(--line); border-radius:5px; height:10px; overflow:hidden; }
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
 .bars .value { font-variant-numeric:tabular-nums; color:var(--muted); }
