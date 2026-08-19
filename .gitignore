@@ -63,6 +63,7 @@ tsconfig.tsbuildinfo
 
 # wrangler local secrets (CF_API_TOKEN for `wrangler dev`) — never committed
 .dev.vars
+.wrangler/
 
 # macOS
 .DS_Store
