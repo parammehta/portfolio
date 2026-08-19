@@ -10,12 +10,13 @@ interface ThemeToggleProps extends ComponentPropsWithoutRef<typeof Button> {
 }
 
 export const ThemeToggle = ({ isMobile, ...rest }: ThemeToggleProps) => {
-  const { dispatch } = useAppContext();
+  const { theme, dispatch } = useAppContext();
   const id = useId();
   const maskId = `${id}theme-toggle-mask`;
 
   const handleClick = () => {
-    trackEvent(analyticsEvents.themeToggle);
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    trackEvent(analyticsEvents.themeToggle, { theme: nextTheme });
     dispatch({ type: 'toggleTheme' });
   };
 

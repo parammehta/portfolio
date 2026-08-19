@@ -109,8 +109,9 @@ async function handleEvent(request, env) {
   const reason =
     typeof props.reason === 'string' ? props.reason.slice(0, 64) : '';
   // A single free-text field for whichever prop identifies *what* was
-  // clicked (nav/social label, experience company, skills tool link).
-  const detailValue = props.label ?? props.company ?? props.tool;
+  // clicked (nav/social label, experience company, skills tool link, or the
+  // resulting theme on a theme_toggle).
+  const detailValue = props.label ?? props.company ?? props.tool ?? props.theme;
   const detail = typeof detailValue === 'string' ? detailValue.slice(0, 64) : '';
 
   // `writeDataPoint` is only bound in deployed/`wrangler dev` runs; guard so
@@ -159,7 +160,7 @@ async function handleDashboard(request, env, url) {
   }
 
   try {
-    const [totals, daily, referrers, countries, interactions] = await Promise.all([
+    const [totals, daily, referrers, countries, interactions, activity] = await Promise.all([
       runQuery(
         env,
         `SELECT blob1 AS event, sum(_sample_interval) AS n
@@ -186,10 +187,16 @@ async function handleDashboard(request, env, url) {
         `SELECT concat(blob1, ': ', blob5) AS interaction, sum(_sample_interval) AS n
          FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`
       ),
+      runQuery(
+        env,
+        `SELECT toDayOfWeek(timestamp) AS dow, toHour(timestamp) AS hour,
+                sum(_sample_interval) AS n
+         FROM ${DATASET} GROUP BY dow, hour`
+      ),
     ]);
 
     return htmlResponse(
-      dashboardPage({ totals, daily, referrers, countries, interactions, auth })
+      dashboardPage({ totals, daily, referrers, countries, interactions, activity, auth })
     );
   } catch (error) {
     return htmlResponse(errorPage('Query failed', String(error.message || error)), 502);
