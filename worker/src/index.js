@@ -484,7 +484,7 @@ function sparkline(daily) {
       const left = ((x / w) * 100).toFixed(2);
       const top = ((y / h) * 100).toFixed(2);
       const tip = esc(`${num(series[i].n)} on ${series[i].day}`);
-      return `<span class="spark-point tip" data-tip="${tip}" style="left:${left}%;top:${top}%"></span>`;
+      return `<span class="spark-point tip" data-tip="${tip}" aria-label="${tip}" tabindex="0" style="left:${left}%;top:${top}%"></span>`;
     })
     .join('');
 
@@ -763,7 +763,11 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
   padding:4px 8px; border-radius:6px; font-size:12px; white-space:nowrap;
   opacity:0; pointer-events:none; transition:opacity .1s ease; z-index:10;
 }
-.tip:hover::after, .tip:focus-visible::after { opacity:1; }
+/* Plain :focus, not :focus-visible — tapping a tabindex="0" element on a
+   touch device satisfies :focus but not reliably :focus-visible across
+   browsers, and tap is the only way a touch user can reach this at all. */
+.tip:hover::after, .tip:focus::after { opacity:1; }
+.tip:focus { outline:2px solid var(--accent); outline-offset:2px; }
 .bars .track { background:var(--line); border-radius:5px; height:10px; overflow:hidden; }
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
 .bars .value { font-variant-numeric:tabular-nums; color:var(--muted); }
