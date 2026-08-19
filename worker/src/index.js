@@ -310,13 +310,14 @@ function sparkline(daily) {
   const h = 160;
   const max = Math.max(...daily.map(d => Number(d.n) || 0), 1);
   const step = daily.length > 1 ? w / (daily.length - 1) : w;
-  const points = daily
-    .map((d, i) => {
-      const x = i * step;
-      const y = h - (Number(d.n) || 0) / max * (h - 20) - 10;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  const yFor = d => h - (Number(d.n) || 0) / max * (h - 20) - 10;
+  // A single data point can't form a polyline segment, so plot it as a flat
+  // line across the full width instead of a coordinate that renders nothing.
+  const coords =
+    daily.length > 1
+      ? daily.map((d, i) => [i * step, yFor(d)])
+      : [[0, yFor(daily[0])], [w, yFor(daily[0])]];
+  const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
   return `<svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
     <polyline fill="none" stroke="currentColor" stroke-width="2" points="${points}" />
   </svg>`;
