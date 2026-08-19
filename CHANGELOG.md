@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.6](https://github.com/parammehta/portfolio/compare/v1.11.5...v1.11.6) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** plot events-per-day on a real time axis ([#61](https://github.com/parammehta/portfolio/issues/61)) ([7496462](https://github.com/parammehta/portfolio/commit/74964620982e7e982a6bcba55579f142c9a94e4a))
+
 ## [1.11.5](https://github.com/parammehta/portfolio/compare/v1.11.4...v1.11.5) (2026-08-19)
 
 
