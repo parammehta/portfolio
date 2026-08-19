@@ -340,8 +340,10 @@ function barList(rows, labelKey) {
   return `<ul class="bars">${rows
     .map(r => {
       const pct = ((Number(r.n) || 0) / max) * 100;
+      const label = esc(r[labelKey] || '—');
+      // `title` gives a full-text tooltip for labels the column truncates.
       return `<li>
-        <span class="label">${esc(r[labelKey] || '—')}</span>
+        <span class="label" title="${label}">${label}</span>
         <span class="track"><span class="fill" style="width:${pct.toFixed(1)}%"></span></span>
         <span class="value">${num(r.n)}</span>
       </li>`;
@@ -363,9 +365,34 @@ function sparkline(daily) {
       ? daily.map((d, i) => [i * step, yFor(d)])
       : [[0, yFor(daily[0])], [w, yFor(daily[0])]];
   const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+
+  // A bare line has no numbers on it at all — add a hoverable marker (with a
+  // native tooltip) per day, plus a caption so the peak/latest are visible
+  // without needing to hover.
+  const markers = coords
+    .map(([x, y], i) => {
+      const d = daily[i];
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor"><title>${esc(
+        `${num(d.n)} on ${d.day}`
+      )}</title></circle>`;
+    })
+    .join('');
+
+  const peakIndex = daily.reduce(
+    (best, d, i) => (Number(d.n) > Number(daily[best].n) ? i : best),
+    0
+  );
+  const peak = daily[peakIndex];
+  const latest = daily[daily.length - 1];
+  const caption = `<p class="spark-caption">Peak <strong>${num(peak.n)}</strong> on ${esc(
+    peak.day
+  )} · Latest <strong>${num(latest.n)}</strong> on ${esc(latest.day)}</p>`;
+
   return `<svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
     <polyline fill="none" stroke="currentColor" stroke-width="2" points="${points}" />
-  </svg>`;
+    ${markers}
+  </svg>
+  ${caption}`;
 }
 
 function contactFunnel(totals) {
@@ -413,9 +440,12 @@ function heatmap(activity) {
         .map(n => {
           // Mirrors --accent (#f5842a); the CSS var can't be read from here.
           const bg = n > 0 ? `rgba(245,132,42,${(0.15 + 0.85 * (n / max)).toFixed(2)})` : 'var(--line)';
+          // Color intensity alone isn't legible cell-to-cell, so print the
+          // count directly (blank for 0 — the empty background already reads
+          // as "nothing happened here").
           return `<div class="heat-cell" style="background:${bg}" title="${esc(
             `${n} on ${HEAT_DAYS[d]}`
-          )}"></div>`;
+          )}">${n > 0 ? n : ''}</div>`;
         })
         .join('');
       return `<div class="heat-row"><div class="heat-daylabel">${HEAT_DAYS[d]}</div>${cells}</div>`;
@@ -496,7 +526,7 @@ function dashboardPage({
     <section class="panel"><h2>By event</h2>${panel(errors, 'totals', () => barList(totals, 'event'))}</section>
     <section class="panel"><h2>Top referrers</h2>${panel(errors, 'referrers', () => barList(referrers, 'referer'))}</section>
     <section class="panel"><h2>Top countries</h2>${panel(errors, 'countries', () => barList(countries, 'country'))}</section>
-    <section class="panel"><h2>Top interactions</h2>${panel(errors, 'interactions', () => barList(interactions, 'interaction'))}</section>
+    <section class="panel panel-wide"><h2>Top interactions</h2>${panel(errors, 'interactions', () => barList(interactions, 'interaction'))}</section>
     <section class="panel"><h2>Contact funnel</h2>${panel(errors, 'totals', () => contactFunnel(totals))}</section>
   </div>
 
@@ -523,17 +553,19 @@ header h1 { margin:0 0 4px; font-size:24px; }
 .sub, .muted { color:var(--muted); }
 .sub { margin:0 0 24px; font-size:13px; }
 code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; }
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-bottom:28px; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(136px,1fr)); gap:12px; margin-bottom:28px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow:hidden; }
 .big { font-size:26px; font-weight:600; }
-.cap { color:var(--muted); font-size:12px; margin-top:2px; text-transform:uppercase; letter-spacing:.04em; }
+.cap { color:var(--muted); font-size:12px; margin-top:2px; text-transform:uppercase; letter-spacing:.04em; overflow-wrap:anywhere; }
 .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-bottom:20px; }
 .panel h2 { margin:0 0 14px; font-size:15px; }
 .grid { display:grid; grid-template-columns:1fr; gap:20px; }
-@media (min-width:680px) { .grid { grid-template-columns:1fr 1fr; } .grid .panel:first-child { grid-column:1/-1; } }
+@media (min-width:680px) { .grid { grid-template-columns:1fr 1fr; } .grid .panel:first-child, .grid .panel-wide { grid-column:1/-1; } }
 .spark { width:100%; height:160px; color:var(--accent); display:block; }
+.spark-caption { margin:8px 0 0; font-size:12px; color:var(--muted); }
+.spark-caption strong { color:var(--fg); font-weight:600; }
 .bars { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
-.bars li { display:grid; grid-template-columns:minmax(90px,34%) 1fr auto; align-items:center; gap:10px; font-size:13px; }
+.bars li { display:grid; grid-template-columns:minmax(90px,50%) 1fr auto; align-items:center; gap:10px; font-size:13px; }
 .bars .label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .bars .track { background:var(--line); border-radius:5px; height:10px; overflow:hidden; }
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
@@ -543,9 +575,9 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .card-error { display:flex; align-items:center; }
 .card-error .panel-error { font-size:12px; }
 .heatmap { display:flex; flex-direction:column; gap:3px; overflow-x:auto; }
-.heat-row { display:grid; grid-template-columns:34px repeat(24,minmax(14px,1fr)); gap:3px; align-items:center; }
+.heat-row { display:grid; grid-template-columns:34px repeat(24,minmax(22px,1fr)); gap:3px; align-items:center; }
 .heat-daylabel { font-size:11px; color:var(--muted); }
 .heat-hourlabel { font-size:9px; color:var(--muted); text-align:center; }
-.heat-cell { aspect-ratio:1; border-radius:3px; }
+.heat-cell { aspect-ratio:1; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:9px; font-variant-numeric:tabular-nums; color:var(--fg); }
 footer { color:var(--muted); font-size:12px; margin-top:28px; }
 `;
