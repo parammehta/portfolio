@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.1](https://github.com/parammehta/portfolio/compare/v1.11.0...v1.11.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** render sparkline when only one day has data ([#51](https://github.com/parammehta/portfolio/issues/51)) ([a32b12e](https://github.com/parammehta/portfolio/commit/a32b12e26d1d48c2c884a79598d02f6079b21668))
+
 ## [1.11.0](https://github.com/parammehta/portfolio/compare/v1.10.1...v1.11.0) (2026-08-19)
 
 
