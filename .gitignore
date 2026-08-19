@@ -61,6 +61,9 @@ tsconfig.tsbuildinfo
 .env
 .env.local
 
+# wrangler local secrets (CF_API_TOKEN for `wrangler dev`) — never committed
+.dev.vars
+
 # macOS
 .DS_Store
 
