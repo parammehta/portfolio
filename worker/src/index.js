@@ -184,7 +184,7 @@ async function handleDashboard(request, env, url) {
       ),
       runQuery(
         env,
-        `SELECT concat(blob1, ': ', blob5) AS interaction, sum(_sample_interval) AS n
+        `SELECT format('{}: {}', blob1, blob5) AS interaction, sum(_sample_interval) AS n
          FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`
       ),
       runQuery(
@@ -209,9 +209,18 @@ async function runQuery(env, sql) {
     { method: 'POST', headers: { Authorization: `Bearer ${env.CF_API_TOKEN}` }, body: sql }
   );
 
-  const json = await res.json();
-  // The SQL API returns { meta, data, rows } on success and the standard
-  // { success: false, errors } envelope on failure.
+  // The SQL API returns { meta, data, rows } as JSON on success, but some
+  // failures (e.g. invalid SQL) come back as a plain-text body — read as
+  // text first so a bad response can't crash as a raw JSON.parse error.
+  const text = await res.text();
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+  // On success it's the raw { meta, data, rows } shape; on failure it's the
+  // standard { success: false, errors } envelope.
   if (!res.ok || json.success === false) {
     throw new Error(JSON.stringify(json.errors ?? json));
   }
