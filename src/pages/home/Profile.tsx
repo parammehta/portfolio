@@ -15,6 +15,7 @@ import profileImgLarge from 'assets/profile-large.jpg';
 import profileImgPlaceholder from 'assets/profile-placeholder.jpg';
 import profileImg from 'assets/profile.jpg';
 import { useScrollToHash } from 'hooks';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { media } from 'utils/style';
 import styles from './Profile.module.css';
 
@@ -60,6 +61,7 @@ export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
 
   const handleContactClick = (event: MouseEvent) => {
     event.preventDefault();
+    trackEvent(analyticsEvents.profileContactClick);
     scrollToHash('#contact');
   };
 

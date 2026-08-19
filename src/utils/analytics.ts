@@ -34,6 +34,13 @@ export const analyticsEvents = {
   resumeDownload: 'resume_download',
   resumeOpen: 'resume_open',
   designSystemOpen: 'design_system_open',
+  navLinkClick: 'nav_link_click',
+  socialLinkClick: 'social_link_click',
+  themeToggle: 'theme_toggle',
+  profileContactClick: 'profile_contact_click',
+  experienceTabSelect: 'experience_tab_select',
+  experienceDetailsClick: 'experience_details_click',
+  skillsToolLinkClick: 'skills_tool_link_click',
 } as const;
 
 const devSink: AnalyticsSink = ({ name, props }) => {
