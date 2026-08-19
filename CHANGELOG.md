@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.5](https://github.com/parammehta/portfolio/compare/v1.11.4...v1.11.5) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** fix dashboard legibility — no visible numbers, chopped labels ([#59](https://github.com/parammehta/portfolio/issues/59)) ([63fd7b0](https://github.com/parammehta/portfolio/commit/63fd7b03f3dc34e9a06a4cb6be395754dd6dbdb5))
+
 ## [1.11.4](https://github.com/parammehta/portfolio/compare/v1.11.3...v1.11.4) (2026-08-19)
 
 
