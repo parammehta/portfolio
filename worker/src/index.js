@@ -454,19 +454,32 @@ function sparkline(daily) {
   const step = w / (series.length - 1);
   const yFor = d => h - (d.n / max) * (h - 20) - 10;
   const coords = series.map((d, i) => [i * step, yFor(d)]);
-  const points = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const pointsAttr = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
 
-  // A bare line has no numbers on it at all — mark the days that actually have
-  // events (hoverable, with a native tooltip), and caption the peak/latest so
-  // they're readable without hovering.
-  const markers = coords
+  // A bare line has no numbers on it at all — mark the days that actually
+  // have events, visually as an SVG dot and separately (below) as an HTML
+  // hover target, since SVG's own native <title> has the exact same
+  // unreliability as the HTML title attribute. Caption the peak/latest too,
+  // so they're readable without hovering at all.
+  const dots = coords
     .map(([x, y], i) =>
       series[i].n > 0
-        ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor"><title>${esc(
-            `${num(series[i].n)} on ${series[i].day}`
-          )}</title></circle>`
+        ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="currentColor" />`
         : ''
     )
+    .join('');
+
+  // CSS tooltip targets, positioned by percentage over the fixed-size SVG box
+  // (not inside the SVG — a generated ::after on an SVG shape doesn't
+  // position reliably across browsers the way it does on an HTML element).
+  const points = coords
+    .map(([x, y], i) => {
+      if (series[i].n === 0) return '';
+      const left = ((x / w) * 100).toFixed(2);
+      const top = ((y / h) * 100).toFixed(2);
+      const tip = esc(`${num(series[i].n)} on ${series[i].day}`);
+      return `<span class="spark-point tip" data-tip="${tip}" style="left:${left}%;top:${top}%"></span>`;
+    })
     .join('');
 
   const withEvents = series.filter(d => d.n > 0);
@@ -476,10 +489,13 @@ function sparkline(daily) {
     peak.day
   )} · Latest <strong>${num(latest.n)}</strong> on ${esc(latest.day)}</p>`;
 
-  return `<svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
-    <polyline fill="none" stroke="currentColor" stroke-width="2" points="${points}" />
-    ${markers}
-  </svg>
+  return `<div class="spark-wrap">
+    <svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none" role="img" aria-label="Events per day">
+      <polyline fill="none" stroke="currentColor" stroke-width="2" points="${pointsAttr}" />
+      ${dots}
+    </svg>
+    ${points}
+  </div>
   ${caption}`;
 }
 
@@ -710,7 +726,16 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .panel h2 { margin:0 0 14px; font-size:15px; }
 .grid { display:grid; grid-template-columns:1fr; gap:20px; }
 @media (min-width:680px) { .grid { grid-template-columns:1fr 1fr; } .grid .panel:first-child, .grid .panel-wide { grid-column:1/-1; } }
+.spark-wrap { position:relative; width:100%; height:160px; }
 .spark { width:100%; height:160px; color:var(--accent); display:block; }
+/* .spark-point.tip (two classes) beats the base .tip's position:relative
+   (one class) on specificity regardless of source order — needed since this
+   element must stay position:absolute to sit over the chart by percentage. */
+.spark-point.tip {
+  position:absolute; width:16px; height:16px; margin:-8px 0 0 -8px;
+  border-radius:50%; cursor:default;
+}
+.spark-point.tip::after { left:50%; bottom:auto; top:-6px; margin-bottom:0; transform:translate(-50%,-100%); }
 .spark-caption { margin:8px 0 0; font-size:12px; color:var(--muted); }
 .spark-caption strong { color:var(--fg); font-weight:600; }
 .delta { font-weight:600; }
