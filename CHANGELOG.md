@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/parammehta/portfolio/compare/v1.10.1...v1.11.0) (2026-08-19)
+
+
+### Features
+
+* add a Cloudflare Access-protected analytics dashboard ([#26](https://github.com/parammehta/portfolio/issues/26)) ([e405d06](https://github.com/parammehta/portfolio/commit/e405d0630a25c06cc223b5792d21b5b8e25cbcc6))
+
 ## [1.10.1](https://github.com/parammehta/portfolio/compare/v1.10.0...v1.10.1) (2026-08-19)
 
 
