@@ -159,48 +159,51 @@ async function handleDashboard(request, env, url) {
     );
   }
 
-  try {
-    const [totals, daily, referrers, countries, interactions, activity] = await Promise.all([
-      runQuery(
-        env,
-        `SELECT blob1 AS event, sum(_sample_interval) AS n
-         FROM ${DATASET} GROUP BY event ORDER BY n DESC`
-      ),
-      runQuery(
-        env,
-        `SELECT toStartOfDay(timestamp) AS day, sum(_sample_interval) AS n
-         FROM ${DATASET} WHERE timestamp > now() - INTERVAL '30' DAY
-         GROUP BY day ORDER BY day`
-      ),
-      runQuery(
-        env,
-        `SELECT blob3 AS referer, sum(_sample_interval) AS n
-         FROM ${DATASET} WHERE blob3 != '' GROUP BY referer ORDER BY n DESC LIMIT 10`
-      ),
-      runQuery(
-        env,
-        `SELECT blob4 AS country, sum(_sample_interval) AS n
-         FROM ${DATASET} WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10`
-      ),
-      runQuery(
-        env,
-        `SELECT format('{}: {}', blob1, blob5) AS interaction, sum(_sample_interval) AS n
-         FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`
-      ),
-      runQuery(
-        env,
-        `SELECT toDayOfWeek(timestamp) AS dow, toHour(timestamp) AS hour,
-                sum(_sample_interval) AS n
-         FROM ${DATASET} GROUP BY dow, hour`
-      ),
-    ]);
+  // Named rather than a fixed-order array so a bad query fails only its own
+  // panel — see runDashboardQueries.
+  const queries = {
+    totals: `SELECT blob1 AS event, sum(_sample_interval) AS n
+              FROM ${DATASET} GROUP BY event ORDER BY n DESC`,
+    daily: `SELECT toStartOfDay(timestamp) AS day, sum(_sample_interval) AS n
+            FROM ${DATASET} WHERE timestamp > now() - INTERVAL '30' DAY
+            GROUP BY day ORDER BY day`,
+    referrers: `SELECT blob3 AS referer, sum(_sample_interval) AS n
+                FROM ${DATASET} WHERE blob3 != '' GROUP BY referer ORDER BY n DESC LIMIT 10`,
+    countries: `SELECT blob4 AS country, sum(_sample_interval) AS n
+                FROM ${DATASET} WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10`,
+    interactions: `SELECT format('{}: {}', blob1, blob5) AS interaction, sum(_sample_interval) AS n
+                   FROM ${DATASET} WHERE blob5 != '' GROUP BY interaction ORDER BY n DESC LIMIT 15`,
+    activity: `SELECT toDayOfWeek(timestamp) AS dow, toHour(timestamp) AS hour,
+                      sum(_sample_interval) AS n
+               FROM ${DATASET} GROUP BY dow, hour`,
+  };
 
-    return htmlResponse(
-      dashboardPage({ totals, daily, referrers, countries, interactions, activity, auth })
-    );
-  } catch (error) {
-    return htmlResponse(errorPage('Query failed', String(error.message || error)), 502);
-  }
+  const { data, errors } = await runDashboardQueries(env, queries);
+  return htmlResponse(dashboardPage({ ...data, errors, auth }));
+}
+
+/**
+ * Runs each named query independently (Promise.allSettled, not .all) so one
+ * bad query — a typo'd SQL function, a transient API error — degrades only
+ * its own panel instead of blanking the whole dashboard. `data[name]` is
+ * always an array (empty on failure); `errors[name]` is set only on failure.
+ */
+async function runDashboardQueries(env, queries) {
+  const entries = Object.entries(queries);
+  const settled = await Promise.allSettled(entries.map(([, sql]) => runQuery(env, sql)));
+
+  const data = {};
+  const errors = {};
+  entries.forEach(([name], i) => {
+    const result = settled[i];
+    if (result.status === 'fulfilled') {
+      data[name] = result.value;
+    } else {
+      data[name] = [];
+      errors[name] = String(result.reason?.message || result.reason);
+    }
+  });
+  return { data, errors };
 }
 
 async function runQuery(env, sql) {
@@ -421,7 +424,26 @@ function heatmap(activity) {
   </div>`;
 }
 
-function dashboardPage({ totals, daily, referrers, countries, interactions, activity, auth }) {
+function panelError(message) {
+  return `<p class="panel-error">Query failed: ${esc(message)}</p>`;
+}
+
+// Renders a panel body, or the query's error if that one query failed —
+// so one bad query only blanks its own panel. See runDashboardQueries.
+function panel(errors, key, render) {
+  return errors[key] ? panelError(errors[key]) : render();
+}
+
+function dashboardPage({
+  totals,
+  daily,
+  referrers,
+  countries,
+  interactions,
+  activity,
+  errors,
+  auth,
+}) {
   const grandTotal = totals.reduce((sum, r) => sum + (Number(r.n) || 0), 0);
   return `<!doctype html>
 <html lang="en"><head>
@@ -440,7 +462,10 @@ function dashboardPage({ totals, daily, referrers, countries, interactions, acti
   </header>
 
   <section class="cards">
-    <div class="card"><div class="big">${num(grandTotal)}</div><div class="cap">total events</div></div>
+    ${
+      errors.totals
+        ? `<div class="card card-error">${panelError(errors.totals)}</div>`
+        : `<div class="card"><div class="big">${num(grandTotal)}</div><div class="cap">total events</div></div>
     ${totals
       .slice(0, 4)
       .map(
@@ -449,25 +474,26 @@ function dashboardPage({ totals, daily, referrers, countries, interactions, acti
             r.event
           )}</div></div>`
       )
-      .join('')}
+      .join('')}`
+    }
   </section>
 
   <section class="panel">
     <h2>Events per day <span class="muted">(30d)</span></h2>
-    ${sparkline(daily)}
+    ${panel(errors, 'daily', () => sparkline(daily))}
   </section>
 
   <section class="panel">
     <h2>Activity by day &amp; hour</h2>
-    ${heatmap(activity)}
+    ${panel(errors, 'activity', () => heatmap(activity))}
   </section>
 
   <div class="grid">
-    <section class="panel"><h2>By event</h2>${barList(totals, 'event')}</section>
-    <section class="panel"><h2>Top referrers</h2>${barList(referrers, 'referer')}</section>
-    <section class="panel"><h2>Top countries</h2>${barList(countries, 'country')}</section>
-    <section class="panel"><h2>Top interactions</h2>${barList(interactions, 'interaction')}</section>
-    <section class="panel"><h2>Contact funnel</h2>${contactFunnel(totals)}</section>
+    <section class="panel"><h2>By event</h2>${panel(errors, 'totals', () => barList(totals, 'event'))}</section>
+    <section class="panel"><h2>Top referrers</h2>${panel(errors, 'referrers', () => barList(referrers, 'referer'))}</section>
+    <section class="panel"><h2>Top countries</h2>${panel(errors, 'countries', () => barList(countries, 'country'))}</section>
+    <section class="panel"><h2>Top interactions</h2>${panel(errors, 'interactions', () => barList(interactions, 'interaction'))}</section>
+    <section class="panel"><h2>Contact funnel</h2>${panel(errors, 'totals', () => contactFunnel(totals))}</section>
   </div>
 
   <footer>Rendered ${new Date().toISOString()} · counts are sampling-adjusted</footer>
@@ -509,6 +535,9 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9em; 
 .bars .fill { display:block; height:100%; background:var(--accent); border-radius:5px; }
 .bars .value { font-variant-numeric:tabular-nums; color:var(--muted); }
 .empty { color:var(--muted); margin:0; }
+.panel-error { color:#e5484d; margin:0; font-size:13px; }
+.card-error { display:flex; align-items:center; }
+.card-error .panel-error { font-size:12px; }
 .heatmap { display:flex; flex-direction:column; gap:3px; overflow-x:auto; }
 .heat-row { display:grid; grid-template-columns:34px repeat(24,minmax(14px,1fr)); gap:3px; align-items:center; }
 .heat-daylabel { font-size:11px; color:var(--muted); }
