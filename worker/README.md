@@ -43,6 +43,23 @@ deploy and prints the Worker URL
 
 Or from the repo root: `npm run deploy:worker`.
 
+### Before deploying a dashboard query change
+
+Analytics Engine's SQL dialect is a limited ClickHouse subset — no `concat()`
+or `||`, for example — so a query that looks fine can still 422 in production.
+Two checks catch that before it reaches the live dashboard:
+
+```bash
+cd worker
+CF_API_TOKEN=<token> npm run verify   # runs every dashboardQueries() entry against the live SQL API
+npx wrangler dev                      # then hit /dashboard once locally against real data
+```
+
+`verify` needs the same token as `CF_API_TOKEN` (Account Analytics: Read) —
+export it locally, it isn't read from the deployed secret. A query that fails
+would otherwise only surface once it's live, as that panel's "Query failed"
+message on the real dashboard.
+
 ## Wire it to the site
 
 The site sends events here only when `NEXT_PUBLIC_ANALYTICS_EVENTS_URL` is set
