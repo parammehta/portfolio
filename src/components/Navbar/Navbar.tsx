@@ -9,6 +9,7 @@ import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/router';
 import { cssProps, media, msToNum, numToMs, classes } from 'utils/style';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { NavToggle } from './NavToggle';
 import { NavGroup } from './NavbarSubmenu';
 import styles from './Navbar.module.css';
@@ -159,6 +160,9 @@ export const Navbar = () => {
 
   const handleNavItemClick = (event: MouseEvent<HTMLAnchorElement>) => {
     const hash = event.currentTarget.href.split('#')[1];
+    trackEvent(analyticsEvents.navLinkClick, {
+      label: event.currentTarget.textContent?.trim() ?? '',
+    });
     setTarget(null);
 
     if (hash && route === '/') {
@@ -287,6 +291,7 @@ const NavbarIcons = ({ desktop }: { desktop?: boolean }) => (
         href={url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent(analyticsEvents.socialLinkClick, { label })}
       >
         <Icon className={styles.navIcon} icon={icon} />
       </a>

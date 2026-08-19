@@ -13,6 +13,7 @@ import {
   companyHref,
   type CompanySlug,
 } from 'data/experience';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, media } from 'utils/style';
 import styles from './ExperienceIndex.module.css';
 
@@ -131,7 +132,10 @@ export const ExperienceIndex = () => {
                 tabRefs.current[index] = element;
               }}
               className={styles.tab}
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => {
+                trackEvent(analyticsEvents.experienceTabSelect, { company: item.slug });
+                setCurrentIndex(index);
+              }}
             >
               {item.shortName}
               <span className={styles.tabDate} aria-hidden>
@@ -198,7 +202,14 @@ export const ExperienceIndex = () => {
               role="presentation"
               sizes={`(max-width: ${media.mobile}px) 96px, 120px`}
             />
-            <Button iconHoverShift href={companyHref(company.slug)} iconEnd="arrowRight">
+            <Button
+              iconHoverShift
+              href={companyHref(company.slug)}
+              iconEnd="arrowRight"
+              onClick={() =>
+                trackEvent(analyticsEvents.experienceDetailsClick, { company: company.slug })
+              }
+            >
               See Details
             </Button>
           </div>
