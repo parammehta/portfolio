@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/parammehta/portfolio/compare/v1.11.6...v1.12.0) (2026-08-19)
+
+
+### Features
+
+* add visitors, per-page, theme and week-over-week panels ([#62](https://github.com/parammehta/portfolio/issues/62)) ([7a068a8](https://github.com/parammehta/portfolio/commit/7a068a8570068f705d35ffc7aa3a53aeaf1118f7))
+
 ## [1.11.6](https://github.com/parammehta/portfolio/compare/v1.11.5...v1.11.6) (2026-08-19)
 
 
