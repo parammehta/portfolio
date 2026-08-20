@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/parammehta/portfolio/compare/v1.12.2...v1.13.0) (2026-08-20)
+
+
+### Features
+
+* engineer-forward resume and Intuit experience copy ([#69](https://github.com/parammehta/portfolio/issues/69)) ([79b75e1](https://github.com/parammehta/portfolio/commit/79b75e1b3b788fb9ae36128671db57b8416ddbef))
+
 ## [1.12.2](https://github.com/parammehta/portfolio/compare/v1.12.1...v1.12.2) (2026-08-19)
 
 
