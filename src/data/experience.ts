@@ -76,6 +76,7 @@ export const companies: Company[] = [
         highlights: [
           'Shipped passkey registration, post-enrollment education and a centralized post-auth surface across 8 Intuit products, lifting adoption from 10% to 26% of active customers',
           "Built Intuit's first cross-identity SSO — embedded QuickBooks inside Amazon's domain with Intuit authentication handled cross-domain — now the canonical partnership-onboarding pattern, driving 100K+ new subscribers",
+          "Shipped digital ID (mDL) verification, letting customers verify with the license already in their phone's wallet instead of uploading a document photo",
           'Built LLM-powered prototypes running agentic workflows against production identity APIs, and defined MCP-based authentication for non-human principals',
           'Migrated 40 REST endpoints spanning 20 signup and account-manager flows to GraphQL for Identity 2.0, leading 8 engineers across backend, frontend and product',
           'Cut P95 latency 56% (8s → 3.5s account selector, 11s → 7.2s account manager) through bundle splitting, lazy loading and render optimization',

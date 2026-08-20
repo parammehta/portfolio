@@ -203,10 +203,17 @@
   }
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spaceL);
+  margin-top: calc(var(--spaceXL) * 2);
+}
+
 .button {
   --buttonLoaderDelay: var(--durationL);
 
-  margin-top: calc(var(--spaceXL) * 2);
   transition-property: opacity;
   transition-timing-function: var(--bezierFastoutSlowin);
   transition-delay: var(--delay);
@@ -365,6 +372,40 @@
       transform: translate3d(0, calc(var(--space2XL) * -1), 0);
     }
   }
+}
+
+.scheduling {
+  transition-property: opacity;
+  transition-timing-function: var(--bezierFastoutSlowin);
+  transition-duration: var(--durationXL);
+  transition-delay: var(--delay);
+  opacity: 0;
+
+  @media (--mediaUseMotion) {
+    transition-property: transform, opacity;
+    transform: translate3d(0, var(--space3XL), 0);
+  }
+
+  &[data-status='entering'],
+  &[data-status='entered'] {
+    transform: none;
+    opacity: 1;
+  }
+
+  &[data-status='exiting'] {
+    transition-duration: var(--durationM);
+    transition-delay: 0s;
+    opacity: 0;
+
+    @media (--mediaUseMotion) {
+      transform: translate3d(0, calc(var(--space2XL) * -1), 0);
+    }
+  }
+}
+
+.schedulingAnchor {
+  /* Anchor only: Google inserts the button as this element's next sibling. */
+  display: none;
 }
 
 .formError {
