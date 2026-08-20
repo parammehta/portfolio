@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/parammehta/portfolio/compare/v1.13.0...v1.14.0) (2026-08-20)
+
+
+### Features
+
+* use the resume's spare page space for work that was cut ([b0213a3](https://github.com/parammehta/portfolio/commit/b0213a306f80e7b394a81b85b9d6c8c444957834))
+
 ## [1.13.0](https://github.com/parammehta/portfolio/compare/v1.12.2...v1.13.0) (2026-08-20)
 
 
