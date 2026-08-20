@@ -174,12 +174,12 @@ export const Intuit = () => {
                 Cross-identity SSO for Amazon partnerships
               </ExperienceSectionHeading>
               <ExperienceSectionText>
-                I defined and led the technical strategy for Intuit&apos;s Amazon identity
-                integrations &mdash; an end-to-end initiative spanning Identity, Amazon
-                Business Prime, Seller Central, and platform teams. I architected the
-                first-ever cross-identity SSO pattern at Intuit for linking third-party
-                accounts for partnerships; the eligibility design is now the canonical
-                framework for future partnership onboarding.
+                I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded directly
+                inside Amazon&apos;s domain, with Intuit authentication handled cross-domain so
+                a seller never leaves Amazon to sign in. Getting an identity provider to work
+                from inside someone else&apos;s origin is the hard part &mdash; the eligibility
+                design that came out of it is now the canonical framework for onboarding future
+                partnerships.
               </ExperienceSectionText>
               <ExperienceSectionText>
                 Owning the integration lifecycle from discovery through production across
@@ -219,10 +219,11 @@ export const Intuit = () => {
                 Identity 2.0, performance, and Storybook
               </ExperienceSectionHeading>
               <ExperienceSectionText>
-                I led a team of 8 engineers across backend, frontend, and product to build
-                Identity 2.0 for Account Manager on a GraphQL-based architecture,
-                delivering scalability improvements and an 85% GTM velocity gain, and
-                setting migration SOPs with TPMs and Eng leads across products.
+                For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
+                account-manager flows onto GraphQL, leading 8 engineers across backend,
+                frontend, and product through it. Collapsing that many flows onto one schema
+                is what bought the scalability headroom and an 85% GTM velocity gain, and the
+                migration SOPs we set became the pattern other products followed.
               </ExperienceSectionText>
               <ExperienceSectionText>
                 I also led a performance track that cut P95 latency by 56% (account
