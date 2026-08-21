@@ -1,36 +1,45 @@
 # Layouts and Pages
 
-## Layout System
-
-Route-specific components in `src/pages/` are page-level shells that compose components into full pages. Pages in `src/pages/` are thin entry points that render layouts.
+Route-specific components in `src/pages/` are page-level shells that compose primitives
+from `refract-ui` and this site's own `src/components/` into full pages. Pages under
+`src/pages/**/index.page.tsx` (and other `*.page.tsx` files) are thin entry points that
+render these layouts.
 
 ```
-src/pages/index.page.js
-    └── src/pages/home/Home.js
+src/pages/index.page.tsx
+    └── src/pages/home/Home.tsx
             ├── Intro
             ├── Profile
-            ├── ExperienceGroup (x3)
-            │     └── ExperienceSummary (x N)
-            ├── Skills
-            └── Footer
+            └── Contact
+
+src/pages/experience/index.page.tsx
+    └── src/pages/experience/ExperienceIndex.tsx   (tabbed company switcher)
+
+src/pages/experience/<company>/index.page.tsx
+    └── src/pages/experience/<company>/<Company>.tsx  (built from Experience.tsx blocks)
 ```
 
 ---
 
 ## App Shell (`src/shell/`)
 
-### _app.page.js
+### _app.page.tsx
 
 The Next.js custom App wrapper. Provides:
-- `AppContext` (global state via `useReducer`)
-- `ThemeProvider` (dark/light theming)
+- `AppContext` (global state via `useReducer`, defined in `shell/reducer.ts`/`shell/types.ts`)
+- `ThemeProvider` and `LinkProvider` (from `refract-ui`) — `LinkProvider` is wired to
+  `shell/NextLinkAdapter.tsx` so `Link`/`Button` route through `next/link` without
+  `refract-ui` depending on Next directly
 - `LazyMotion` (Framer Motion with `domAnimation`)
 - `Navbar`
 - Page transitions (`AnimatePresence mode="wait"` with opacity fade)
-- Cloudflare Web Analytics beacon (production only)
+- A skip-to-content link (`VisuallyHidden` from `refract-ui`)
+- Cloudflare Web Analytics beacon (production only, gated on `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`) and wiring the custom-event sink (`utils/analytics`) to the analytics Worker
+- A canonical `<link>` tag derived from the router
+- `ScrollRestore` (`shell/ScrollRestore.tsx`)
 - Console Easter egg on mount
 
-### reducer.js
+### reducer.ts
 
 Global state reducer:
 
@@ -40,102 +49,93 @@ Global state reducer:
 | `toggleTheme` | Flips between `'dark'` and `'light'` |
 | `toggleMenu` | Toggles `state.menuOpen` |
 
-Initial state: `{ menuOpen: false }`. Theme is initialized from localStorage in the App component.
+Initial state: `{ theme: 'dark', menuOpen: false }`. The App component then re-syncs
+`theme` from localStorage (via `useLocalStorage`) once it mounts.
 
-### _document.page.js
+### _document.page.tsx
 
 Custom Next.js Document. Sets up:
 - `<html lang="en">`
-- Font preloads (Gotham Medium + Book, woff2)
-- Inline `<style>` tags for design tokens and font faces
-- `<body data-theme="dark">` with inline script for theme flash prevention
+- Font preloads (Gotham Medium + Book, woff2, from `shell/fonts.ts`)
+- Inline `<style>` tags for `refract-ui`'s design tokens (`tokenStyles`) and this site's
+  font faces (`fontStyles`)
+- `<body data-theme="dark">` with an inline script for theme-flash prevention
 - `<div id="portal-root">` for modals/overlays
 
 ---
 
 ## Home Page (`src/pages/home/`)
 
-### Home.js
+### Home.tsx
 
-The main landing page. Renders sections in order:
+The main landing page. Unlike a normal scrolling document, `Home` is a **snap-scroll
+container** (`data-scroll-container`, `onScroll`): each of its three sections —
+**Intro**, **Profile**, **Contact** — occupies one full viewport pane, and a column of
+dots (`nav.sectionDots`) on the side lets a visitor jump directly to a pane. Scroll
+position drives `activeSection` (which dot is lit) and `scrollIndicatorHidden` (whether
+Intro's scroll-down affordance shows).
 
-1. **Intro** — Hero with 3D sphere, name, and rotating subtitle
-2. **Profile** — "About Me" with bio and photo
-3. **Experience** — Section header + three company groups
-4. **Skills** — Tech table + tools list
-5. **Footer**
+An `IntersectionObserver` (threshold 0.1, one-shot, watching Intro and Profile) builds a
+`visibleSections` array that drives each section's entrance animation via a `visible`
+prop passed down to `Transition` components.
 
-Uses two `IntersectionObserver` instances:
-- One watches 13 section refs (threshold 0.1, one-shot) to build a `visibleSections` array for scroll-triggered animations
-- One toggles `scrollIndicatorHidden` when the intro leaves the viewport
+Experience and Skills, which used to be sections on this page, are now their own routes
+(`/experience`, `/skills`) — see below.
 
-All experience content is declared inline in JSX props.
+### Intro.tsx
 
-### Intro.js
-
-Hero section with:
-- `HeroSphere` (dynamically imported 3D background)
+Hero pane with:
+- `HeroSphere` (dynamically imported 3D background, `ssr: false`)
 - "Param Mehta" rendered with `ScrambleReveal`
-- Rotating discipline words ("Leader", "Mentor", "Full-Stack", "Coffee") cycling every 5s via `useInterval`
-- Scroll indicator pointing to `/#profile`
+- A rotating discipline word ("Leader", "Mentor", "Full-Stack", "Coffee ☕") cycling every
+  5s via `useInterval`, keyed off the current theme so it resets on theme change
+- "View Resume" and "Get in touch" CTAs (desktop and a separate mobile layout)
+- A scroll indicator pointing to `/#profile`
 
-Re-transitions the entire section when theme changes (keyed on `theme.themeId`).
+### Profile.tsx
 
-### Profile.js
-
-"About Me" section with:
+"About Me" pane with:
 - "Hi there" heading with `ScrambleReveal`
-- Bio paragraphs with inline links
+- Bio paragraphs with inline links to `/skills` and `/articles`
 - "Send me a message" button linking to `/#contact`
-- Profile photo with responsive srcSet
-- Decorative Devanagari SVG
+- Profile photo with responsive srcSet and a decorative Devanagari SVG accent
 
 Activates on `visible || focused` for keyboard accessibility.
 
-### ExperienceGroup.js
+### Contact.tsx
 
-Company wrapper showing:
-- Company logo (with optional `invertOnDark` for dark-mode CSS filter)
-- Children (ExperienceSummary cards)
-- Divider at the end
+The contact form, rendered as the home page's third pane (`/#contact`) rather than its
+own route. See [Contact Form Spam Protection](patterns.md#contact-form-spam-protection)
+in Patterns for the honeypot + Turnstile details. On success it swaps to a "Message Sent"
+state with a "Back to top" button; the Footer renders inside this pane.
 
-Uses `data-first` attribute on the first group for CSS spacing.
-
-### ExperienceSummary.js
-
-Individual role card with:
-- Details column: title, date range, bulleted description (split on `. `), "See Details" button
-- Preview column: dynamically imported 3D device `Model` with screen textures
-- `alternate` prop flips the column order
-
-### HeroSphere.js
+### HeroSphere.tsx
 
 WebGL animated sphere using raw Three.js (no React Three Fiber):
-- `SphereGeometry` (32 radius, 128x128 segments)
-- Custom GLSL shaders with `time` and `accentColor` uniforms
+- `IcosahedronGeometry` (radius 32) with custom GLSL fragment shader
+  (`heroSphere.frag.glsl`)
 - Framer Motion springs for smooth mouse-follow rotation
-- Adaptive quality via `useFps` (drops pixel ratio to 0.5 on low FPS)
-- Only animates when in viewport
+- Adaptive quality via `useFps` (drops pixel ratio on low FPS)
+- Only animates when in viewport (`useInViewport`)
 - Static frame when reduced motion is preferred
-
-### SectionHeader.js
-
-Standalone section header with optional eyebrow tag (Divider + label) and `ScrambleReveal` heading.
-
-### Skills.js
-
-Pure presentational section with:
-- "Skills" heading with `ScrambleReveal`
-- Tech table (Languages, Frameworks, Infrastructure, Domains, Soft Skills)
-- Development tools list with external links
+- Theme-aware: light setup and the `accentColor` GLSL uniform (synced to the CSS
+  `--rgbAccent` token) update in separate effects when the theme changes
 
 ---
 
+## Experience Index (`src/pages/experience/ExperienceIndex.tsx`)
+
+Own route (`/experience`). A tabbed company switcher (Intuit / Rivian / Walmart) with a
+sliding rail marker (`ResizeObserver`-tracked) that follows the active tab, full roving-
+tabindex keyboard navigation (arrow keys, Home/End), and a "See Details" button linking
+to the company's detail page. Company/role data comes from `data/experience`. Uses
+`ViewportPage` (`components/ViewportPage`) for its breadcrumb/title shell.
+
 ## Experience Detail (`src/pages/experience/_shared/`)
 
-### Experience.js
+### Experience.tsx
 
-A composable building-block system for experience detail pages. Exports:
+A composable building-block system for the per-company experience detail pages. Exports:
 
 | Component | Purpose |
 |---|---|
@@ -150,6 +150,10 @@ A composable building-block system for experience detail pages. Exports:
 | `ExperienceTextRow` | Text row with width/alignment options |
 | `ExperienceSectionColumns` | Multi-column layout |
 
+This mirrors `components/Page` (see [Components](components.md#page)) almost exactly but
+lives next to the pages that use it rather than in `src/components/`, since nothing
+outside `src/pages/experience/` reuses it.
+
 Key patterns:
 - Parallax via `useParallax(0.6, ...)` on background images
 - Staggered role animations (300ms base + 140ms per item)
@@ -159,83 +163,54 @@ Key patterns:
 
 Each company has its own page in `src/pages/experience/`:
 
-- `intuit/Intuit.js` — Passkeys, Design System, Amazon SSO, Agentic AI, Identity 2.0
-- `rivian/Rivian.js` — Fleet OS experience
-- `walmart/Walmart.js` — Walmart Global Tech experience
+- `intuit/Intuit.tsx` — Passkeys, Design System, Amazon SSO, Agentic AI, Identity 2.0
+- `rivian/Rivian.tsx` — Fleet OS experience
+- `walmart/Walmart.tsx` — Walmart Global Tech experience
 
-These are content-heavy, stateless components composing the Experience layout building blocks. All content is hardcoded JSX.
-
----
-
-## Project Detail (`src/components/Page/`)
-
-### Project.js
-
-Identical composable system to Experience.js but with `Project`-prefixed exports. Separate CSS module. Reused by the Resume page.
+These are content-heavy, stateless components composing the Experience layout building
+blocks. All content is hardcoded JSX.
 
 ---
 
-## Blog (`src/pages/articles/_post/`)
+## Contact (`/#contact`)
 
-### Post.js
+Not its own route — see [Home Page](#home-page-srcpageshome) above.
+`src/pages/contact/index.page.tsx` still exists, but only as a redirect stub for the old
+`/contact/` URL (still indexed/linked externally) — it sends visitors on to `/#contact`
+rather than rendering a form itself.
+
+## Resume (`src/pages/resume/Resume.tsx`)
+
+Own route (`/resume`). PDF resume viewer built from `components/Page` blocks
+(`PageHeader`, `PageSection`, `PageSectionContent`):
+- Download / open-in-new-tab / "Design system" (links to refract-ui's Storybook) buttons
+- Iframe embed of the PDF on desktop, text fallback on mobile/tablet — the desktop/mobile
+  branch is driven by `useSyncExternalStore` over a `matchMedia` query (deliberately not
+  `useWindowSize`, whose guessed initial size could otherwise briefly mount and then tear
+  down the PDF iframe on a mobile visitor)
+
+## Skills (`src/pages/skills/Skills.tsx`)
+
+Own route (`/skills`). Uses `ViewportPage` for its breadcrumb/title shell. A table of
+languages, frameworks, infrastructure/tooling, domains, and soft skills, plus a linked
+list of day-to-day development tools (each link click tracked via `trackEvent`).
+
+## Articles (`src/pages/articles/`)
+
+- `index.page.tsx` / `Articles.tsx` — Blog listing page
+- `[slug].page.tsx` — Dynamic blog post route (MDX via `mdx-bundler`)
+- `_post/Post.tsx`, `_post/PostMarkdown.tsx` — Post layout and MDX-rendering wrapper
+
+### Post.tsx
 
 Blog post layout with:
 - Banner image with parallax blur effect (`useParallax(0.004, ...)`)
-- Date divider (client-only formatting via `useEffect` to avoid hydration mismatch)
+- Date divider (client-side formatting via `useEffect`/`useSyncExternalStore` to avoid
+  hydration mismatch)
 - Staggered title word animation (100ms per word)
-- Post body (children)
+- Post body (children, rendered via `PostMarkdown`)
 - Footer
 
----
+## 404 (`src/pages/404/`)
 
-## Other Pages
-
-> The rest of this document (and this file generally) predates the route
-> split that moved Skills and Experience off the single-scroll home page and
-> onto their own routes — several sections above still describe the old
-> `Home.js`/`ExperienceGroup.js`/`Skills.js` structure. Needs a fuller pass;
-> the note below is a narrow, verified fix to the Contact section only.
-
-### Contact (`src/pages/home/Contact.tsx`)
-
-Contact form, now a section on the home page (`/#contact`) rather than its
-own route:
-- Email input + message textarea (using `useFormInput`)
-- Hidden honeypot field for bot detection
-- POST to `NEXT_PUBLIC_API_URL/message`
-- Success/error states with animated transitions
-- Staggered form element entry animations
-
-`src/pages/contact/index.page.tsx` still exists, but only as a redirect stub
-for the old `/contact/` URL — it sends visitors on to `/#contact` rather than
-rendering a form itself.
-
-### Resume (`src/pages/resume/Resume.tsx`)
-
-PDF resume viewer:
-- Iframe embed on desktop, text fallback on mobile/tablet
-- Uses `useSyncExternalStore` for hydration-safe client detection
-- Reuses Project layout components
-
-### Articles (`src/pages/articles/`)
-
-- `index.page.js` — Blog listing page
-- `[slug].page.js` — Dynamic blog post route (MDX via `mdx-bundler`)
-
-### Skills (`src/pages/skills/Skills.tsx`)
-
-Own route (`/skills`), split out of the home page. Tables of languages,
-frameworks, infrastructure and tools, plus a linked list of the tooling used
-day to day. Uses `ViewportPage` (`components/ViewportPage`) for its
-breadcrumb/title shell — a different page-shell component from the
-`components/Page` one Resume uses.
-
-### Experience index (`src/pages/experience/ExperienceIndex.tsx`)
-
-Own route (`/experience`), also split out of the home page. A tabbed
-company switcher (Intuit / Rivian / Walmart) with a sliding rail marker that
-tracks the active tab, driven by `data/experience`. Also uses `ViewportPage`.
-
-### 404 (`src/pages/404/`)
-
-Custom not-found page.
+Custom not-found page (`404.tsx`).

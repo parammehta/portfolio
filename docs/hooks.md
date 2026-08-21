@@ -1,16 +1,19 @@
 # Hooks Reference
 
-All hooks live in `src/hooks/`. Most are re-exported from `src/hooks/index.js` (exception: `useFps` must be imported directly).
+All hooks live in `src/hooks/` — this is the set of hooks the site still uses directly;
+`refract-ui` has its own internal copies of the hooks its components need, so there's no
+sharing between the two. Most are re-exported from `src/hooks/index.ts` (exception:
+`useFps` must be imported directly).
 
 ---
 
 ## useAppContext
 
-```js
+```ts
 const { dispatch, ...state } = useAppContext();
 ```
 
-Convenience wrapper around `useContext(AppContext)`. Returns the global app state (theme, menuOpen) and dispatch function from the reducer in `_app.page.js`.
+Convenience wrapper around `useContext(AppContext)`. Returns the global app state (theme, menuOpen) and dispatch function from the reducer in `_app.page.tsx`.
 
 ---
 

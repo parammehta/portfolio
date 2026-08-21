@@ -1,6 +1,11 @@
 # Conventions and Patterns
 
-Cross-cutting patterns used throughout the codebase.
+Cross-cutting patterns used throughout the codebase. Several of the polymorphic/animated
+primitives referenced below (`Text`, `Heading`, `Section`, `VisuallyHidden`, `Transition`,
+`Link`, `Button`, `ScrambleReveal`, `Model`, `Loader`, `Carousel`, ...) now live in
+[refract-ui](https://github.com/parammehta/refract-ui) rather than this repo — the
+patterns themselves are unchanged, but their implementations are documented in that
+package's own [Storybook](https://storybook.parammehta.com), not here.
 
 ---
 
@@ -29,7 +34,7 @@ This keeps the JS clean (no class concatenation logic) and makes CSS selectors e
 
 ## CSS Custom Properties via `cssProps`
 
-Dynamic values are passed to CSS through inline custom properties using the `cssProps` utility:
+Dynamic values are passed to CSS through inline custom properties using the `cssProps` utility (`utils/style.ts`):
 
 ```jsx
 <div style={cssProps({ delay: 300, width: 100 })}>
@@ -52,15 +57,15 @@ Auto-conversion rules:
 
 ## Scroll-Triggered Animations
 
-Sections animate in when they enter the viewport. The pattern:
+Sections animate in when they enter the viewport. The pattern (see `Home.tsx`):
 
-1. **Home.js** creates refs for each section and an `IntersectionObserver` (threshold 0.1, one-shot)
+1. **Home.tsx** creates refs for each section and an `IntersectionObserver` (threshold 0.1, one-shot)
 2. Observed sections are added to a `visibleSections` state array
 3. Each section receives a `visible` boolean prop
-4. Sections pass `visible` to `Transition` components, which drive CSS transitions via `data-visible` or status-based class names
+4. Sections pass `visible` to `Transition` components (from `refract-ui`), which drive CSS transitions via `data-visible` or status-based class names
 
 ```jsx
-// In Home.js
+// In Home.tsx
 const profileRef = useRef();
 const isVisible = (ref) => visibleSections.includes(ref.current);
 
@@ -71,7 +76,7 @@ const isVisible = (ref) => visibleSections.includes(ref.current);
 
 ## Transition Component Pattern
 
-The `Transition` component bridges React state and CSS animations:
+`Transition` (from `refract-ui`) bridges React state and CSS animations:
 
 ```jsx
 <Transition in={visible} timeout={0}>
@@ -126,7 +131,7 @@ Multiple elements animate in with increasing delays:
 
 ## Polymorphic Components
 
-Several components accept an `as` prop to change the rendered element:
+Several `refract-ui` primitives accept an `as` prop to change the rendered element:
 
 ```jsx
 <Section as="article">         {/* renders <article> */}
@@ -135,25 +140,25 @@ Several components accept an `as` prop to change the rendered element:
 <VisuallyHidden as="div">      {/* renders <div> */}
 ```
 
-All use `forwardRef` for ref forwarding.
+All use `forwardRef` for ref forwarding. `components/Page`'s `PageSection` follows the
+same pattern for this site's own building blocks.
 
 ---
 
 ## Dynamic Imports for Heavy Components
 
-Three.js components are code-split with `next/dynamic`:
+Three.js components are code-split with `next/dynamic` so their weight is only loaded when needed:
 
 ```jsx
 const HeroSphere = dynamic(() =>
-  import('./HeroSphere').then(mod => mod.HeroSphere)
-);
-
-const Model = dynamic(() =>
-  import('components/Model').then(mod => mod.Model)
+  import('./HeroSphere').then(mod => mod.HeroSphere),
+  { ssr: false }
 );
 ```
 
-This keeps the initial bundle small since Three.js and 3D models are only loaded when needed.
+This is the only dynamic import currently in the app. `refract-ui`'s `Model` and
+`Carousel` (also Three.js-backed) are available for a similar pattern but aren't used on
+any current page.
 
 ---
 
@@ -161,19 +166,19 @@ This keeps the initial bundle small since Three.js and 3D models are only loaded
 
 Every animated component checks `useReducedMotion()` from Framer Motion:
 
-- **ScrambleReveal** — skips scramble animation, shows final text immediately
-- **HeroSphere** — renders a single static frame instead of animating
-- **Carousel** — disables displacement transitions
-- **Model** — skips entry animations, sets positions directly
-- **Loader** — shows text instead of animated dots
-- **useParallax** — disabled entirely
-- **useScrollToHash** — uses `behavior: 'auto'` instead of `'smooth'`
+- **ScrambleReveal** (`refract-ui`) — skips the scramble animation, shows final text immediately
+- **HeroSphere** (local) — renders a single static frame instead of animating
+- **Carousel** (`refract-ui`) — disables displacement transitions
+- **Model** (`refract-ui`) — skips entry animations, sets positions directly
+- **Loader** (`refract-ui`) — shows text instead of animated dots
+- **useParallax** (local hook) — disabled entirely
+- **useScrollToHash** (local hook) — uses `behavior: 'auto'` instead of `'smooth'`
 
 ---
 
 ## Adaptive Quality (3D)
 
-The `useFps` hook monitors frame rate in animation loops:
+The `useFps` hook (`hooks/useFps.ts`) monitors frame rate in animation loops:
 
 ```jsx
 const { measureFps, isLowFps } = useFps(isAnimating);
@@ -187,28 +192,27 @@ function animate() {
 }
 ```
 
-Used by `HeroSphere` and `Model` to maintain smooth performance on lower-end devices.
+Used by `HeroSphere` to maintain smooth performance on lower-end devices. `refract-ui`'s
+`Model` component uses its own internal copy of the same hook.
 
 ---
 
 ## Smart Links
 
-The `Link` component auto-detects link type:
+`Link` and `Button` (both from `refract-ui`) auto-detect link type:
 
 | Pattern | Behavior |
 |---|---|
 | Contains `://` | Plain `<a>` with `target="_blank"` and `rel="noreferrer noopener"` |
 | Starts with `#` | Plain `<a>` (hash link) |
 | Ends with `.txt`, `.png`, `.jpg` | Plain `<a>` (file link) |
-| Everything else | Next.js `Link` with `scroll={false}` |
-
-The `Button` component follows the same pattern.
+| Everything else | Next.js `Link` (via `LinkProvider`/`NextLinkAdapter`) with `scroll={false}` |
 
 ---
 
 ## Viewport-Aware Lazy Loading
 
-Heavy resources (images, textures, 3D models) only load when their container enters the viewport:
+Heavy resources (images, textures, 3D models) only load when their container enters the viewport, via the local `useInViewport` hook:
 
 ```jsx
 const inViewport = useInViewport(canvasRef, true, { threshold: 0.2 });
@@ -226,7 +230,7 @@ The `unobserveOnIntersect` parameter (second arg, `true`) means the observer dis
 
 ## Contact Form Spam Protection
 
-The contact form uses two complementary layers:
+The contact form (`src/pages/home/Contact.tsx`) uses two complementary layers:
 
 ### 1. Honeypot field
 
@@ -240,7 +244,7 @@ A hidden "Name" field is placed in the DOM but invisible to real users:
 />
 ```
 
-If a bot fills it in, both the client (`Contact.js`) and the Lambda (`functions/index.js`) silently pretend to succeed without sending.
+If a bot fills it in, both the client (`Contact.tsx`) and the Lambda (`functions/index.js`) silently pretend to succeed without sending.
 
 ### 2. Cloudflare Turnstile
 
@@ -280,6 +284,8 @@ Three.js scenes react to theme changes:
 - The `accentColor` GLSL uniform syncs with the CSS `--rgbAccent` token
 - Separate `useEffect` hooks handle light setup and accent color updates
 
+See `HeroSphere.tsx` in [Layouts and Pages](layouts-and-pages.md#herospheretsx).
+
 ---
 
 ## Hydration Safety
@@ -289,6 +295,18 @@ Several patterns prevent SSR/client mismatches:
 | Pattern | Used For |
 |---|---|
 | `useHasMounted()` | Gating client-only rendering (portals, video) |
-| `useSyncExternalStore` | Client detection in Resume page |
+| `useSyncExternalStore` | Client `matchMedia`/date detection (Resume, Articles/Post) |
 | Client-side `useEffect` for dates | Locale-dependent `formatDate` in Post |
-| `_document.page.js` inline script | Setting `data-theme` before hydration |
+| `_document.page.tsx` inline script | Setting `data-theme` before hydration |
+
+---
+
+## Custom Event Analytics
+
+`utils/analytics.ts` keeps a fixed set of event names (`analyticsEvents`) and a
+`trackEvent(name, props)` call that's safe to fire from anywhere — it never throws, and
+until a sink is installed it just logs in development and no-ops in production. `_app.page.tsx`
+installs the real sink (`createBeaconSink`, pointed at the analytics Worker via
+`NEXT_PUBLIC_ANALYTICS_EVENTS_URL`) once on mount. Pageviews are handled separately and
+automatically by the Cloudflare Web Analytics beacon (SPA mode) — `trackEvent` is only for
+named interactions like `contactSubmit`, `resumeDownload`, or `experienceTabSelect`.
