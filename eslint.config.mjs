@@ -1,6 +1,5 @@
 import js from '@eslint/js';
 import nextConfig from 'eslint-config-next';
-import storybook from 'eslint-plugin-storybook';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -9,7 +8,6 @@ export default tseslint.config(
       '.next/**',
       '.claude/**',
       'build/**',
-      'build-storybook/**',
       'public/draco/**',
       'public/og/**',
       'functions/**',
@@ -20,7 +18,6 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...nextConfig,
-  ...storybook.configs['flat/recommended'],
   {
     rules: {
       semi: 'error',
