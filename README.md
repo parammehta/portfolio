@@ -60,11 +60,10 @@ Once it's done, copy `.env.example` to `.env` and fill in the values (see `docs/
 npm run dev
 ```
 
-To view the components storybook:
-
-```bash
-npm run storybook
-```
+Shared UI components (Button, Text, Image, Model, Carousel, ThemeProvider, etc.) live in a
+separate package, [refract-ui](https://github.com/parammehta/refract-ui) — its Storybook is at
+[storybook.parammehta.com](https://storybook.parammehta.com). This repo only holds
+site-specific components (Navbar, Footer, Meta, Page, ...).
 
 To create a production build (static export):
 
@@ -80,7 +79,7 @@ npm start
 
 ## Deployment
 
-The site is hosted on AWS (S3 for the static site, Lambda for the contact form). You'll need an AWS account and the AWS CLI installed, and the S3 bucket names in `package.json`'s `deploy`/`deploy:storybook` scripts updated to your own.
+The site is hosted on AWS (S3 for the static site, Lambda for the contact form). You'll need an AWS account and the AWS CLI installed, and the S3 bucket name in `package.json`'s `deploy` script updated to your own.
 
 Deploy the site to S3:
 
