@@ -1,4 +1,4 @@
-import type { BreadcrumbItem } from 'components/Breadcrumbs';
+import type { BreadcrumbItem } from 'refract-ui';
 import { socialLinks } from 'components/Navbar/navData';
 
 const siteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL;

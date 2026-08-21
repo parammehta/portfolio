@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { Icon } from 'components/Icon';
-import { Wordmark } from 'components/Wordmark';
-import { tokens } from 'components/ThemeProvider';
-import { Transition } from 'components/Transition';
-import { useTheme } from 'components/ThemeProvider';
+import { Icon, Wordmark, tokens, Transition, useTheme } from 'refract-ui';
 import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/router';
 import { cssProps, media, msToNum, numToMs, classes } from 'utils/style';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { NavToggle } from './NavToggle';
 import { NavGroup } from './NavbarSubmenu';
 import styles from './Navbar.module.css';
@@ -159,6 +156,9 @@ export const Navbar = () => {
 
   const handleNavItemClick = (event: MouseEvent<HTMLAnchorElement>) => {
     const hash = event.currentTarget.href.split('#')[1];
+    trackEvent(analyticsEvents.navLinkClick, {
+      label: event.currentTarget.textContent?.trim() ?? '',
+    });
     setTarget(null);
 
     if (hash && route === '/') {
@@ -252,7 +252,10 @@ export const Navbar = () => {
                 href={item.pathname}
                 scroll={false}
                 key={`${item.label}-${index}`}
-                className={classes(styles.mobileNavLink, item.nested && styles.mobileNavSubLink)}
+                className={classes(
+                  styles.mobileNavLink,
+                  item.nested && styles.mobileNavSubLink
+                )}
                 data-visible={visible}
                 aria-current={getIsActive(item)}
                 onClick={handleMobileNavClick}
@@ -287,6 +290,7 @@ const NavbarIcons = ({ desktop }: { desktop?: boolean }) => (
         href={url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent(analyticsEvents.socialLinkClick, { label })}
       >
         <Icon className={styles.navIcon} icon={icon} />
       </a>

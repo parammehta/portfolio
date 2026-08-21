@@ -1,6 +1,5 @@
 import { type HTMLAttributes, startTransition, useEffect, useRef, useState } from 'react';
-import { useTheme } from 'components/ThemeProvider';
-import { Transition } from 'components';
+import { Transition, useTheme } from 'refract-ui';
 import { useReducedMotion, useSpring } from 'framer-motion';
 import { useInViewport } from 'hooks';
 import { useFps } from 'hooks/useFps';
@@ -91,7 +90,9 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
 
     material.current = new MeshPhongMaterial({ flatShading: true, shininess: 40 });
     material.current.onBeforeCompile = shader => {
-      const [r, g, b] = (rgbAccent ?? '251 146 60').split(' ').map(v => parseInt(v) / 255);
+      const [r, g, b] = (rgbAccent ?? '251 146 60')
+        .split(' ')
+        .map(v => parseInt(v) / 255);
       uniforms.current = UniformsUtils.merge([
         shader.uniforms,
         { accentColor: { value: new Vector3(r, g, b) } },

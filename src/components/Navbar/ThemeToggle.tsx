@@ -1,7 +1,8 @@
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
-import { Button } from 'components/Button';
+import { Button } from 'refract-ui';
 import { useAppContext } from 'hooks';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './ThemeToggle.module.css';
 
 interface ThemeToggleProps extends ComponentPropsWithoutRef<typeof Button> {
@@ -9,11 +10,13 @@ interface ThemeToggleProps extends ComponentPropsWithoutRef<typeof Button> {
 }
 
 export const ThemeToggle = ({ isMobile, ...rest }: ThemeToggleProps) => {
-  const { dispatch } = useAppContext();
+  const { theme, dispatch } = useAppContext();
   const id = useId();
   const maskId = `${id}theme-toggle-mask`;
 
   const handleClick = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    trackEvent(analyticsEvents.themeToggle, { theme: nextTheme });
     dispatch({ type: 'toggleTheme' });
   };
 

@@ -7,3 +7,15 @@ compatibility_date = "2024-09-23"
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "portfolio_events"
+
+# GET /dashboard reads back from the SQL API. ACCOUNT_ID is public (it appears
+# in dashboard URLs); the API token is a secret set out-of-band:
+#   npx wrangler secret put CF_API_TOKEN   (needs Account Analytics: Read)
+#
+# ACCESS_TEAM_DOMAIN + ACCESS_AUD gate the dashboard behind Cloudflare Access.
+# Until both are set, /dashboard is refused in production (open only on
+# localhost `wrangler dev`). See worker/README.md for the Access setup.
+[vars]
+ACCOUNT_ID = "2b3e10900a534b6fb7e855e199717511"
+ACCESS_TEAM_DOMAIN = "parammehta.cloudflareaccess.com"
+ACCESS_AUD = "d8eb0f678505028e88ce16356ed9d3e3bcca9beaf4e930afe13ebdf7a3aa8758"
