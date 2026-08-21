@@ -1,6 +1,7 @@
 import notFoundPoster from 'assets/notfound.jpg';
 import notFoundVideo from 'assets/notfound.mp4';
-import { Button, ScrambleReveal, Heading, Meta, Text, Transition } from 'components';
+import { Meta } from 'components';
+import { Button, ScrambleReveal, Heading, Text, Transition } from 'refract-ui';
 import { Fragment } from 'react';
 import styles from './404.module.css';
 

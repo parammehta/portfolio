@@ -37,9 +37,9 @@ module.exports = {
       use: [{ loader: '@svgr/webpack', options: { svgo: false } }],
     });
 
-    // Import videos, models, hdrs, and fonts
+    // Import videos and fonts
     config.module.rules.push({
-      test: /\.(mp4|hdr|glb|woff|woff2)$/i,
+      test: /\.(mp4|woff|woff2)$/i,
       type: 'asset/resource',
     });
 

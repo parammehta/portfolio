@@ -254,10 +254,6 @@
   list-style: none;
   margin: var(--spaceS) 0 0;
   padding: 0;
-
-  @media (--mediaMobile), (--mediaMobileLS) {
-    display: none;
-  }
 }
 
 .techChip {

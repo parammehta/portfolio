@@ -1,17 +1,15 @@
 import { type ReactNode, useRef, useState, useEffect } from 'react';
+import { Footer, Meta, StructuredData } from 'components';
 import {
   Breadcrumbs,
   Divider,
-  Footer,
   Heading,
   Image,
-  Meta,
   Section,
-  StructuredData,
   Text,
   Transition,
-} from 'components';
-import { tokens } from 'components/ThemeProvider';
+  tokens,
+} from 'refract-ui';
 import ArrowDown from 'assets/arrow-down.svg';
 import { useParallax, useScrollToHash } from 'hooks';
 import RouterLink from 'next/link';
@@ -32,7 +30,16 @@ interface PostProps {
   slug: string;
 }
 
-export const Post = ({ children, title, date, abstract, banner, timecode, ogImage, slug }: PostProps) => {
+export const Post = ({
+  children,
+  title,
+  date,
+  abstract,
+  banner,
+  timecode,
+  ogImage,
+  slug,
+}: PostProps) => {
   const scrollToHash = useScrollToHash();
   const imageRef = useRef<HTMLDivElement>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);

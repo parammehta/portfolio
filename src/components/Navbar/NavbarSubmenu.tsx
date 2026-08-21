@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, FocusEvent } from 'react';
 import RouterLink from 'next/link';
 import { msToNum } from 'utils/style';
-import { tokens } from 'components/ThemeProvider';
+import { tokens } from 'refract-ui';
 import { useId } from 'react';
 import styles from './Navbar.module.css';
 
@@ -147,11 +147,7 @@ export const NavGroup = ({
         {label}
       </RouterLink>
 
-      <div
-        className={styles.submenu}
-        data-open={open}
-        id={submenuId}
-      >
+      <div className={styles.submenu} data-open={open} id={submenuId}>
         <div
           className={styles.submenuInner}
           data-navbar-item
@@ -162,7 +158,9 @@ export const NavGroup = ({
               key={child.label}
               href={child.pathname}
               scroll={false}
-              ref={(el: HTMLAnchorElement | null) => { itemRefs.current[index] = el; }}
+              ref={(el: HTMLAnchorElement | null) => {
+                itemRefs.current[index] = el;
+              }}
               className={styles.subLink}
               tabIndex={focusedIndex === index ? 0 : -1}
               aria-current={child.isActive}

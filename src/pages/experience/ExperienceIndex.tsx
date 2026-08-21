@@ -5,7 +5,8 @@ import rivianThumbnail from 'assets/rivian-fleet-os-background.webp';
 import rivianThumbnailPlaceholder from 'assets/rivian-fleet-os-background-placeholder.png';
 import walmartThumbnail from 'assets/walmart-background.png';
 import walmartThumbnailPlaceholder from 'assets/walmart-background-placeholder.png';
-import { Button, Divider, Heading, Image, Meta, Text, ViewportPage } from 'components';
+import { Meta, ViewportPage } from 'components';
+import { Button, Divider, Heading, Image, Text } from 'refract-ui';
 import {
   TAB_HIGHLIGHT_LIMIT,
   TAB_TECH_LIMIT,
@@ -13,10 +14,14 @@ import {
   companyHref,
   type CompanySlug,
 } from 'data/experience';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, media } from 'utils/style';
 import styles from './ExperienceIndex.module.css';
 
-const thumbnails: Record<CompanySlug, { src: typeof intuitThumbnail; placeholder: typeof intuitThumbnailPlaceholder }> = {
+const thumbnails: Record<
+  CompanySlug,
+  { src: typeof intuitThumbnail; placeholder: typeof intuitThumbnailPlaceholder }
+> = {
   intuit: { src: intuitThumbnail, placeholder: intuitThumbnailPlaceholder },
   rivian: { src: rivianThumbnail, placeholder: rivianThumbnailPlaceholder },
   walmart: { src: walmartThumbnail, placeholder: walmartThumbnailPlaceholder },
@@ -131,7 +136,10 @@ export const ExperienceIndex = () => {
                 tabRefs.current[index] = element;
               }}
               className={styles.tab}
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => {
+                trackEvent(analyticsEvents.experienceTabSelect, { company: item.slug });
+                setCurrentIndex(index);
+              }}
             >
               {item.shortName}
               <span className={styles.tabDate} aria-hidden>
@@ -198,7 +206,16 @@ export const ExperienceIndex = () => {
               role="presentation"
               sizes={`(max-width: ${media.mobile}px) 96px, 120px`}
             />
-            <Button iconHoverShift href={companyHref(company.slug)} iconEnd="arrowRight">
+            <Button
+              iconHoverShift
+              href={companyHref(company.slug)}
+              iconEnd="arrowRight"
+              onClick={() =>
+                trackEvent(analyticsEvents.experienceDetailsClick, {
+                  company: company.slug,
+                })
+              }
+            >
               See Details
             </Button>
           </div>

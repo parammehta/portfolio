@@ -1,10 +1,13 @@
 import 'shell/reset.css';
 import 'shell/global.css';
+import 'refract-ui/styles.css';
+// Side-effect import: forces the font-face assets into the client bundle
+// (and thus the exported static output) even though only _document.page.tsx
+// reads `fontStyles` itself.
+import 'shell/fonts';
 
 import { Navbar } from 'components/Navbar';
-import { ThemeProvider } from 'components/ThemeProvider';
-import { tokens } from 'components/ThemeProvider/theme';
-import { VisuallyHidden } from 'components/VisuallyHidden';
+import { LinkProvider, ThemeProvider, tokens, VisuallyHidden } from 'refract-ui';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocalStorage } from 'hooks';
 import styles from 'shell/App.module.css';
@@ -22,6 +25,7 @@ import {
   setAnalyticsSink,
 } from 'utils/analytics';
 import { msToNum } from 'utils/style';
+import { NextLinkAdapter } from 'shell/NextLinkAdapter';
 import { ScrollRestore } from '../shell/ScrollRestore';
 
 export const AppContext = createContext<AppContextValue>({
@@ -75,53 +79,55 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <AppContext.Provider value={{ ...state, dispatch }}>
       <ThemeProvider themeId={state.theme}>
-        <LazyMotion features={domAnimation}>
-          <Fragment>
-            {analyticsEnabled && (
-              <Script
-                src={cloudflareBeaconSrc}
-                strategy="afterInteractive"
-                data-cf-beacon={cloudflareBeaconConfig(analyticsToken)}
-              />
-            )}
-            <Head>
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <link
-                rel="canonical"
-                href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}${canonicalRoute}`}
-              />
-            </Head>
-            <VisuallyHidden
-              showOnFocus
-              as="a"
-              className={styles.skip}
-              href="#MainContent"
-            >
-              Skip to main content
-            </VisuallyHidden>
-            <Navbar />
-            <main className={styles.app} tabIndex={-1} id="MainContent">
-              <AnimatePresence mode="wait">
-                <m.div
-                  key={route}
-                  className={styles.page}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    type: 'tween',
-                    ease: 'linear',
-                    duration: msToNum(tokens.base.durationS) / 1000,
-                    delay: 0.1,
-                  }}
-                >
-                  <ScrollRestore />
-                  <Component {...pageProps} />
-                </m.div>
-              </AnimatePresence>
-            </main>
-          </Fragment>
-        </LazyMotion>
+        <LinkProvider component={NextLinkAdapter}>
+          <LazyMotion features={domAnimation}>
+            <Fragment>
+              {analyticsEnabled && (
+                <Script
+                  src={cloudflareBeaconSrc}
+                  strategy="afterInteractive"
+                  data-cf-beacon={cloudflareBeaconConfig(analyticsToken)}
+                />
+              )}
+              <Head>
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link
+                  rel="canonical"
+                  href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}${canonicalRoute}`}
+                />
+              </Head>
+              <VisuallyHidden
+                showOnFocus
+                as="a"
+                className={styles.skip}
+                href="#MainContent"
+              >
+                Skip to main content
+              </VisuallyHidden>
+              <Navbar />
+              <main className={styles.app} tabIndex={-1} id="MainContent">
+                <AnimatePresence mode="wait">
+                  <m.div
+                    key={route}
+                    className={styles.page}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      type: 'tween',
+                      ease: 'linear',
+                      duration: msToNum(tokens.base.durationS) / 1000,
+                      delay: 0.1,
+                    }}
+                  >
+                    <ScrollRestore />
+                    <Component {...pageProps} />
+                  </m.div>
+                </AnimatePresence>
+              </main>
+            </Fragment>
+          </LazyMotion>
+        </LinkProvider>
       </ThemeProvider>
     </AppContext.Provider>
   );

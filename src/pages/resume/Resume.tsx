@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
-import { Button, Footer, Meta } from 'components';
+import { Footer, Meta } from 'components';
+import { Button } from 'refract-ui';
 import { PageHeader, PageSection, PageSectionContent } from 'components/Page';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { media } from 'utils/style';
