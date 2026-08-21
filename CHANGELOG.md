@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/parammehta/portfolio/compare/v1.14.0...v1.15.0) (2026-08-21)
+
+
+### Features
+
+* themed book-a-chat button and contact layout fixes ([#72](https://github.com/parammehta/portfolio/issues/72)) ([b28cb82](https://github.com/parammehta/portfolio/commit/b28cb8256c2d7842cd58774cec2cc742566d943f))
+
 ## [1.14.0](https://github.com/parammehta/portfolio/compare/v1.13.0...v1.14.0) (2026-08-20)
 
 
