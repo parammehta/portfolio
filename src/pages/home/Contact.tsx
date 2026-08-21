@@ -28,23 +28,9 @@ declare global {
       remove: (widgetId: string) => void;
       reset: (widgetId: string) => void;
     };
-    calendar?: {
-      schedulingButton: {
-        load: (options: {
-          url: string;
-          color: string;
-          label: string;
-          target: HTMLElement;
-        }) => void;
-      };
-    };
   }
 }
 
-const schedulingScriptUrl =
-  'https://calendar.google.com/calendar/scheduling-button-script.js';
-const schedulingStylesUrl =
-  'https://calendar.google.com/calendar/scheduling-button-script.css';
 const schedulingUrl =
   'https://calendar.google.com/calendar/appointments/schedules/AcZssZ1rYjKW8kCvg2D-PvqkY8RTEOAsY7QYYJ7rCDi8nmdTBmpm46ybaM3SKXfBE11e6_LDj0BKJK51?gv=true';
 
@@ -70,10 +56,6 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
 
-  // Callback ref rather than useRef: the form unmounts on submit success, so the
-  // scheduling target node changes identity and the effect has to run again.
-  const [schedulingTarget, setSchedulingTarget] = useState<HTMLDivElement | null>(null);
-
   useEffect(() => {
     if (!scriptLoaded || !turnstileRef.current) return;
 
@@ -92,67 +74,6 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
       }
     };
   }, [scriptLoaded]);
-
-  useEffect(() => {
-    if (!schedulingTarget) return;
-
-    let cancelled = false;
-
-    // Google's stylesheet for the button. Injected here rather than through
-    // next/head, which refuses stylesheets, and it is only needed on this page.
-    if (!document.querySelector(`link[href="${schedulingStylesUrl}"]`)) {
-      const stylesheet = document.createElement('link');
-      stylesheet.rel = 'stylesheet';
-      stylesheet.href = schedulingStylesUrl;
-      document.head.appendChild(stylesheet);
-    }
-
-    // Loaded imperatively rather than through next/script: the button can only
-    // be created once the global exists, so the effect needs the load callback.
-    const script =
-      document.querySelector<HTMLScriptElement>(`script[src="${schedulingScriptUrl}"]`) ??
-      Object.assign(document.createElement('script'), {
-        src: schedulingScriptUrl,
-        async: true,
-      });
-
-    const renderButton = () => {
-      if (cancelled || !window.calendar) return;
-
-      window.calendar.schedulingButton.load({
-        url: schedulingUrl,
-        color: '#F09300',
-        label: 'Book an appointment',
-        target: schedulingTarget,
-      });
-    };
-
-    // The button is appended asynchronously, as a *sibling* of the target
-    // element, so the observer watches the wrapper. It carries no explicit type,
-    // and inside a form that would default to submit and fire the contact
-    // request on click.
-    const wrapper = schedulingTarget.parentElement;
-
-    const observer = new MutationObserver(() =>
-      wrapper?.querySelectorAll('button').forEach(button => (button.type = 'button'))
-    );
-
-    if (wrapper) observer.observe(wrapper, { childList: true, subtree: true });
-
-    if (window.calendar) {
-      renderButton();
-    } else {
-      script.addEventListener('load', renderButton);
-      if (!script.isConnected) document.head.appendChild(script);
-    }
-
-    return () => {
-      cancelled = true;
-      script.removeEventListener('load', renderButton);
-      observer.disconnect();
-      wrapper?.querySelectorAll('button').forEach(button => button.remove());
-    };
-  }, [schedulingTarget]);
 
   const handleBackToTop = (event: MouseEvent) => {
     event.preventDefault();
@@ -290,7 +211,7 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
                 style={getDelay(tokens.base.durationS, initDelay)}
                 autoComplete="off"
                 label="Message"
-                placeholder="Tell me about a project, a role, or just say hi…"
+                placeholder="A project, a role, or just say hi…"
                 maxLength={4096}
                 {...message}
               />
@@ -334,13 +255,17 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
                 >
                   Send message
                 </Button>
-                <div
+                <Button
+                  secondary
                   className={styles.scheduling}
                   data-status={status}
                   style={getDelay(tokens.base.durationM, initDelay, 1.5)}
+                  href={schedulingUrl}
+                  icon="link"
+                  onClick={() => trackEvent(analyticsEvents.schedulingOpen)}
                 >
-                  <div className={styles.schedulingAnchor} ref={setSchedulingTarget} />
-                </div>
+                  Book a chat
+                </Button>
               </div>
             </form>
           )}

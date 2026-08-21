@@ -123,7 +123,7 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
                     strokeLinejoin="round"
                     aria-hidden
                   >
-                    <path d="M12 4v10M8 12l4 4 4-4M6 19h12" />
+                    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" />
                   </svg>
                 </RouterLink>
                 <RouterLink
@@ -162,7 +162,7 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
                   strokeLinejoin="round"
                   aria-hidden
                 >
-                  <path d="M12 4v10M8 12l4 4 4-4M6 19h12" />
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" />
                 </svg>
               </RouterLink>
               <RouterLink
