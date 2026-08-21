@@ -7,7 +7,7 @@
   "author": "Param Mehta <param.mehta95@gmail.com>",
   "devDependencies": {
     "@eslint/js": "^9.39.5",
-    "@mapbox/rehype-prism": "^0.8.0",
+    "@mapbox/rehype-prism": "^0.9.0",
     "@playwright/test": "^1.62.1",
     "@svgr/webpack": "^6.5.1",
     "@testing-library/dom": "^10.4.1",
