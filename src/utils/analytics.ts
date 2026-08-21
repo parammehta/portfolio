@@ -31,6 +31,7 @@ export const analyticsEvents = {
   contactSubmit: 'contact_submit',
   contactSuccess: 'contact_success',
   contactError: 'contact_error',
+  schedulingOpen: 'scheduling_open',
   resumeDownload: 'resume_download',
   resumeOpen: 'resume_open',
   designSystemOpen: 'design_system_open',
