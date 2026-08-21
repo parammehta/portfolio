@@ -1,8 +1,15 @@
-import { type FormEvent, type MouseEvent, type RefObject, useEffect, useRef, useState } from 'react';
+import {
+  type FormEvent,
+  type MouseEvent,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import Script from 'next/script';
+import { Footer } from 'components';
 import {
   Button,
-  Footer,
   ScrambleReveal,
   Divider,
   Heading,
@@ -11,9 +18,9 @@ import {
   Section,
   Text,
   Transition,
-} from 'components';
+  tokens,
+} from 'refract-ui';
 import styles from './Contact.module.css';
-import { tokens } from 'components/ThemeProvider';
 import { useFormInput, useScrollToHash } from 'hooks';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, msToNum, numToMs } from 'utils/style';
@@ -21,10 +28,7 @@ import { cssProps, msToNum, numToMs } from 'utils/style';
 declare global {
   interface Window {
     turnstile: {
-      render: (
-        container: HTMLElement,
-        options: Record<string, unknown>
-      ) => string;
+      render: (container: HTMLElement, options: Record<string, unknown>) => string;
       remove: (widgetId: string) => void;
       reset: (widgetId: string) => void;
     };
@@ -165,146 +169,150 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
           param.mehta95@gmail.com
         </a>
         <div className={styles.formWrapper}>
-        <Transition unmount in={!complete} timeout={1600}>
-          {(visible: boolean, status: string) => (
-            <form className={styles.form} method="post" onSubmit={onSubmit}>
-              <Heading
-                className={styles.title}
-                data-status={status}
-                level={3}
-                as="h2"
-                id={titleId}
-                style={getDelay(tokens.base.durationXS, initDelay, 0.3)}
-              >
-                <ScrambleReveal text="Say hello" start={status !== 'exited'} delay={300} />
-              </Heading>
-              <Divider
-                className={styles.divider}
-                data-status={status}
-                style={getDelay(tokens.base.durationXS, initDelay, 0.4)}
-              />
-              {/* Hidden honeypot field to identify bots */}
-              <Input
-                className={styles.botkiller}
-                label="Name"
-                maxLength={512}
-                {...name}
-              />
-              <Input
-                required
-                className={styles.input}
-                data-status={status}
-                style={getDelay(tokens.base.durationXS, initDelay)}
-                autoComplete="email"
-                label="Your Email"
-                type="email"
-                placeholder="you@example.com"
-                maxLength={512}
-                {...email}
-              />
-              <Input
-                required
-                multiline
-                maxRows={6}
-                className={styles.input}
-                data-status={status}
-                style={getDelay(tokens.base.durationS, initDelay)}
-                autoComplete="off"
-                label="Message"
-                placeholder="A project, a role, or just say hi…"
-                maxLength={4096}
-                {...message}
-              />
-              {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
-                <div
-                  ref={turnstileRef}
-                  className={styles.turnstile}
+          <Transition unmount in={!complete} timeout={1600}>
+            {(visible: boolean, status: string) => (
+              <form className={styles.form} method="post" onSubmit={onSubmit}>
+                <Heading
+                  className={styles.title}
                   data-status={status}
-                  style={getDelay(tokens.base.durationS, initDelay, 1.5)}
+                  level={3}
+                  as="h2"
+                  id={titleId}
+                  style={getDelay(tokens.base.durationXS, initDelay, 0.3)}
+                >
+                  <ScrambleReveal
+                    text="Say hello"
+                    start={status !== 'exited'}
+                    delay={300}
+                  />
+                </Heading>
+                <Divider
+                  className={styles.divider}
+                  data-status={status}
+                  style={getDelay(tokens.base.durationXS, initDelay, 0.4)}
                 />
-              )}
-              <Transition in={!!statusError} timeout={msToNum(tokens.base.durationM)}>
-                {(errorStatus: boolean) => (
+                {/* Hidden honeypot field to identify bots */}
+                <Input
+                  className={styles.botkiller}
+                  label="Name"
+                  maxLength={512}
+                  {...name}
+                />
+                <Input
+                  required
+                  className={styles.input}
+                  data-status={status}
+                  style={getDelay(tokens.base.durationXS, initDelay)}
+                  autoComplete="email"
+                  label="Your Email"
+                  type="email"
+                  placeholder="you@example.com"
+                  maxLength={512}
+                  {...email}
+                />
+                <Input
+                  required
+                  multiline
+                  maxRows={6}
+                  className={styles.input}
+                  data-status={status}
+                  style={getDelay(tokens.base.durationS, initDelay)}
+                  autoComplete="off"
+                  label="Message"
+                  placeholder="A project, a role, or just say hi…"
+                  maxLength={4096}
+                  {...message}
+                />
+                {process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
                   <div
-                    className={styles.formError}
-                    data-status={errorStatus}
-                    style={cssProps({
-                      height: errorStatus ? errorRef.current?.offsetHeight ?? 0 : 0,
-                    })}
-                  >
-                    <div className={styles.formErrorContent} ref={errorRef}>
-                      <div className={styles.formErrorMessage}>
-                        <Icon className={styles.formErrorIcon} icon="error" />
-                        {statusError}
+                    ref={turnstileRef}
+                    className={styles.turnstile}
+                    data-status={status}
+                    style={getDelay(tokens.base.durationS, initDelay, 1.5)}
+                  />
+                )}
+                <Transition in={!!statusError} timeout={msToNum(tokens.base.durationM)}>
+                  {(errorStatus: boolean) => (
+                    <div
+                      className={styles.formError}
+                      data-status={errorStatus}
+                      style={cssProps({
+                        height: errorStatus ? (errorRef.current?.offsetHeight ?? 0) : 0,
+                      })}
+                    >
+                      <div className={styles.formErrorContent} ref={errorRef}>
+                        <div className={styles.formErrorMessage}>
+                          <Icon className={styles.formErrorIcon} icon="error" />
+                          {statusError}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </Transition>
-              <div className={styles.actions}>
-                <Button
-                  className={styles.button}
+                  )}
+                </Transition>
+                <div className={styles.actions}>
+                  <Button
+                    className={styles.button}
+                    data-status={status}
+                    data-sending={sending}
+                    style={getDelay(tokens.base.durationM, initDelay)}
+                    disabled={sending}
+                    loading={sending}
+                    loadingText="Sending..."
+                    icon="send"
+                    type="submit"
+                  >
+                    Send message
+                  </Button>
+                  <Button
+                    secondary
+                    className={styles.scheduling}
+                    data-status={status}
+                    style={getDelay(tokens.base.durationM, initDelay, 1.5)}
+                    href={schedulingUrl}
+                    icon="link"
+                    onClick={() => trackEvent(analyticsEvents.schedulingOpen)}
+                  >
+                    Book a chat
+                  </Button>
+                </div>
+              </form>
+            )}
+          </Transition>
+          <Transition unmount in={complete} timeout={msToNum(tokens.base.durationXL)}>
+            {(visible: boolean, status: string) => (
+              <div className={styles.complete} aria-live="polite">
+                <Heading
+                  level={3}
+                  as="h3"
+                  className={styles.completeTitle}
                   data-status={status}
-                  data-sending={sending}
-                  style={getDelay(tokens.base.durationM, initDelay)}
-                  disabled={sending}
-                  loading={sending}
-                  loadingText="Sending..."
-                  icon="send"
-                  type="submit"
                 >
-                  Send message
-                </Button>
+                  Message Sent
+                </Heading>
+                <Text
+                  size="l"
+                  as="p"
+                  className={styles.completeText}
+                  data-status={status}
+                  style={getDelay(tokens.base.durationXS)}
+                >
+                  I’ll get back to you within a couple days, sit tight
+                </Text>
                 <Button
                   secondary
-                  className={styles.scheduling}
+                  iconHoverShift
+                  className={styles.completeButton}
                   data-status={status}
-                  style={getDelay(tokens.base.durationM, initDelay, 1.5)}
-                  href={schedulingUrl}
-                  icon="link"
-                  onClick={() => trackEvent(analyticsEvents.schedulingOpen)}
+                  style={getDelay(tokens.base.durationM)}
+                  href="/#intro"
+                  icon="chevronRight"
+                  onClick={handleBackToTop}
                 >
-                  Book a chat
+                  Back to top
                 </Button>
               </div>
-            </form>
-          )}
-        </Transition>
-        <Transition unmount in={complete} timeout={msToNum(tokens.base.durationXL)}>
-          {(visible: boolean, status: string) => (
-            <div className={styles.complete} aria-live="polite">
-              <Heading
-                level={3}
-                as="h3"
-                className={styles.completeTitle}
-                data-status={status}
-              >
-                Message Sent
-              </Heading>
-              <Text
-                size="l"
-                as="p"
-                className={styles.completeText}
-                data-status={status}
-                style={getDelay(tokens.base.durationXS)}
-              >
-                I’ll get back to you within a couple days, sit tight
-              </Text>
-              <Button
-                secondary
-                iconHoverShift
-                className={styles.completeButton}
-                data-status={status}
-                style={getDelay(tokens.base.durationM)}
-                href="/#intro"
-                icon="chevronRight"
-                onClick={handleBackToTop}
-              >
-                Back to top
-              </Button>
-            </div>
-          )}
-        </Transition>
+            )}
+          </Transition>
         </div>
         <Footer className={styles.footer} />
       </Section>

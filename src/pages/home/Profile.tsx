@@ -9,7 +9,7 @@ import {
   Section,
   Text,
   Transition,
-} from 'components';
+} from 'refract-ui';
 import profileDevanagari from 'assets/devanagari-profile.svg?url';
 import profileImgLarge from 'assets/profile-large.jpg';
 import profileImgPlaceholder from 'assets/profile-placeholder.jpg';

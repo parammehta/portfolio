@@ -1,7 +1,0 @@
-.textarea {
-  resize: var(--resize);
-
-  /* Once maxRows caps the auto-grow, longer messages scroll inside the field
-     rather than stretching the form past the contact pane. */
-  overflow-y: auto;
-}

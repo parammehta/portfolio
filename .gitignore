@@ -72,6 +72,7 @@ build/
 build-storybook/
 public/sitemap.xml
 public/draco/
+public/models/
 public/og
 .serverless
 .next

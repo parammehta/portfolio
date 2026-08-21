@@ -1,7 +1,14 @@
 import { Fragment, type MouseEvent, type RefObject, useEffect, useState } from 'react';
 import ArrowDown from 'assets/arrow-down.svg';
-import { ScrambleReveal, Heading, Section, Transition, VisuallyHidden } from 'components';
-import { tokens, useTheme } from 'components/ThemeProvider';
+import {
+  ScrambleReveal,
+  Heading,
+  Section,
+  Transition,
+  VisuallyHidden,
+  tokens,
+  useTheme,
+} from 'refract-ui';
 import { AnimatePresence } from 'framer-motion';
 import { useInterval, usePrevious, useScrollToHash } from 'hooks';
 import dynamic from 'next/dynamic';
@@ -9,10 +16,9 @@ import RouterLink from 'next/link';
 import { cssProps } from 'utils/style';
 import styles from './Intro.module.css';
 
-const HeroSphere = dynamic(
-  () => import('./HeroSphere').then(mod => mod.HeroSphere),
-  { ssr: false }
-);
+const HeroSphere = dynamic(() => import('./HeroSphere').then(mod => mod.HeroSphere), {
+  ssr: false,
+});
 
 interface IntroProps {
   id: string;
@@ -21,7 +27,13 @@ interface IntroProps {
   scrollIndicatorHidden: boolean;
 }
 
-export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...rest }: IntroProps) {
+export function Intro({
+  id,
+  sectionRef,
+  disciplines,
+  scrollIndicatorHidden,
+  ...rest
+}: IntroProps) {
   const theme = useTheme();
   const [disciplineIndex, setDisciplineIndex] = useState(0);
   const prevTheme = usePrevious(theme);
@@ -111,7 +123,12 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
                 </div>
               </Heading>
               <div className={styles.actions} data-visible={visible}>
-                <RouterLink href="/resume" scroll={false} className={styles.cta} data-arrow="down">
+                <RouterLink
+                  href="/resume"
+                  scroll={false}
+                  className={styles.cta}
+                  data-arrow="down"
+                >
                   <span className={styles.ctaLabel}>View Resume</span>
                   <svg
                     className={styles.ctaIcon}
@@ -150,7 +167,12 @@ export function Intro({ id, sectionRef, disciplines, scrollIndicatorHidden, ...r
               </div>
             </header>
             <div className={styles.mobileActions} data-visible={visible}>
-              <RouterLink href="/resume" scroll={false} className={styles.cta} data-arrow="down">
+              <RouterLink
+                href="/resume"
+                scroll={false}
+                className={styles.cta}
+                data-arrow="down"
+              >
                 <span className={styles.ctaLabel}>View Resume</span>
                 <svg
                   className={styles.ctaIcon}
