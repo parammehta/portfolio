@@ -1,17 +1,16 @@
+import { Meta, ViewportPage } from 'components';
 import {
   Heading,
   Link,
   List,
   ListItem,
-  Meta,
   Table,
   TableBody,
   TableCell,
   TableHeadCell,
   TableRow,
   Text,
-  ViewportPage,
-} from 'components';
+} from 'refract-ui';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './Skills.module.css';
 
@@ -38,7 +37,9 @@ export const Skills = () => (
           <TableBody>
             <TableRow>
               <TableHeadCell>Languages</TableHeadCell>
-              <TableCell>JavaScript, TypeScript, Java, SQL, GraphQL, HTML, CSS.</TableCell>
+              <TableCell>
+                JavaScript, TypeScript, Java, SQL, GraphQL, HTML, CSS.
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableHeadCell>Frameworks &amp; Libraries</TableHeadCell>
@@ -62,7 +63,9 @@ export const Skills = () => (
             </TableRow>
             <TableRow>
               <TableHeadCell>Soft Skills</TableHeadCell>
-              <TableCell>Technical Leadership, Mentorship, Cross-org Collaboration.</TableCell>
+              <TableCell>
+                Technical Leadership, Mentorship, Cross-org Collaboration.
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -75,7 +78,10 @@ export const Skills = () => (
         <Text size="m" as="div">
           <List className={styles.list}>
             <ListItem>
-              <Link href="https://code.visualstudio.com/" onClick={trackToolLinkClick('VS Code')}>
+              <Link
+                href="https://code.visualstudio.com/"
+                onClick={trackToolLinkClick('VS Code')}
+              >
                 VS Code
               </Link>
               , One Dark Pro Monokai Darker, Operator Mono.
@@ -109,7 +115,10 @@ export const Skills = () => (
               for spring animations.
             </ListItem>
             <ListItem>
-              <Link href="https://storybook.js.org/" onClick={trackToolLinkClick('Storybook')}>
+              <Link
+                href="https://storybook.js.org/"
+                onClick={trackToolLinkClick('Storybook')}
+              >
                 Storybook
               </Link>{' '}
               for components in isolation.

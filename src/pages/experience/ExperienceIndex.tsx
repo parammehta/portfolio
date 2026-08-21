@@ -5,7 +5,8 @@ import rivianThumbnail from 'assets/rivian-fleet-os-background.webp';
 import rivianThumbnailPlaceholder from 'assets/rivian-fleet-os-background-placeholder.png';
 import walmartThumbnail from 'assets/walmart-background.png';
 import walmartThumbnailPlaceholder from 'assets/walmart-background-placeholder.png';
-import { Button, Divider, Heading, Image, Meta, Text, ViewportPage } from 'components';
+import { Meta, ViewportPage } from 'components';
+import { Button, Divider, Heading, Image, Text } from 'refract-ui';
 import {
   TAB_HIGHLIGHT_LIMIT,
   TAB_TECH_LIMIT,
@@ -17,7 +18,10 @@ import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps, media } from 'utils/style';
 import styles from './ExperienceIndex.module.css';
 
-const thumbnails: Record<CompanySlug, { src: typeof intuitThumbnail; placeholder: typeof intuitThumbnailPlaceholder }> = {
+const thumbnails: Record<
+  CompanySlug,
+  { src: typeof intuitThumbnail; placeholder: typeof intuitThumbnailPlaceholder }
+> = {
   intuit: { src: intuitThumbnail, placeholder: intuitThumbnailPlaceholder },
   rivian: { src: rivianThumbnail, placeholder: rivianThumbnailPlaceholder },
   walmart: { src: walmartThumbnail, placeholder: walmartThumbnailPlaceholder },
@@ -207,7 +211,9 @@ export const ExperienceIndex = () => {
               href={companyHref(company.slug)}
               iconEnd="arrowRight"
               onClick={() =>
-                trackEvent(analyticsEvents.experienceDetailsClick, { company: company.slug })
+                trackEvent(analyticsEvents.experienceDetailsClick, {
+                  company: company.slug,
+                })
               }
             >
               See Details

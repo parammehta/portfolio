@@ -4,7 +4,8 @@ import intuitDesignSystem from 'assets/intuit-design-system-1.png';
 import intuitIdentityConsole from 'assets/intuit-identity-console-1.png';
 import intuitMdlVerification from 'assets/intuit-mdl-verification.png';
 import intuitPasskeyEnrollment from 'assets/intuit-passkey-enrollment.png';
-import { Footer, Image, Meta } from 'components';
+import { Footer, Meta } from 'components';
+import { Image } from 'refract-ui';
 import {
   ExperienceBackground,
   ExperienceContainer,
@@ -174,12 +175,12 @@ export const Intuit = () => {
                 Cross-identity SSO for Amazon partnerships
               </ExperienceSectionHeading>
               <ExperienceSectionText>
-                I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded directly
-                inside Amazon&apos;s domain, with Intuit authentication handled cross-domain so
-                a seller never leaves Amazon to sign in. Getting an identity provider to work
-                from inside someone else&apos;s origin is the hard part &mdash; the eligibility
-                design that came out of it is now the canonical framework for onboarding future
-                partnerships.
+                I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded
+                directly inside Amazon&apos;s domain, with Intuit authentication handled
+                cross-domain so a seller never leaves Amazon to sign in. Getting an
+                identity provider to work from inside someone else&apos;s origin is the
+                hard part &mdash; the eligibility design that came out of it is now the
+                canonical framework for onboarding future partnerships.
               </ExperienceSectionText>
               <ExperienceSectionText>
                 Owning the integration lifecycle from discovery through production across
@@ -221,9 +222,10 @@ export const Intuit = () => {
               <ExperienceSectionText>
                 For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
                 account-manager flows onto GraphQL, leading 8 engineers across backend,
-                frontend, and product through it. Collapsing that many flows onto one schema
-                is what bought the scalability headroom and an 85% GTM velocity gain, and the
-                migration SOPs we set became the pattern other products followed.
+                frontend, and product through it. Collapsing that many flows onto one
+                schema is what bought the scalability headroom and an 85% GTM velocity
+                gain, and the migration SOPs we set became the pattern other products
+                followed.
               </ExperienceSectionText>
               <ExperienceSectionText>
                 I also led a performance track that cut P95 latency by 56% (account

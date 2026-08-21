@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
-import { Button } from 'components/Button';
+import { Button } from 'refract-ui';
 import { useAppContext } from 'hooks';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './ThemeToggle.module.css';

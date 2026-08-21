@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { Icon } from 'components/Icon';
-import { Wordmark } from 'components/Wordmark';
-import { tokens } from 'components/ThemeProvider';
-import { Transition } from 'components/Transition';
-import { useTheme } from 'components/ThemeProvider';
+import { Icon, Wordmark, tokens, Transition, useTheme } from 'refract-ui';
 import { useAppContext, useScrollToHash, useWindowSize } from 'hooks';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -256,7 +252,10 @@ export const Navbar = () => {
                 href={item.pathname}
                 scroll={false}
                 key={`${item.label}-${index}`}
-                className={classes(styles.mobileNavLink, item.nested && styles.mobileNavSubLink)}
+                className={classes(
+                  styles.mobileNavLink,
+                  item.nested && styles.mobileNavSubLink
+                )}
                 data-visible={visible}
                 aria-current={getIsActive(item)}
                 onClick={handleMobileNavClick}

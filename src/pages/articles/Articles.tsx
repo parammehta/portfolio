@@ -1,16 +1,15 @@
 import Barcode from 'assets/barcode.svg';
+import { Footer, Meta } from 'components';
 import {
   Breadcrumbs,
   Button,
   ScrambleReveal,
   Divider,
-  Footer,
   Heading,
   Image,
-  Meta,
   Section,
   Text,
-} from 'components';
+} from 'refract-ui';
 import { useReducedMotion } from 'framer-motion';
 import RouterLink from 'next/link';
 import { useState, useEffect, useSyncExternalStore } from 'react';

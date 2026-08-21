@@ -3,7 +3,8 @@ import '../src/shell/global.css';
 import './preview.css';
 
 import { useEffect } from 'react';
-import { ThemeProvider, fontStyles, tokenStyles } from '../src/components';
+import { ThemeProvider, tokenStyles } from 'refract-ui';
+import { fontStyles } from '../src/shell/fonts';
 import type { Preview } from '@storybook/nextjs';
 
 const preview: Preview = {
