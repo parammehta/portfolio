@@ -13,20 +13,24 @@ import { DRACOLoader, GLTFLoader } from 'three-stdlib';
 // Enable caching for all loaders
 Cache.enabled = true;
 
-let gltfLoader: GLTFLoader | undefined;
+const gltfLoaders = new Map<string, GLTFLoader>();
 
 /**
  * GLTF model loader configured with the draco decoder. Constructed lazily on
  * first use rather than at module scope, so importing this module has no
- * side effect.
+ * side effect. Cached per decoder path.
  */
-export function getModelLoader(): GLTFLoader {
+export function getModelLoader(decoderPath = '/draco/'): GLTFLoader {
+  let gltfLoader = gltfLoaders.get(decoderPath);
+
   if (!gltfLoader) {
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/draco/');
+    dracoLoader.setDecoderPath(decoderPath);
     gltfLoader = new GLTFLoader();
     gltfLoader.setDRACOLoader(dracoLoader);
+    gltfLoaders.set(decoderPath, gltfLoader);
   }
+
   return gltfLoader;
 }
 
@@ -66,7 +70,10 @@ export const cleanMaterial = (material: Material): void => {
       typeof value === 'object' &&
       'minFilter' in (value as Record<string, unknown>)
     ) {
-      const texture = value as { dispose: () => void; source?: { data?: { close?: () => void } } };
+      const texture = value as {
+        dispose: () => void;
+        source?: { data?: { close?: () => void } };
+      };
       texture.dispose();
 
       // Close GLTF bitmap textures

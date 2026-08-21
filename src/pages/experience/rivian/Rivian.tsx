@@ -8,7 +8,8 @@ import rivianFleetMobileScreen2 from 'assets/rivian-fleet-os-mobile-2.png';
 import rivianFleetScreen2 from 'assets/rivian-fleet-os-2.webp';
 import rivianFleetScreen3 from 'assets/rivian-fleet-os-3.webp';
 import rivianFleetScreen4 from 'assets/rivian-fleet-os-4.webp';
-import { Footer, Image, Meta } from 'components';
+import { Footer, Meta } from 'components';
+import { Image } from 'refract-ui';
 import {
   ExperienceBackground,
   ExperienceContainer,
@@ -29,7 +30,7 @@ import styles from './Rivian.module.css';
 
 const title = 'Senior Software Engineer at Rivian';
 const description =
-  'As a founding engineer on the Fleet Core team, I led the design and delivery of a cross-platform notifications system for Rivian\'s fleet management software.';
+  "As a founding engineer on the Fleet Core team, I led the design and delivery of a cross-platform notifications system for Rivian's fleet management software.";
 const roles = [
   'Founding Engineer',
   'Full Stack',

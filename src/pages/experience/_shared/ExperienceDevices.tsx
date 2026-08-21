@@ -1,6 +1,6 @@
-import { deviceModels, Model } from 'components';
-import { ExperienceSectionHeading } from './Experience';
 import { useInViewport } from 'hooks';
+import { deviceModels, Model } from 'refract-ui/model';
+import { ExperienceSectionHeading } from './Experience';
 import { useRef, type ReactNode } from 'react';
 import { classes } from 'utils/style';
 import styles from './ExperienceDevices.module.css';

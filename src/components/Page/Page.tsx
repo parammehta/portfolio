@@ -1,13 +1,21 @@
-import { forwardRef, type ElementType, type HTMLAttributes, type ReactNode, useRef } from 'react';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Button } from 'components/Button';
-import { ScrambleReveal } from 'components/ScrambleReveal';
-import { Heading } from 'components/Heading';
-import { Image } from 'components/Image';
-import { Section } from 'components/Section';
-import { Text } from 'components/Text';
-import { tokens } from 'components/ThemeProvider/theme';
-import { Transition } from 'components/Transition';
+import {
+  forwardRef,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactNode,
+  useRef,
+} from 'react';
+import {
+  Breadcrumbs,
+  Button,
+  ScrambleReveal,
+  Heading,
+  Image,
+  Section,
+  Text,
+  tokens,
+  Transition,
+} from 'refract-ui';
 import { useParallax } from 'hooks';
 import { classes, cssProps, msToNum, numToMs } from 'utils/style';
 import styles from './Page.module.css';
@@ -142,7 +150,11 @@ interface PageBackgroundProps {
   [key: string]: unknown;
 }
 
-export const PageBackground = ({ opacity = 0.7, className, ...rest }: PageBackgroundProps) => {
+export const PageBackground = ({
+  opacity = 0.7,
+  className,
+  ...rest
+}: PageBackgroundProps) => {
   const imageRef = useRef<HTMLDivElement>(null);
 
   useParallax(0.6, (value: number) => {
@@ -184,7 +196,11 @@ interface PageSectionContentProps extends HTMLAttributes<HTMLDivElement> {
   width?: string;
 }
 
-export const PageSectionContent = ({ className, width = 'l', ...rest }: PageSectionContentProps) => (
+export const PageSectionContent = ({
+  className,
+  width = 'l',
+  ...rest
+}: PageSectionContentProps) => (
   <div
     className={classes(styles.sectionContent, className)}
     data-width={width}
@@ -199,7 +215,12 @@ interface PageSectionHeadingProps {
   [key: string]: unknown;
 }
 
-export const PageSectionHeading = ({ className, level = 3, as = 'h2', ...rest }: PageSectionHeadingProps) => (
+export const PageSectionHeading = ({
+  className,
+  level = 3,
+  as = 'h2',
+  ...rest
+}: PageSectionHeadingProps) => (
   <Heading
     className={classes(styles.sectionHeading, className)}
     as={as}
@@ -255,7 +276,11 @@ interface PageSectionColumnsProps extends HTMLAttributes<HTMLDivElement> {
   centered?: boolean;
 }
 
-export const PageSectionColumns = ({ className, centered, ...rest }: PageSectionColumnsProps) => (
+export const PageSectionColumns = ({
+  className,
+  centered,
+  ...rest
+}: PageSectionColumnsProps) => (
   <PageSectionContent
     className={classes(styles.sectionColumns, className)}
     data-centered={centered}

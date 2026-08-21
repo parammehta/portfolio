@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/parammehta/portfolio/compare/v1.15.0...v1.16.0) (2026-08-21)
+
+
+### Features
+
+* consume refract-ui, retire local copies of extracted components ([#74](https://github.com/parammehta/portfolio/issues/74)) ([3cb9368](https://github.com/parammehta/portfolio/commit/3cb9368b3e8ac8d869e642bcccf9dc9669968cc7))
+
 ## [1.15.0](https://github.com/parammehta/portfolio/compare/v1.14.0...v1.15.0) (2026-08-21)
 
 

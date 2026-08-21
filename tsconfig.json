@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2022"
-    ],
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "allowJs": false,
     "checkJs": false,
     "skipLibCheck": true,
@@ -21,24 +17,18 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": "src",
     "paths": {
-      "components/*": [
-        "components/*"
-      ],
-      "hooks/*": [
-        "hooks/*"
-      ],
-      "utils/*": [
-        "utils/*"
-      ],
-      "shell/*": [
-        "shell/*"
-      ],
-      "assets/*": [
-        "assets/*"
-      ],
-      "pages/*": [
-        "pages/*"
-      ]
+      "components/*": ["components/*"],
+      "hooks/*": ["hooks/*"],
+      "utils/*": ["utils/*"],
+      "shell/*": ["shell/*"],
+      "assets/*": ["assets/*"],
+      "pages/*": ["pages/*"],
+
+      // refract-ui@1.0.1 emits its subpath types at dist/entries/*.d.ts but
+      // points exports["./model"].types at dist/model.d.ts, which it never
+      // ships. The runtime entry resolves fine; only the types 404. Remove
+      // this once the package's exports map is fixed upstream.
+      "refract-ui/model": ["../node_modules/refract-ui/dist/entries/model.d.ts"]
     },
     "plugins": [
       {
@@ -46,20 +36,6 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "types/**/*.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".storybook/**/*.ts",
-    ".storybook/**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "build",
-    "build-storybook",
-    ".next",
-    "functions",
-    "scripts"
-  ]
+  "include": ["next-env.d.ts", "types/**/*.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "build", ".next", "functions", "scripts"]
 }

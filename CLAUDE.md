@@ -1,13 +1,16 @@
 # Portfolio — parammehta.com
 
-Personal portfolio site for Param Mehta. Next.js static-export app with Storybook component library.
+Personal portfolio site for Param Mehta. Next.js static-export app. Shared UI primitives
+(Button, Text, Image, Model, Carousel, ThemeProvider, etc.) live in a separate published
+package, [refract-ui](https://github.com/parammehta/refract-ui) — this repo only holds
+site-specific components (Navbar, Footer, Meta, Page, ArchitectureDiagram, StructuredData,
+ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 
 ## Quick reference
 
 | What | Command |
 |---|---|
 | Dev server | `npm run dev` |
-| Storybook | `npm run storybook` (port 9009) |
 | Build (static export) | `npm run build` |
 | Preview the built site | `npm start` (serves `build/`; run `npm run build` first) |
 | Tests (unit + integration) | `npm test` |
@@ -19,7 +22,6 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 | Lint | `npm run lint` / `npm run stylelint` |
 | Typecheck | `npm run typecheck` |
 | Deploy site | `npm run deploy` |
-| Deploy Storybook | `npm run deploy:storybook` |
 | Deploy API functions | `npm run deploy:functions` |
 | Deploy analytics Worker | `npm run deploy:worker` |
 
@@ -34,8 +36,9 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 - **Routing**: file-based via Next.js — `src/pages/index.page.tsx` → `/`, `src/pages/resume/index.page.tsx` → `/resume/`, etc. `trailingSlash: true`, so routes resolve as `route/index.html`. The contact form lives on the home page as an `/#contact` section, not its own route; `src/pages/contact/index.page.tsx` exists only as a redirect stub for the old `/contact/` URL (still indexed/linked externally), which sends visitors on to `/#contact`.
 - **Styling**: CSS Modules (`.module.css`). camelCase class names (`selectorClassPattern: ^[a-z][a-zA-Z0-9]+$`).
 - **CSS chunking**: `next.config.js` forces every stylesheet into a single chunk shared by all routes. Next otherwise gives each route its own chunk and unloads it the moment the next route commits — which leaves the outgoing page unstyled while it plays its exit animation, stretching it to full width. This depends on the webpack builder (the `--webpack` flag on `dev` and `build`); the `webpack()` hook is ignored under Turbopack, and dropping the flag silently brings the bug back.
-- **Imports**: `tsconfig.json` sets `baseUrl: "src"`, so import from `components/Button`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed.
-- **3D**: Three.js for the hero displacement sphere and device models. Draco decoder is copied to `public/draco/` at build time.
+- **Imports**: `tsconfig.json` sets `baseUrl: "src"`, so import from `components/Navbar`, `utils/style`, `hooks/useWindowSize`, etc. — no `../` chains needed. Shared primitives (`Text`, `Button`, `Image`, `ThemeProvider`, ...) import from the `refract-ui` package instead, not `components/*`.
+- **Component library**: `refract-ui` ([repo](https://github.com/parammehta/refract-ui), [Storybook](https://storybook.parammehta.com)) supplies the primitives extracted from this site. `LinkProvider` (from `refract-ui`) is wired in `_app.page.tsx` with `src/shell/NextLinkAdapter.tsx` so `Link`/`Button` route through `next/link` without the library depending on Next directly. `src/shell/fonts.ts` supplies `--brandFontStack` (Gotham) locally — the library is font-agnostic since Gotham is commercially licensed and can't ship in a public package. `refract-ui/styles.css` is imported once in `_app.page.tsx`; `tokenStyles` (also from `refract-ui`) is inlined into `<head>` in `_document.page.tsx` alongside `fontStyles`.
+- **3D**: Three.js for the hero displacement sphere (local, `src/pages/home/HeroSphere.tsx`) and device models / carousel (`refract-ui`'s `Model`/`Carousel`, currently unused on any page but available). Draco decoder and device `.glb` files are copied from `node_modules/refract-ui/dist/assets` to `public/draco/` and `public/models/` at build time by `scripts/draco.js`.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.
 - **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`. Custom events are POSTed to a Cloudflare Worker (`worker/`) that records them to a Workers Analytics Engine dataset; CF Web Analytics itself has no event API.
 
@@ -43,32 +46,38 @@ Personal portfolio site for Param Mehta. Next.js static-export app with Storyboo
 
 ```
 src/
-  components/   — reusable UI (Button, Navbar, Image, Model, Page, etc.)
-  hooks/        — custom React hooks
-  shell/        — app-wide chrome (global CSS, reducer, ScrollRestore)
+  components/   — site-specific UI only (Navbar, Footer, Meta, Page, ArchitectureDiagram,
+                  StructuredData, ViewportPage, Code) — shared primitives live in refract-ui
+  hooks/        — custom React hooks (useLocalStorage, useWindowSize, etc. — only ones this
+                  site still uses directly; refract-ui has its own copies of the hooks it needs)
+  shell/        — app-wide chrome (global CSS, reducer, ScrollRestore, fonts.ts, NextLinkAdapter)
   pages/        — Next.js pages (*.page.tsx) and co-located route components
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
-public/         — static files served at root (favicons, resume PDF, OG images, draco decoder)
+public/         — static files served at root (favicons, resume PDF, OG images, draco decoder,
+                  device .glb models — the latter two populated at build time, see scripts/draco.js)
 functions/      — serverless API functions (separate deploy via serverless framework)
 worker/         — Cloudflare Worker: custom-event sink to Analytics Engine (separate deploy via wrangler)
-scripts/        — build-time scripts (sitemap generation, draco copy, CloudFront invalidation)
+scripts/        — build-time scripts (sitemap generation, draco/model copy, CloudFront invalidation)
 ```
 
 ## Component conventions
 
 Each component lives in its own directory:
 ```
-src/components/Button/
-  Button.tsx          — component implementation
-  Button.module.css  — styles
-  Button.stories.tsx  — Storybook story
+src/components/Navbar/
+  Navbar.tsx          — component implementation
+  Navbar.module.css  — styles
   index.ts           — re-export
 ```
 
+No `.stories.tsx` files here — Storybook for these components moved to `refract-ui` along
+with the components themselves; `Navbar`/`Footer`/`Code` never had library-shippable
+stories since they depend on portfolio-specific data (`AppContext`, nav links, footer copy).
+
 ## Linting & formatting
 
-- **ESLint**: flat config (`eslint.config.mjs`) — `@eslint/js` recommended + `eslint-config-next` + `eslint-plugin-storybook`. Enforces semicolons.
+- **ESLint**: flat config (`eslint.config.mjs`) — `@eslint/js` recommended + `eslint-config-next`. Enforces semicolons.
 - **Stylelint**: `stylelint-config-standard` + `stylelint-config-css-modules`. camelCase selectors/custom properties.
 - **Prettier**: configured via `.prettierrc`.
 
@@ -117,7 +126,9 @@ The workflow also declares `workflow_call`, and `deploy.yml` calls it as a `veri
 Static site deployed to S3 + CloudFront:
 - `npm run build` → `next build` then moves `out/` to `build/`
 - `npm run deploy` → syncs `build/` to S3, invalidates CloudFront cache
-- Storybook builds to `build-storybook/`, deployed to a separate S3 bucket
+
+Storybook is a separate repo/deploy — see [refract-ui](https://github.com/parammehta/refract-ui),
+which publishes its own Storybook to `storybook.parammehta.com` from its own CI.
 
 The site deploy also runs automatically on release — see [Releases](#releases). The `npm run deploy` scripts remain available for manual/out-of-band deploys.
 
@@ -182,3 +193,9 @@ These commit types also drive automated versioning and changelog generation — 
 - New pages must use the `.page.tsx` (or `.page.ts`) extension or Next.js won't pick them up.
 - CSS class names must be camelCase to pass stylelint.
 - Do not commit `.env` — use `.env.example` as reference.
+- A new component with no portfolio-specific content or data (no `AppContext`, no hardcoded
+  copy/nav links) belongs in [refract-ui](https://github.com/parammehta/refract-ui), not
+  `src/components/`. Adding it here means duplicating it later.
+- If you need to change a `refract-ui` component's behavior, that's a PR against the
+  `refract-ui` repo followed by a version bump here (`npm i refract-ui@latest`) — not a
+  local patch or a re-implementation in this repo.

@@ -1,6 +1,7 @@
 import GothamBook from 'assets/fonts/gotham-book.woff2';
 import GothamMedium from 'assets/fonts/gotham-medium.woff2';
-import { fontStyles, tokenStyles } from 'components/ThemeProvider';
+import { tokenStyles } from 'refract-ui';
+import { fontStyles } from 'shell/fonts';
 import { Head, Html, Main, NextScript } from 'next/document';
 
 export default function Document() {
@@ -9,6 +10,7 @@ export default function Document() {
       <Head>
         {/* Next auto-injects a charset meta into every page's <head> when none
             is declared via next/head, so a literal one here just duplicates it. */}
+        <meta name="theme-color" content="#111111" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="shortcut icon" href="/favicon.png" type="image/png" />
         <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
