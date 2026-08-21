@@ -1,133 +1,73 @@
 # Theming System
 
-The theme system uses CSS custom properties as its foundation, with React Context for programmatic access.
+The theme system itself — design tokens, `ThemeProvider`, `useTheme`, and dark/light
+theme colors — now lives entirely in [refract-ui](https://github.com/parammehta/refract-ui)
+(`ThemeProvider`, `useTheme`, `tokens`, `tokenStyles` are all exported from the package).
+Full token reference and the `ThemeProvider` API are documented in that package's own
+[Storybook](https://storybook.parammehta.com) — this page only covers the pieces that
+stay in this repo because they're portfolio-specific.
 
 ## How It Works
 
 ```
-theme.js (token definitions)
+refract-ui: theme.ts (token definitions) + ThemeProvider (React Context, generates CSS custom properties)
     |
     v
-ThemeProvider.js (generates CSS custom properties, provides React Context)
-    |
-    v
-_document.page.js (injects token + font CSS as inline <style> tags)
+_document.page.tsx (injects tokenStyles + this site's own fontStyles as inline <style> tags)
     |
     v
 Components consume tokens via var(--tokenName) in CSS Modules
 ```
 
-## Design Tokens
+## Root Provider
 
-Defined in `src/components/ThemeProvider/theme.js`.
+Wired up once in `_app.page.tsx`:
 
-### Base Tokens
-
-Applied to `:root` via CSS custom properties:
-
-| Category | Examples |
-|---|---|
-| Colors | `--rgbBlack`, `--rgbWhite` |
-| Animation | `--bezierFastoutSlowin`, `--durationXS` through `--durationXL` |
-| Typography | `--fontStack` (Gotham), `--systemFontStack`, `--monoFontStack`, `--devanagariFontStack` |
-| Font weights | `--fontWeightRegular` (400), `--fontWeightMedium` (500), `--fontWeightBold` (700) |
-| Font sizes | `--fontSizeH0` through `--fontSizeH5`, `--fontSizeBodyXL` through `--fontSizeBodyXS` |
-| Line heights | `--lineHeightTitle`, `--lineHeightBody` |
-| Max widths | `--maxWidthS`, `--maxWidthM`, `--maxWidthL`, `--maxWidthXL` |
-| Spacing | `--spaceXS` through `--space5XL` |
-| Z-index | `--zIndex0` (0) through `--zIndex5` (64) |
-
-### Responsive Overrides
-
-Tokens adjust at each breakpoint via `@media (max-width)` queries. Breakpoints match `utils/style.js`:
-
-| Breakpoint | Width | Changes |
-|---|---|---|
-| desktop | 2080px | Slightly reduced H0 |
-| laptop | 1680px | Reduced heading sizes |
-| tablet | 1040px | Further reductions, tighter spacing |
-| mobile | 696px | Smallest heading/body sizes |
-| mobileS | 400px | Minimal sizes |
-
-### Theme Colors
-
-Two themes: `dark` and `light`. Applied via `[data-theme]` attribute selectors.
-
-| Token | Dark | Light |
-|---|---|---|
-| `--rgbBackground` | `17 17 17` | `242 242 242` |
-| `--rgbBackgroundLight` | `38 38 38` | `230 230 230` |
-| `--rgbPrimary` | `251 146 60` (orange) | `251 146 60` (orange) |
-| `--rgbAccent` | `251 146 60` | `251 146 60` |
-| `--rgbText` | `255 255 255` | `0 0 0` |
-| `--rgbError` | `255 55 102` | `255 0 60` |
-
-Derived properties use CSS `rgb()` with alpha channels for text opacity levels (e.g., `--colorTextTitle`, `--colorTextBody`, `--colorTextLight`).
-
-## ThemeProvider Component
-
-Located at `src/components/ThemeProvider/ThemeProvider.js`.
-
-### Usage
-
-```jsx
-// Root provider (in _app.page.js)
-<ThemeProvider themeId={storedTheme}>
-  {children}
-</ThemeProvider>
-
-// Nested provider (for inverted sections)
-<ThemeProvider themeId="light" as="section">
+```tsx
+<ThemeProvider themeId={state.theme}>
   {children}
 </ThemeProvider>
 ```
 
-### Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `themeId` | `'dark' \| 'light'` | `'dark'` | Active theme |
-| `theme` | object | — | Token overrides merged on top |
-| `as` | elementType | `'div'` | Wrapper element for nested providers |
-
-### Root vs Nested Behavior
-
-- **Root:** Sets `data-theme` on `document.body`, persists to localStorage, sets `<meta name="theme-color">`. Renders children directly (no wrapper element).
-- **Nested:** Wraps children in an element with `data-theme` attribute for CSS scoping. Used for sections that need the opposite theme.
+`state.theme` comes from `AppContext` (see [Layouts and Pages](layouts-and-pages.md#app-shell-srcshell)),
+which is itself seeded from `localStorage` via `useLocalStorage('theme', 'dark')`. Nested
+`<ThemeProvider themeId="light" as="section">` usages elsewhere in the app flip a subtree
+to the opposite theme (e.g. inverted sections) — see `refract-ui`'s Storybook for the full
+root-vs-nested behavior.
 
 ## useTheme Hook
 
-```js
-import { useTheme } from 'components/ThemeProvider';
+```ts
+import { useTheme } from 'refract-ui';
 
 const theme = useTheme();
 // theme.themeId, theme.rgbBackground, theme.colorTextTitle, etc.
 ```
 
-Returns the full theme token object for the active theme (nearest ThemeProvider ancestor).
+Returns the full theme token object for the active theme (nearest `ThemeProvider`
+ancestor). Used throughout this repo — e.g. `Navbar`'s theme-inversion scroll logic,
+`HeroSphere`'s GLSL uniforms, `Code`'s `data-theme` wrapper.
 
 ## Flash Prevention
 
-`_document.page.js` injects an inline script before React hydrates:
+`_document.page.tsx` injects an inline script before React hydrates:
 
 ```js
-const theme = localStorage.getItem('theme');
-document.body.dataset.theme = theme || 'dark';
+const initialTheme = JSON.parse(localStorage.getItem('theme'));
+document.body.dataset.theme = initialTheme || 'dark';
 ```
 
 This sets the correct `data-theme` attribute before the first paint, preventing a flash of the wrong theme on page load.
 
-## Fonts
+## Fonts (site-specific)
 
-Gotham font family loaded via `@font-face` declarations injected as inline CSS in `_document.page.js`:
-
-| Weight | Style | File |
-|---|---|---|
-| 400 (Book) | normal, italic | woff2 |
-| 500 (Medium) | normal, italic | woff2 |
-| 700 (Bold) | normal, italic | woff2 |
-
-Font display strategy: `block` (invisible text until font loads).
+Gotham is commercially licensed, so it can't ship inside the public `refract-ui` package —
+`refract-ui` only ever sees the generic `--brandFontStack` custom property. This repo
+supplies the actual font: `src/shell/fonts.ts` builds `fontStyles`, a string of
+`@font-face` declarations (Book/Medium/Bold, each normal + italic, woff2) built with
+`refract-ui`'s `squish()` helper, imported once for its side effect in `_app.page.tsx` and
+rendered into `<head>` by `_document.page.tsx` alongside `refract-ui`'s `tokenStyles`.
+Font display strategy: `block` (invisible text until the font loads).
 
 ## Using Tokens in CSS Modules
 
@@ -138,18 +78,15 @@ Font display strategy: `block` (invisible text until font loads).
   margin-bottom: var(--spaceL);
   transition: color var(--durationM) var(--bezierFastoutSlowin);
 }
-
-@media (max-width: 696px) {
-  /* Tokens auto-adjust via the responsive overrides — 
-     usually no manual media queries needed for font sizes */
-}
 ```
+
+Tokens auto-adjust at breakpoints via `refract-ui`'s responsive overrides — usually no
+manual media queries are needed just to resize type.
 
 ## Using Tokens in JavaScript
 
-```js
-import { tokens } from 'components/ThemeProvider/theme';
-import { useTheme } from 'components/ThemeProvider';
+```ts
+import { tokens, useTheme } from 'refract-ui';
 
 // Static access to base tokens
 const duration = tokens.base.durationM;  // '0.4s'

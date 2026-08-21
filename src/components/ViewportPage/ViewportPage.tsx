@@ -1,8 +1,11 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { Breadcrumbs, type BreadcrumbItem } from 'components/Breadcrumbs';
-import { Heading } from 'components/Heading';
-import { ScrambleReveal } from 'components/ScrambleReveal';
-import { Section } from 'components/Section';
+import {
+  Breadcrumbs,
+  type BreadcrumbItem,
+  Heading,
+  ScrambleReveal,
+  Section,
+} from 'refract-ui';
 import { classes } from 'utils/style';
 import styles from './ViewportPage.module.css';
 
@@ -37,7 +40,9 @@ export const ViewportPage = ({
 
   return (
     <Section as="section" className={classes(styles.page, className)}>
-      {!!breadcrumbs?.length && <Breadcrumbs className={styles.breadcrumbs} items={breadcrumbs} />}
+      {!!breadcrumbs?.length && (
+        <Breadcrumbs className={styles.breadcrumbs} items={breadcrumbs} />
+      )}
       <Heading className={styles.title} level={2} as="h1" data-visible={visible}>
         <ScrambleReveal text={title} start={visible} />
       </Heading>

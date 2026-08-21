@@ -1,5 +1,4 @@
-import { Button } from 'components/Button';
-import { Icon } from 'components/Icon';
+import { Button, Icon } from 'refract-ui';
 import type { ComponentPropsWithoutRef } from 'react';
 import styles from './NavToggle.module.css';
 

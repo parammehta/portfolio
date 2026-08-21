@@ -1,200 +1,75 @@
 # Components Reference
 
-All components live in `src/components/` with a consistent directory structure:
+`src/components/` now holds only **site-specific** components — ones that depend on
+portfolio content (`AppContext`, nav links, footer copy) or this site's routing. Every
+shared, content-agnostic primitive (Button, Text, Image, Model, Carousel, ThemeProvider,
+Heading, Icon, Input/TextArea, Link, List, Loader, Section, SegmentedControl, Table,
+Transition, VisuallyHidden, Wordmark, Divider, ScrambleReveal, and more) was extracted into
+[refract-ui](https://github.com/parammehta/refract-ui), a separately published/versioned
+package. Its props and behavior are documented in that package's own
+[Storybook](https://storybook.parammehta.com) — this file doesn't duplicate them.
+
+Each component here lives in its own directory:
 
 ```
 ComponentName/
-  ComponentName.js          Implementation
+  ComponentName.tsx          Implementation
   ComponentName.module.css  Styles
-  ComponentName.stories.js  Storybook story
-  index.js                  Re-export
+  index.ts                  Re-export
 ```
 
-Components are re-exported from `src/components/index.js` for convenient imports.
+There are no `.stories.tsx` files in this repo — Storybook for shareable components moved
+to refract-ui along with the components themselves. None of the components below ever had
+library-shippable stories anyway, since they depend on portfolio-specific data.
 
 ---
 
-## Button
+## ArchitectureDiagram
 
-Polymorphic button/link component.
+Interactive diagram of this site's infrastructure (client, edge/CDN, storage, API,
+external services, CI/CD), used on the `/articles/anatomy-of-this-site` post. Renders a
+positioned node graph with animated SVG connector paths.
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `href` | string | — | If set, renders as a link. External URLs (`://`) render `<a>`, internal use Next.js `Link` |
-| `secondary` | boolean | — | Secondary visual style |
-| `loading` | boolean | — | Shows animated `Loader` overlay |
-| `loadingText` | string | `'loading'` | Screen reader text during loading |
-| `icon` | string | — | Leading icon name |
-| `iconEnd` | string | — | Trailing icon name |
-| `iconOnly` | boolean | — | Hides text, shows only icon |
-| `iconHoverShift` | boolean | — | Icon shifts on hover |
-| `as` | elementType | — | Override rendered element |
+- A `SegmentedControl` (from refract-ui) switches between an overview and three flows —
+  page load, contact form submit, and deploy — each highlighting the nodes/edges involved.
+- Clicking a node toggles isolation of just that node's connected edges and shows its
+  detail text in a live-region panel below the diagram.
+- Below a `560px` container width the board switches to a stacked, non-scaled list of
+  nodes (`compact` mode) instead of shrinking the diagram past legibility.
+- Connector paths are recomputed from `offsetLeft`/`offsetTop` measurements (immune to the
+  CSS `transform: scale` used to fit the board) on mount, resize (via `ResizeObserver`),
+  and once web fonts finish loading.
 
-External links automatically get `rel="noopener noreferrer"` and `target="_blank"`.
-
----
-
-## Carousel
-
-WebGL-powered image carousel with displacement-shader transitions.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `width` | number | — | Canvas width |
-| `height` | number | — | Canvas height |
-| `images` | `Array<{alt, src, srcSet}>` | — | Slide images |
-| `placeholder` | string | — | Placeholder shown while textures load |
-
-Features: pointer swipe/drag, keyboard nav (arrow keys), dot navigation, spring-based transitions. Respects reduced motion. Lazy-loads textures when in viewport.
+No props — the node/edge/flow data is hardcoded for this site's own architecture.
 
 ---
 
 ## Code
 
-Syntax-highlighted code block with copy button.
+Syntax-highlighted code block wrapper with a copy button, used inside MDX blog posts.
 
-Detects language from className (e.g., `language-js`). Renders a language label, `<pre>` block, and a copy-to-clipboard button with check feedback.
-
----
-
-## ScrambleReveal
-
-Animated text reveal that scrambles through Devanagari glyphs before settling on the target text.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `text` | string | — | Final text to reveal |
-| `start` | boolean | `true` | Whether to begin the animation |
-| `delay` | number | `0` | Delay before animation starts (ms) |
-
-Uses `framer-motion` springs. Directly manipulates `innerHTML` for performance (avoids per-frame React re-renders). Respects reduced motion. Renders a `VisuallyHidden` element with the real text for screen readers.
-
----
-
-## Divider
-
-Horizontal line with an optional notch accent.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `lineWidth` | string | `'100%'` | Line width |
-| `lineHeight` | string | `'2px'` | Line thickness |
-| `notchWidth` | string | `'90px'` | Notch width |
-| `notchHeight` | string | `'10px'` | Notch height |
-| `collapsed` | boolean | `false` | Animate to collapsed state |
-| `collapseDelay` | number | `0` | Delay before collapse (ms) |
-| `notch` | boolean | `true` | Show the notch |
-| `light` | boolean | `false` | Light color variant |
+- Detects language from a `className` like `language-js` (the convention `mdx-bundler`'s
+  highlighter emits) and renders it as a label.
+- Renders the given `<pre>`/children via the `className`/other DOM props spread onto a
+  `<pre>` element, plus an icon-only `Button` (from refract-ui) that copies the block's
+  `textContent` to the clipboard and swaps a copy icon for a check icon for two seconds.
 
 ---
 
 ## Footer
 
-Site footer. Renders copyright with current year and a "Crafted by yours truly" link to `/humans.txt`.
-
----
-
-## Heading
-
-Polymorphic heading element.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `level` | number | `1` | Heading level (0-5). Level 0 renders as `<h1>` with `data-level={0}` |
-| `as` | elementType | — | Override element (e.g., `'h3'`) |
-| `align` | string | `'auto'` | Text alignment |
-| `weight` | string | `'medium'` | Font weight |
-
----
-
-## Icon
-
-SVG icon component. Looks up icons by name from an internal map.
+Site footer. Renders copyright with the current year and a "Crafted by yours truly" link
+to `/humans.txt`.
 
 | Prop | Type | Description |
 |---|---|---|
-| `icon` | string | Icon name key |
-
-Available icons: `arrowLeft`, `arrowRight`, `articles`, `company`, `check`, `chevronRight`, `close`, `copy`, `error`, `figma`, `github`, `link`, `linkedin`, `menu`, `pause`, `play`, `send`, `skills`, `twitter`.
-
----
-
-## Image
-
-Responsive image/video component with lazy loading, placeholder fade-out, and reveal animations.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `src` | string | — | Image/video source (`.mp4` renders as video) |
-| `srcSet` | string/array | — | Responsive image sources |
-| `placeholder` | string | — | Low-res placeholder image |
-| `reveal` | boolean | — | Enable reveal animation |
-| `delay` | number | `0` | Reveal delay (ms) |
-| `raised` | boolean | — | Raised shadow style |
-| `alt` | string | — | Alt text |
-| `sizes` | string | — | Sizes attribute for srcSet |
-
-Videos render as `<video>` (muted, looped, playsInline) with play/pause toggle. Lazy-loads full source when in viewport via `useInViewport`. Respects reduced motion for video autoplay.
-
----
-
-## Input / TextArea
-
-Form input with floating label, underline focus indicator, and animated error messages.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `id` | string | — | Input ID (auto-generated if omitted) |
-| `label` | string | — | Floating label text |
-| `value` | string | — | Current value |
-| `multiline` | boolean | — | Renders `TextArea` instead |
-| `error` | string | — | Error message |
-| `required` | boolean | — | HTML5 required |
-| `maxLength` | number | — | Max character count |
-
-`TextArea` auto-grows based on content, measuring line height and scroll height.
-
----
-
-## Link
-
-Smart link component.
-
-| Prop | Type | Description |
-|---|---|---|
-| `href` | string | Destination URL |
-| `secondary` | boolean | Secondary style variant |
-
-External URLs (containing `://`), hash links (`#`), and file extensions (`.txt`, `.png`, `.jpg`) render as plain `<a>` tags. Everything else uses Next.js `Link` with `scroll={false}`.
-
----
-
-## List / ListItem
-
-Thin wrappers around `<ul>`/`<ol>` and `<li>` for consistent styling.
-
-| Prop (List) | Type | Default | Description |
-|---|---|---|---|
-| `ordered` | boolean | — | Renders `<ol>` instead of `<ul>` |
-
----
-
-## Loader
-
-Animated loading indicator with three animated spans.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `size` | number | `32` | Size in pixels |
-| `text` | string | `'Loading...'` | Screen reader text |
-
-Renders a `VisuallyHidden` `aria-live="assertive"` announcement via portal. Falls back to text display when reduced motion is preferred.
+| `className` | string | Optional extra class |
 
 ---
 
 ## Meta
 
-SEO head component.
+SEO head component (wraps `next/head`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -202,125 +77,94 @@ SEO head component.
 | `description` | string | — | Meta description |
 | `prefix` | string | `'Param Mehta'` | Title prefix (joined with ` \| `) |
 | `ogImage` | string | `social-image.png` | OpenGraph image URL |
+| `ogType` | `'website' \| 'article'` | `'website'` | OpenGraph type |
+| `publishedTime` | string | — | ISO date; only rendered when `ogType` is `'article'` |
 
-Outputs OpenGraph and Twitter Card (`summary_large_image`) meta tags.
-
----
-
-## Model
-
-Three.js 3D device model viewer (phones and laptops).
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `models` | array | — | Model configs (type, textures, position, etc.) |
-| `show` | boolean | `true` | Whether to show the model |
-| `showDelay` | number | `0` | Entry animation delay (ms) |
-| `cameraPosition` | object | `{x:0, y:0, z:8}` | Camera position |
-| `alt` | string | — | Accessible description |
-
-Features: mouse-tracking rotation (framer-motion springs), adaptive quality (drops pixel ratio on low FPS), shadow rendering with blur passes, two animation types (`SpringUp` for phones, `LaptopOpen` for laptops), two-phase texture loading (placeholder then full-res with crossfade).
-
-Device types defined in `deviceModels.js`:
-- `phone` — iPhone 11 model (374x512 screen)
-- `laptop` — MacBook Pro model (1280x800 screen)
-
----
-
-## Wordmark
-
-SVG logo/monogram with optional highlight.
-
-| Prop | Type | Description |
-|---|---|---|
-| `highlight` | boolean | Show highlighted overlay |
-
-Uses `useId()` for unique SVG clip-path IDs.
+Outputs OpenGraph and Twitter Card (`summary_large_image`) meta tags. The canonical
+`og:url` is derived from the router the same way `_app.page.tsx` computes its `<link
+rel="canonical">`, so the two always agree.
 
 ---
 
 ## Navbar
 
-Site navigation header. No props — uses hooks for all state.
+Site navigation header. No props — uses hooks (`useAppContext`, `useScrollToHash`,
+`useWindowSize`) and the router for all state.
 
-**Desktop:** Logo link, horizontal nav links with scroll-spy active state, social icon links, theme toggle.
+**Desktop:** Logo link, horizontal nav links with scroll-spy active state, social icon
+links, theme toggle.
 
-**Mobile:** Logo, hamburger toggle, animated drawer with nav links and theme toggle.
+**Mobile:** Logo, hamburger toggle (`NavToggle`), animated drawer with nav links and theme
+toggle.
 
-**Scroll-spy:** On the home route, an `IntersectionObserver` highlights the nav link matching the currently visible section.
+**Scroll-spy:** On the home route, an `IntersectionObserver` highlights the nav link
+matching the currently visible `/#hash` section (tracked via `hashIds` derived from
+`navData.ts`).
 
-**Theme inversion:** On light theme, monitors scroll to detect when nav items overlap `[data-invert]` sections and dynamically flips item themes for contrast.
+**Theme inversion:** On light theme, monitors scroll to detect when nav items overlap
+`[data-invert]` sections and dynamically flips item themes for contrast.
 
-Navigation data in `navData.js`:
-- Nav links: Profile, Experience, Skills, Resume, Articles, Contact
+Navigation data in `navData.ts`:
+- Nav links: Profile (`/#profile`), Experience (`/experience`), Skills (`/skills`), Resume
+  (`/resume`), Articles (`/articles`), Contact (`/#contact`)
 - Social links: Twitter, LinkedIn, GitHub
 
----
-
-## Section
-
-Generic section wrapper. Polymorphic via `as` prop (default `'div'`). Uses `forwardRef`.
+Sub-components in the same directory: `NavToggle` (hamburger button), `NavbarSubmenu`
+(`NavGroup`, unused by any current link but kept for a future submenu), `ThemeToggle`.
 
 ---
 
-## SegmentedControl
+## Page
 
-Radio-group style segmented control with animated indicator.
+A composable building-block system for long-form, normally-scrolling pages (articles,
+posts, resume, experience detail pages). Exports (all in `src/components/Page/Page.tsx`):
+
+| Component | Purpose |
+|---|---|
+| `PageHeader` | Title (`ScrambleReveal`), description, optional link button, optional breadcrumbs and role list |
+| `PageContainer` | `<article>` wrapper |
+| `PageSection` | Section with optional background overlay, `light`/`fullHeight`/`padding` data attributes |
+| `PageBackground` | Parallax background image with scrim (`useParallax(0.6, ...)`) |
+| `PageImage` | Reveal-animated image |
+| `PageSectionContent` | Content wrapper (`width` data attribute) |
+| `PageSectionHeading` | Section heading |
+| `PageSectionText` | Section body text |
+| `PageTextRow` | Text row with width/alignment/justify options |
+| `PageSectionColumns` | Multi-column layout |
+
+Used by the Resume page and the experience index. The near-identical
+`Experience*`-prefixed set in `src/pages/experience/_shared/Experience.tsx` follows the
+same pattern for the per-company experience detail pages, but lives alongside those pages
+rather than in `src/components/` since it isn't reused elsewhere — see
+[Layouts and Pages](layouts-and-pages.md#experience-detail-srcpagesexperience_shared).
+
+---
+
+## StructuredData
+
+Injects JSON-LD structured data into `<head>` via `next/head`.
 
 | Prop | Type | Description |
 |---|---|---|
-| `currentIndex` | number | Selected option index |
-| `onChange` | function | Called with new index on selection |
-| `label` | string | Accessible label |
+| `schema` | `object \| object[]` | JSON-LD schema object(s), serialized with `JSON.stringify` |
 
-Options self-register via React Context. Indicator position tracked with `ResizeObserver`. Keyboard nav with arrow keys (roving tabindex pattern).
+Used with schema builders in `utils/structuredData.ts` (e.g. `personSchema`).
 
 ---
 
-## Table
+## ViewportPage
 
-Thin wrappers around HTML table elements: `Table`, `TableRow`, `TableHead`, `TableBody`, `TableHeadCell`, `TableCell`. Purely presentational.
+Shell for routes that must fit exactly one viewport: breadcrumbs and a title
+(`ScrambleReveal`) at the top, then a content region that takes whatever height is left.
 
----
+| Prop | Type | Description |
+|---|---|---|
+| `title` | string | Page title |
+| `breadcrumbs` | `BreadcrumbItem[]` | Optional breadcrumb trail (type from refract-ui) |
+| `className` | string | Optional extra class |
+| `children` | ReactNode | Content region |
 
-## Text
-
-Polymorphic text component.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `size` | string | `'m'` | Text size variant |
-| `as` | elementType | `'span'` | Rendered element |
-| `align` | string | `'auto'` | Text alignment |
-| `weight` | string | `'auto'` | Font weight |
-| `secondary` | boolean | — | Secondary color |
-
----
-
-## Transition
-
-CSS transition orchestrator. Wraps Framer Motion's `AnimatePresence`/`usePresence`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `in` | boolean | — | Whether content is shown |
-| `timeout` | number/object | `0` | Duration in ms, or `{enter, exit}` |
-| `unmount` | boolean | — | Remove from DOM after exit |
-| `onEnter` | function | — | Called when entering starts |
-| `onEntered` | function | — | Called when entering completes |
-| `onExit` | function | — | Called when exiting starts |
-| `onExited` | function | — | Called when exiting completes |
-
-Children is a render function: `(visible: boolean, status: string) => ReactNode`. Status is one of `'entering'`, `'entered'`, `'exiting'`, `'exited'`.
-
----
-
-## VisuallyHidden
-
-Screen-reader-only element. Hidden via CSS but accessible.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `as` | elementType | `'span'` | Rendered element |
-| `showOnFocus` | boolean | — | Become visible when focused (for skip links) |
-| `visible` | boolean | — | Override to make always visible |
+Since these routes have no parent `IntersectionObserver` to reveal them, the entrance
+animation is driven off mount (`requestAnimationFrame` before flipping `visible`) instead.
+Used by the Skills and Experience index pages. Routes with inherently long content use
+`components/Page` instead and scroll normally.

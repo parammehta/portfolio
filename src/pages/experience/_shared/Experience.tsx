@@ -1,15 +1,21 @@
-import { forwardRef, type ElementType, type HTMLAttributes, type ReactNode, useRef } from 'react';
+import {
+  forwardRef,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactNode,
+  useRef,
+} from 'react';
+import { StructuredData } from 'components';
 import {
   Breadcrumbs,
   Button,
   Heading,
   Image,
   Section,
-  StructuredData,
   Text,
   Transition,
-} from 'components';
-import { tokens } from 'components/ThemeProvider';
+  tokens,
+} from 'refract-ui';
 import { useParallax } from 'hooks';
 import { breadcrumbListSchema } from 'utils/structuredData';
 import { classes, cssProps, msToNum, numToMs } from 'utils/style';
@@ -150,7 +156,11 @@ interface ExperienceBackgroundProps {
   [key: string]: unknown;
 }
 
-export const ExperienceBackground = ({ opacity = 0.7, className, ...rest }: ExperienceBackgroundProps) => {
+export const ExperienceBackground = ({
+  opacity = 0.7,
+  className,
+  ...rest
+}: ExperienceBackgroundProps) => {
   const imageRef = useRef<HTMLDivElement>(null);
 
   useParallax(0.6, (value: number) => {
@@ -192,7 +202,11 @@ interface ExperienceSectionContentProps extends HTMLAttributes<HTMLDivElement> {
   width?: string;
 }
 
-export const ExperienceSectionContent = ({ className, width = 'l', ...rest }: ExperienceSectionContentProps) => (
+export const ExperienceSectionContent = ({
+  className,
+  width = 'l',
+  ...rest
+}: ExperienceSectionContentProps) => (
   <div
     className={classes(styles.sectionContent, className)}
     data-width={width}
@@ -227,7 +241,10 @@ interface ExperienceSectionTextProps {
   [key: string]: unknown;
 }
 
-export const ExperienceSectionText = ({ className, ...rest }: ExperienceSectionTextProps) => (
+export const ExperienceSectionText = ({
+  className,
+  ...rest
+}: ExperienceSectionTextProps) => (
   <Text className={classes(styles.sectionText, className)} size="l" as="p" {...rest} />
 );
 
@@ -268,7 +285,11 @@ interface ExperienceSectionColumnsProps extends HTMLAttributes<HTMLDivElement> {
   centered?: boolean;
 }
 
-export const ExperienceSectionColumns = ({ className, centered, ...rest }: ExperienceSectionColumnsProps) => (
+export const ExperienceSectionColumns = ({
+  className,
+  centered,
+  ...rest
+}: ExperienceSectionColumnsProps) => (
   <ExperienceSectionContent
     className={classes(styles.sectionColumns, className)}
     data-centered={centered}

@@ -1,5 +1,12 @@
-import { Children, type ComponentType, type HTMLAttributes, type ImgHTMLAttributes, type ReactNode } from 'react';
-import { ArchitectureDiagram, Code, Heading, Icon, Link, List, ListItem, Text } from 'components';
+import {
+  Children,
+  type ComponentType,
+  type HTMLAttributes,
+  type ImgHTMLAttributes,
+  type ReactNode,
+} from 'react';
+import { ArchitectureDiagram, Code } from 'components';
+import { Heading, Icon, Link, List, ListItem, Text } from 'refract-ui';
 import styles from './PostMarkdown.module.css';
 
 interface PostHeadingLinkProps {
@@ -66,7 +73,9 @@ const PostParagraph = ({ children, ...rest }: PostParagraphProps) => {
   );
 };
 
-const PostLink = ({ ...props }: HTMLAttributes<HTMLAnchorElement> & { href?: string }) => <Link {...props} />;
+const PostLink = ({
+  ...props
+}: HTMLAttributes<HTMLAnchorElement> & { href?: string }) => <Link {...props} />;
 
 const PostUl = (props: HTMLAttributes<HTMLUListElement>) => {
   return <List className={styles.list} {...props} />;
@@ -114,7 +123,13 @@ const PostStrong = (props: HTMLAttributes<HTMLElement>) => {
   return <strong className={styles.strong} {...props} />;
 };
 
-const PostImage = ({ src, alt, width, height, ...rest }: ImgHTMLAttributes<HTMLImageElement>) => {
+const PostImage = ({
+  src,
+  alt,
+  width,
+  height,
+  ...rest
+}: ImgHTMLAttributes<HTMLImageElement>) => {
   return (
     <img
       className={styles.image}
