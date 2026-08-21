@@ -22,13 +22,7 @@
       "utils/*": ["utils/*"],
       "shell/*": ["shell/*"],
       "assets/*": ["assets/*"],
-      "pages/*": ["pages/*"],
-
-      // refract-ui@1.0.1 emits its subpath types at dist/entries/*.d.ts but
-      // points exports["./model"].types at dist/model.d.ts, which it never
-      // ships. The runtime entry resolves fine; only the types 404. Remove
-      // this once the package's exports map is fixed upstream.
-      "refract-ui/model": ["../node_modules/refract-ui/dist/entries/model.d.ts"]
+      "pages/*": ["pages/*"]
     },
     "plugins": [
       {
