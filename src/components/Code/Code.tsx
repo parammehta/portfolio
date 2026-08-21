@@ -1,9 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button } from 'components/Button';
-import { Icon } from 'components/Icon';
-import { Text } from 'components/Text';
-import { Transition } from 'components/Transition';
-import { useTheme } from 'components/ThemeProvider';
+import { Button, Icon, Text, Transition, useTheme } from 'refract-ui';
 import styles from './Code.module.css';
 
 interface CodeProps {

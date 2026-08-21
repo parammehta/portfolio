@@ -81,6 +81,15 @@ test.describe('navigation', () => {
     await expect(page).toHaveURL(/\/skills\/?$/);
   });
 
+  test('shows tech chips for the selected role on the experience page', async ({ page }) => {
+    // Regression test: the tech chip row was previously hidden entirely on
+    // mobile via a `display: none` breakpoint, so this must run on both
+    // projects rather than skip on mobile.
+    await page.goto('/experience/');
+
+    await expect(page.getByText('Design Systems')).toBeVisible();
+  });
+
   test('the skip link jumps to main content', async ({ page }) => {
     await page.goto('/');
 

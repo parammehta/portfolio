@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import { Link, Meta } from 'components';
+import { Meta } from 'components';
+import { Link } from 'refract-ui';
 
 // The contact form moved from its own route to a section on the home page
 // (`/#contact`), but `/contact/` was a live, indexed URL — external links and
@@ -21,7 +22,8 @@ export default function ContactRedirect() {
         <meta name="robots" content="noindex" />
       </Head>
       <p>
-        This page has moved. Redirecting to <Link href="/#contact">the contact section</Link>.
+        This page has moved. Redirecting to{' '}
+        <Link href="/#contact">the contact section</Link>.
       </p>
     </>
   );

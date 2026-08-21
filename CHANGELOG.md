@@ -1,5 +1,110 @@
 # Changelog
 
+## [1.16.0](https://github.com/parammehta/portfolio/compare/v1.15.0...v1.16.0) (2026-08-21)
+
+
+### Features
+
+* consume refract-ui, retire local copies of extracted components ([#74](https://github.com/parammehta/portfolio/issues/74)) ([3cb9368](https://github.com/parammehta/portfolio/commit/3cb9368b3e8ac8d869e642bcccf9dc9669968cc7))
+
+## [1.15.0](https://github.com/parammehta/portfolio/compare/v1.14.0...v1.15.0) (2026-08-21)
+
+
+### Features
+
+* themed book-a-chat button and contact layout fixes ([#72](https://github.com/parammehta/portfolio/issues/72)) ([b28cb82](https://github.com/parammehta/portfolio/commit/b28cb8256c2d7842cd58774cec2cc742566d943f))
+
+## [1.14.0](https://github.com/parammehta/portfolio/compare/v1.13.0...v1.14.0) (2026-08-20)
+
+
+### Features
+
+* use the resume's spare page space for work that was cut ([b0213a3](https://github.com/parammehta/portfolio/commit/b0213a306f80e7b394a81b85b9d6c8c444957834))
+
+## [1.13.0](https://github.com/parammehta/portfolio/compare/v1.12.2...v1.13.0) (2026-08-20)
+
+
+### Features
+
+* engineer-forward resume and Intuit experience copy ([#69](https://github.com/parammehta/portfolio/issues/69)) ([79b75e1](https://github.com/parammehta/portfolio/commit/79b75e1b3b788fb9ae36128671db57b8416ddbef))
+
+## [1.12.2](https://github.com/parammehta/portfolio/compare/v1.12.1...v1.12.2) (2026-08-19)
+
+
+### Bug Fixes
+
+* recover 3 orphaned commits, make tooltips keyboard/touch accessible ([#67](https://github.com/parammehta/portfolio/issues/67)) ([6127cf9](https://github.com/parammehta/portfolio/commit/6127cf9ad7dc43d23a68df9773e8189ff37fcafd))
+
+## [1.12.1](https://github.com/parammehta/portfolio/compare/v1.12.0...v1.12.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** replace native title tooltips with real CSS tooltips ([#65](https://github.com/parammehta/portfolio/issues/65)) ([b519941](https://github.com/parammehta/portfolio/commit/b51994172a8ddb1a54fb90f2420bf2b2203bffb2))
+
+## [1.12.0](https://github.com/parammehta/portfolio/compare/v1.11.6...v1.12.0) (2026-08-19)
+
+
+### Features
+
+* add visitors, per-page, theme and week-over-week panels ([#62](https://github.com/parammehta/portfolio/issues/62)) ([7a068a8](https://github.com/parammehta/portfolio/commit/7a068a8570068f705d35ffc7aa3a53aeaf1118f7))
+
+## [1.11.6](https://github.com/parammehta/portfolio/compare/v1.11.5...v1.11.6) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** plot events-per-day on a real time axis ([#61](https://github.com/parammehta/portfolio/issues/61)) ([7496462](https://github.com/parammehta/portfolio/commit/74964620982e7e982a6bcba55579f142c9a94e4a))
+
+## [1.11.5](https://github.com/parammehta/portfolio/compare/v1.11.4...v1.11.5) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** fix dashboard legibility — no visible numbers, chopped labels ([#59](https://github.com/parammehta/portfolio/issues/59)) ([63fd7b0](https://github.com/parammehta/portfolio/commit/63fd7b03f3dc34e9a06a4cb6be395754dd6dbdb5))
+
+## [1.11.4](https://github.com/parammehta/portfolio/compare/v1.11.3...v1.11.4) (2026-08-19)
+
+
+### Bug Fixes
+
+* prevent dashboard queries from breaking each other, add verify script ([#56](https://github.com/parammehta/portfolio/issues/56)) ([d88e074](https://github.com/parammehta/portfolio/commit/d88e074787f3ea4f76e6a5b5b602fab014caabff))
+
+## [1.11.3](https://github.com/parammehta/portfolio/compare/v1.11.2...v1.11.3) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** use format() not concat() for the interactions query ([#55](https://github.com/parammehta/portfolio/issues/55)) ([99cae3c](https://github.com/parammehta/portfolio/commit/99cae3cfa2f35c162bea43b8d6a3617316647ce4))
+
+## [1.11.2](https://github.com/parammehta/portfolio/compare/v1.11.1...v1.11.2) (2026-08-19)
+
+
+### Bug Fixes
+
+* accept all site analytics events, add dashboard graphs ([#52](https://github.com/parammehta/portfolio/issues/52)) ([76b36c4](https://github.com/parammehta/portfolio/commit/76b36c45d0cfaa28297c5145ce5411a408042279))
+
+## [1.11.1](https://github.com/parammehta/portfolio/compare/v1.11.0...v1.11.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **worker:** render sparkline when only one day has data ([#51](https://github.com/parammehta/portfolio/issues/51)) ([a32b12e](https://github.com/parammehta/portfolio/commit/a32b12e26d1d48c2c884a79598d02f6079b21668))
+
+## [1.11.0](https://github.com/parammehta/portfolio/compare/v1.10.1...v1.11.0) (2026-08-19)
+
+
+### Features
+
+* add a Cloudflare Access-protected analytics dashboard ([#26](https://github.com/parammehta/portfolio/issues/26)) ([e405d06](https://github.com/parammehta/portfolio/commit/e405d0630a25c06cc223b5792d21b5b8e25cbcc6))
+
+## [1.10.1](https://github.com/parammehta/portfolio/compare/v1.10.0...v1.10.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* show tech chips on mobile experience page ([#43](https://github.com/parammehta/portfolio/issues/43)) ([15540a0](https://github.com/parammehta/portfolio/commit/15540a077b027923ddb5e931575a440fb4e70ca8))
+
 ## [1.10.0](https://github.com/parammehta/portfolio/compare/v1.9.0...v1.10.0) (2026-08-18)
 
 
