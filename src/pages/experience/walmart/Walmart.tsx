@@ -14,18 +14,19 @@ import { Footer, Image, Meta } from 'components';
 import {
   ExperienceBackground,
   ExperienceContainer,
+  ExperienceDevices,
   ExperienceHeader,
   ExperienceImage,
   ExperienceSection,
-  ExperienceSectionColumns,
   ExperienceSectionContent,
   ExperienceSectionHeading,
   ExperienceSectionText,
   ExperienceTextRow,
+  laptopModel,
+  phoneModels,
 } from 'pages/experience/_shared';
 import { Fragment } from 'react';
 import { media } from 'utils/style';
-import styles from './Walmart.module.css';
 
 const title = 'Senior Software Engineer at Walmart';
 const description =
@@ -35,7 +36,7 @@ const roles = ['Full Stack', 'Design Systems', 'React + GraphQL', 'Next.js'];
 export const Walmart = () => {
   return (
     <Fragment>
-      <ExperienceContainer className={styles.walmart}>
+      <ExperienceContainer>
         <Meta title={title} prefix="Experiences" description={description} />
         <ExperienceBackground
           opacity={0.5}
@@ -66,17 +67,13 @@ export const Walmart = () => {
         </ExperienceSection>
         <ExperienceSection light>
           <ExperienceSectionContent>
-            <Image
-              raised
-              srcSet={[walmartCoreComponents]}
-              placeholder={walmartCoreComponents}
+            <ExperienceDevices
+              device="laptop"
+              side="right"
               alt="A component library documentation site showing button variants, theme tokens, and the products that use them."
-              sizes={`(max-width: ${media.mobile}px) 100vw, (max-width: ${media.tablet}px) 800px, 1000px`}
-            />
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                First stop: the Core Components team
-              </ExperienceSectionHeading>
+              heading={<>First stop: the Core Components team</>}
+              models={laptopModel(walmartCoreComponents)}
+            >
               <ExperienceSectionText>
                 I spent my first year on Marketplace &amp; UGC embedded in Walmart&apos;s
                 Core Components team, which builds and manages the shared component
@@ -91,7 +88,7 @@ export const Walmart = () => {
                 integrate components correctly &mdash; habits I carried into the seller
                 re-platform work that followed.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
@@ -131,35 +128,22 @@ export const Walmart = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionColumns centered className={styles.columns}>
-            <div className={styles.imagesText}>
-              <ExperienceSectionHeading>
-                ADA-compliant star ratings
-              </ExperienceSectionHeading>
+          <ExperienceSectionContent>
+            <ExperienceDevices
+              device="phone"
+              side="left"
+              alt="The mobile product page showing the redesigned star rating, and the mobile review submission flow."
+              heading={<>ADA-compliant star ratings</>}
+              models={phoneModels(walmartMobileSeller1, walmartMobileSeller2)}
+            >
               <ExperienceSectionText>
                 I redesigned the star-rating component for ADA compliance, reducing its
                 bundle size by 10% and improving rendering performance across the product
                 and purchase review flows it appeared in &mdash; built once and shipped
                 consistently across both the Walmart.com desktop site and mobile web.
               </ExperienceSectionText>
-            </div>
-            <div className={styles.sidebarImages}>
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[walmartMobileSeller1]}
-                placeholder={walmartMobileSeller1}
-                alt="The mobile product page showing the redesigned star rating."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[walmartMobileSeller2]}
-                placeholder={walmartMobileSeller2}
-                alt="The mobile review submission flow."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-            </div>
-          </ExperienceSectionColumns>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
           <ExperienceSectionContent>
@@ -189,11 +173,14 @@ export const Walmart = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionColumns centered className={styles.columns}>
-            <div className={styles.imagesText}>
-              <ExperienceSectionHeading>
-                Earlier: Wireless Verticals &amp; Baby Registry
-              </ExperienceSectionHeading>
+          <ExperienceSectionContent>
+            <ExperienceDevices
+              device="phone"
+              side="right"
+              alt="The Walmart Baby Registry landing page, and adding an item to a baby registry."
+              heading={<>Earlier: Wireless Verticals &amp; Baby Registry</>}
+              models={phoneModels(walmartBabyRegistry1, walmartBabyRegistry2)}
+            >
               <ExperienceSectionText>
                 Before Marketplace, I launched Walmart Baby Registry, reaching 100K new
                 registrants within 30 days. My team was the first at Walmart to adopt
@@ -204,24 +191,8 @@ export const Walmart = () => {
                 a 30bps conversion rate lift on one of Walmart.com&apos;s highest-traffic
                 surfaces.
               </ExperienceSectionText>
-            </div>
-            <div className={styles.sidebarImages}>
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[walmartBabyRegistry1]}
-                placeholder={walmartBabyRegistry1}
-                alt="The Walmart Baby Registry landing page."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[walmartBabyRegistry2]}
-                placeholder={walmartBabyRegistry2}
-                alt="Adding an item to a baby registry."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-            </div>
-          </ExperienceSectionColumns>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
         </ExperienceSection>
       </ExperienceContainer>
       <Footer />
