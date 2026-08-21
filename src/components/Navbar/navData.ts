@@ -5,7 +5,7 @@ export interface NavLink {
   children?: NavLink[];
 }
 
-import type { IconName } from 'components/Icon/Icon';
+import type { IconName } from 'refract-ui';
 
 export interface SocialLink {
   label: string;

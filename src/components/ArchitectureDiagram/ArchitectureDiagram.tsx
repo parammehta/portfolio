@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
-import { SegmentedControl, SegmentedControlOption } from 'components/SegmentedControl';
+import { SegmentedControl, SegmentedControlOption } from 'refract-ui';
 import { classes } from 'utils/style';
 import styles from './ArchitectureDiagram.module.css';
 
@@ -203,7 +203,10 @@ const EDGES: EdgeDef[] = [
 const FLOW_STEPS: Record<Flow, Step[]> = {
   serve: [
     { node: 'browser', text: 'Browser requests a page from `parammehta.com`.' },
-    { node: 'cloudfront', text: 'CloudFront serves the cached file from the nearest edge.' },
+    {
+      node: 'cloudfront',
+      text: 'CloudFront serves the cached file from the nearest edge.',
+    },
     { node: 's3site', text: 'On a cache miss it pulls the origin file from S3.' },
     {
       node: 'analytics',
@@ -264,7 +267,12 @@ const BOARD_H = 560;
 // switch to a stacked, scroll-free layout instead.
 const COMPACT_MAX = 560;
 
-const exitLength = (halfWidth: number, halfHeight: number, ux: number, uy: number): number =>
+const exitLength = (
+  halfWidth: number,
+  halfHeight: number,
+  ux: number,
+  uy: number
+): number =>
   Math.min(
     halfWidth / Math.max(Math.abs(ux), 1e-4),
     halfHeight / Math.max(Math.abs(uy), 1e-4)
@@ -309,7 +317,12 @@ export const ArchitectureDiagram = () => {
       const ux = dx / len;
       const uy = dy / len;
 
-      const ta = exitLength(fromEl.offsetWidth / 2 + 2, fromEl.offsetHeight / 2 + 2, ux, uy);
+      const ta = exitLength(
+        fromEl.offsetWidth / 2 + 2,
+        fromEl.offsetHeight / 2 + 2,
+        ux,
+        uy
+      );
       const tb = exitLength(toEl.offsetWidth / 2 + 2, toEl.offsetHeight / 2 + 2, ux, uy);
 
       const sx = ax + ux * ta;
@@ -393,7 +406,9 @@ export const ArchitectureDiagram = () => {
   };
 
   const activeNodeDef = activeNode ? NODE_MAP[activeNode] : null;
-  const compactNodes = activeFlow ? FLOW_STEPS[activeFlow].map(step => NODE_MAP[step.node]) : NODES;
+  const compactNodes = activeFlow
+    ? FLOW_STEPS[activeFlow].map(step => NODE_MAP[step.node])
+    : NODES;
 
   const renderNodeButton = (node: NodeDef, extraClass: string) => {
     const lit = litNodes?.has(node.id) ?? false;
@@ -407,7 +422,11 @@ export const ArchitectureDiagram = () => {
           nodeRefs.current[node.id] = element;
         }}
         className={classes(extraClass, lit && styles.nodeLit, dim && styles.nodeDim)}
-        style={extraClass === styles.node ? { left: `${node.x}%`, top: `${node.y}%` } : undefined}
+        style={
+          extraClass === styles.node
+            ? { left: `${node.x}%`, top: `${node.y}%` }
+            : undefined
+        }
         aria-label={`${node.name} — ${TIER_LABEL[node.tier]}`}
         aria-pressed={activeNode === node.id}
         onClick={() => toggleNode(node.id)}
@@ -435,7 +454,9 @@ export const ArchitectureDiagram = () => {
       </div>
 
       {compact ? (
-        <div className={styles.stack}>{compactNodes.map(node => renderNodeButton(node, styles.stackNode))}</div>
+        <div className={styles.stack}>
+          {compactNodes.map(node => renderNodeButton(node, styles.stackNode))}
+        </div>
       ) : (
         <div className={styles.fit} style={{ height: Math.round(BOARD_H * scale) }}>
           <div
@@ -443,55 +464,55 @@ export const ArchitectureDiagram = () => {
             ref={boardRef}
             style={{ width: BOARD_W, height: BOARD_H, transform: `scale(${scale})` }}
           >
-          <svg
-            className={styles.edges}
-            viewBox={`0 0 ${BOARD_W} ${BOARD_H}`}
-            aria-hidden="true"
-          >
-            <defs>
-              <marker
-                id={markerId}
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="6"
-                markerHeight="6"
-                orient="auto-start-reverse"
-              >
-                <path
-                  d="M2 1L8 5L2 9"
-                  fill="none"
-                  stroke="context-stroke"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </marker>
-            </defs>
-            {paths.map((path, pathIndex) => {
-              const active = activeNode
-                ? path.from === activeNode || path.to === activeNode
-                : activeFlow
-                  ? path.flow === activeFlow
-                  : false;
-              const faded = isolating && !active;
+            <svg
+              className={styles.edges}
+              viewBox={`0 0 ${BOARD_W} ${BOARD_H}`}
+              aria-hidden="true"
+            >
+              <defs>
+                <marker
+                  id={markerId}
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path
+                    d="M2 1L8 5L2 9"
+                    fill="none"
+                    stroke="context-stroke"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </marker>
+              </defs>
+              {paths.map((path, pathIndex) => {
+                const active = activeNode
+                  ? path.from === activeNode || path.to === activeNode
+                  : activeFlow
+                    ? path.flow === activeFlow
+                    : false;
+                const faded = isolating && !active;
 
-              return (
-                <path
-                  key={pathIndex}
-                  d={path.d}
-                  markerEnd={`url(#${markerId})`}
-                  className={classes(
-                    styles.edge,
-                    path.dashed && styles.edgeDashed,
-                    active && styles.edgeActive,
-                    active && styles.edgeFlowing,
-                    faded && styles.edgeFaded
-                  )}
-                />
-              );
-            })}
-          </svg>
+                return (
+                  <path
+                    key={pathIndex}
+                    d={path.d}
+                    markerEnd={`url(#${markerId})`}
+                    className={classes(
+                      styles.edge,
+                      path.dashed && styles.edgeDashed,
+                      active && styles.edgeActive,
+                      active && styles.edgeFlowing,
+                      faded && styles.edgeFaded
+                    )}
+                  />
+                );
+              })}
+            </svg>
 
             {NODES.map(node => renderNodeButton(node, styles.node))}
           </div>
@@ -521,9 +542,10 @@ export const ArchitectureDiagram = () => {
           </Fragment>
         ) : (
           <p className={styles.panelBody}>
-            One set of infrastructure, three journeys across it. Pick a flow above to isolate its
-            path, or tap any node to see what it does. Dashed lines are side channels — client
-            analytics, the cache invalidation, and the out-of-band Storybook deploy.
+            One set of infrastructure, three journeys across it. Pick a flow above to
+            isolate its path, or tap any node to see what it does. Dashed lines are side
+            channels — client analytics, the cache invalidation, and the out-of-band
+            Storybook deploy.
           </p>
         )}
       </div>

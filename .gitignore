@@ -61,17 +61,20 @@ tsconfig.tsbuildinfo
 .env
 .env.local
 
+# wrangler local secrets (CF_API_TOKEN for `wrangler dev`) — never committed
+.dev.vars
+.wrangler/
+
 # macOS
 .DS_Store
 
 build/
-build-storybook/
 public/sitemap.xml
 public/draco/
+public/models/
 public/og
 .serverless
 .next
-debug-storybook.log
 
 # Playwright
 /test-results/
