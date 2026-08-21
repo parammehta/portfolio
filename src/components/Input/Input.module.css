@@ -121,6 +121,15 @@
   & .input {
     padding-top: 0;
   }
+
+  /* The field opens at one row, so a long placeholder wraps onto a second line
+     and spills past the underline. Clamp it while it is the only thing in the
+     field — `::placeholder` itself takes only ::first-line properties, so the
+     rule has to sit on the field and lift as soon as the user types. */
+  & .input:placeholder-shown {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .error {
