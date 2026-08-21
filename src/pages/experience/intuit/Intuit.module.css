@@ -1,7 +1,3 @@
-.columns {
-  margin: 20px 0 60px;
-}
-
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -24,36 +20,4 @@
   color: rgb(var(--rgbAccent));
   display: block;
   margin-bottom: 8px;
-}
-
-.sidebarImages {
-  display: grid;
-  grid-template-columns: repeat(6, [col] 1fr);
-  align-items: center;
-
-  @media (--mediaTablet) {
-    padding: 0 80px;
-    margin-top: 60px;
-  }
-
-  @media (--mediaMobile) {
-    padding: 0 20px;
-    margin-top: 40px;
-  }
-}
-
-.sidebarImage {
-  &:first-child {
-    grid-column: col 1 / span 4;
-    grid-row: 1;
-    position: relative;
-    top: 5%;
-  }
-
-  &:last-child {
-    grid-column: col 3 / span 4;
-    grid-row: 1;
-    position: relative;
-    top: -5%;
-  }
 }
