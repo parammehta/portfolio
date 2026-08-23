@@ -11,6 +11,7 @@ import {
   ExperienceDevices,
   ExperienceHeader,
   ExperienceSection,
+  ExperienceSectionColumns,
   ExperienceSectionContent,
   ExperienceSectionHeading,
   ExperienceSectionText,
@@ -29,6 +30,22 @@ const roles = [
   'Identity & Auth',
   'AI/MCP Prototyping',
   'Team Leadership',
+];
+
+const designSystemStats = [
+  { value: '2 yrs', label: 'On the Design System team' },
+  { value: '100+', label: 'Reusable components' },
+  { value: '4', label: 'Products on the library' },
+];
+
+const identity20Stats = [
+  { value: '85%', label: 'GTM velocity gain from the Identity 2.0 migration' },
+];
+
+/** One per subject in the section heading, each already stated in its copy. */
+const performanceStats = [
+  { value: '56%', label: 'P95 latency cut across the identity surfaces' },
+  { value: '10+', label: 'Identity repositories on the Storybook environment' },
 ];
 
 export const Intuit = () => {
@@ -60,6 +77,16 @@ export const Intuit = () => {
               alt="A component library documentation site showing button variants, theme tokens, and the products that use them."
               heading={<>Before Identity: the Intuit Design System</>}
               models={laptopModel(intuitDesignSystem)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {designSystemStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 My first two years at Intuit were on the Design System team, building and
@@ -69,6 +96,15 @@ export const Intuit = () => {
                 of the same shared components, so teams got consistency without giving up
                 their product identity.
               </ExperienceSectionText>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
+        </ExperienceSection>
+        <ExperienceSection>
+          <ExperienceSectionContent>
+            <ExperienceTextRow>
+              <ExperienceSectionHeading>
+                Storybook, Figma tooling, and on-call ownership
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I owned the team&apos;s Storybook as the source of truth for usage
                 guidance and accessibility notes, and held weekly office hours to help
@@ -85,10 +121,10 @@ export const Intuit = () => {
                 I was the primary on-call point of contact for the design system, owning
                 production support and SLAs for the products built on top of it.
               </ExperienceSectionText>
-            </ExperienceDevices>
+            </ExperienceTextRow>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceDevices
               device="phone"
@@ -103,6 +139,15 @@ export const Intuit = () => {
                 streamlined registration, post-enrollment education, and a centralized
                 post-auth surface for managing sign-in methods.
               </ExperienceSectionText>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
+        </ExperienceSection>
+        <ExperienceSection>
+          <ExperienceSectionContent>
+            <ExperienceTextRow>
+              <ExperienceSectionHeading>
+                Passkey adoption and digital ID verification
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 The rollout drove passkey adoption from 10% to 26% of active Intuit
                 customers, meaningfully strengthening Intuit&apos;s phishing-resistant
@@ -115,7 +160,7 @@ export const Intuit = () => {
                 document photo &mdash; a faster path through identity verification with
                 fewer drop-offs.
               </ExperienceSectionText>
-            </ExperienceDevices>
+            </ExperienceTextRow>
             <div className={styles.stats}>
               <div className={styles.stat}>
                 <span className={styles.statNumber}>8</span>
@@ -187,32 +232,55 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
-          <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Identity 2.0, performance, and Storybook
-              </ExperienceSectionHeading>
-              <ExperienceSectionText>
-                For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
-                account-manager flows onto GraphQL, leading 8 engineers across backend,
-                frontend, and product through it. Collapsing that many flows onto one
-                schema is what bought the scalability headroom and an 85% GTM velocity
-                gain, and the migration SOPs we set became the pattern other products
-                followed.
-              </ExperienceSectionText>
-              <ExperienceSectionText>
-                I also led a performance track that cut P95 latency by 56% (account
-                selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
-                splitting, lazy loading, and render optimization, and I maintain the
-                Storybook environment across 10+ identity repositories that lets Design
-                and PM partners prototype, validate, and sign off on identity experiences
-                before anything ships.
-              </ExperienceSectionText>
-            </ExperienceTextRow>
+          <ExperienceSectionContent width="xl">
+            <ExperienceSectionColumns className={styles.identityColumns}>
+              <div className={styles.identityColumn}>
+                <ExperienceSectionHeading>
+                  Identity 2.0: the GraphQL migration
+                </ExperienceSectionHeading>
+                <ExperienceSectionText>
+                  For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
+                  account-manager flows onto GraphQL, leading 8 engineers across backend,
+                  frontend, and product through it. Collapsing that many flows onto one
+                  schema is what bought the scalability headroom and an 85% GTM velocity
+                  gain, and the migration SOPs we set became the pattern other products
+                  followed.
+                </ExperienceSectionText>
+                <div className={styles.stats}>
+                  {identity20Stats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.statNumber}>{stat.value}</span>
+                      <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.identityColumn}>
+                <ExperienceSectionHeading>
+                  Performance and the Storybook environment
+                </ExperienceSectionHeading>
+                <ExperienceSectionText>
+                  I also led a performance track that cut P95 latency by 56% (account
+                  selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
+                  splitting, lazy loading, and render optimization, and I maintain the
+                  Storybook environment across 10+ identity repositories that lets Design
+                  and PM partners prototype, validate, and sign off on identity experiences
+                  before anything ships.
+                </ExperienceSectionText>
+                <div className={styles.stats}>
+                  {performanceStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.statNumber}>{stat.value}</span>
+                      <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ExperienceSectionColumns>
           </ExperienceSectionContent>
         </ExperienceSection>
+        <Footer />
       </ExperienceContainer>
-      <Footer />
     </Fragment>
   );
 };

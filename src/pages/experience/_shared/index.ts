@@ -14,5 +14,8 @@ export {
   ExperienceDevices,
   deviceScreenAspect,
   laptopModel,
+  laptopModels,
+  laptopWithPhone,
+  phoneModel,
   phoneModels,
 } from './ExperienceDevices';

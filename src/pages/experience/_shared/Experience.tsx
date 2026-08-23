@@ -101,7 +101,15 @@ interface ExperienceContainerProps extends HTMLAttributes<HTMLElement> {
 }
 
 export const ExperienceContainer = ({ className, ...rest }: ExperienceContainerProps) => (
-  <article className={classes(styles.experience, className)} {...rest} />
+  // Needed so ScrollRestore resets this page's own scroll position on route
+  // change, the same way it does for the home page's inner scroller — see
+  // ScrollRestore.tsx. `window.scrollTo(0, 0)` alone would not reset this
+  // container's scrollTop, since the document itself no longer scrolls.
+  <article
+    className={classes(styles.experience, className)}
+    data-scroll-container
+    {...rest}
+  />
 );
 
 interface ExperienceSectionProps extends HTMLAttributes<HTMLElement> {

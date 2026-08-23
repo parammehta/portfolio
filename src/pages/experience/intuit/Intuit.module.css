@@ -1,11 +1,61 @@
-.stats {
+/* Sits under the laptop in the device column, so it stays a compact row even
+   though it is narrower than the full-width stats block below. */
+.deviceStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: var(--spaceM);
+
+  @media (--mediaMobile) {
+    gap: var(--spaceS);
+  }
+}
+
+.deviceStatNumber {
+  font-size: var(--fontSizeH4);
+  font-weight: var(--fontWeightBold);
+  color: rgb(var(--rgbAccent));
+  display: block;
+  margin-bottom: 4px;
+}
+
+.identityColumns {
+  align-items: start;
+
+  /* The shared `hyphens: auto` is tuned for narrower image+caption columns;
+     at this measure it breaks plain words ("en-gineers", "prod-uct") for no
+     real gain since the text isn't justified. */
+  & p {
+    hyphens: none;
+  }
+}
+
+.identityColumn {
+  display: flex;
+  flex-direction: column;
+
+  /* The right column has one more stat than the left, so its own copy is a
+     touch shorter — this keeps both stat rows sitting at roughly the same
+     height instead of the shorter column's row floating higher. */
+  & .stats {
+    margin-top: auto;
+  }
+}
+
+.stats {
+  /* `grid-auto-columns` + `justify-content: center` rather than a fixed
+     `repeat(3, 1fr)`: a row with fewer than 3 stats (Identity 2.0 split into
+     its own pane, one stat each) would otherwise stretch across all 3 tracks
+     and sit flush left instead of reading as a deliberate, centered group. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(160px, 220px);
+  justify-content: center;
   gap: 40px;
   margin: 40px 0;
 
   @media (--mediaTablet) {
-    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
     gap: 24px;
   }
 }

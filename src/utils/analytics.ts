@@ -39,6 +39,7 @@ export const analyticsEvents = {
   socialLinkClick: 'social_link_click',
   themeToggle: 'theme_toggle',
   profileContactClick: 'profile_contact_click',
+  homeExperienceSlide: 'home_experience_slide',
   experienceTabSelect: 'experience_tab_select',
   experienceDetailsClick: 'experience_details_click',
   skillsToolLinkClick: 'skills_tool_link_click',
