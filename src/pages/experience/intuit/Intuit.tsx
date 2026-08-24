@@ -256,8 +256,8 @@ export const Intuit = () => {
             </div>
             <div className={styles.identityColumn}>
               <ExperienceSectionHeading>
-                Performance and the Storybook environment
-              </ExperienceSectionHeading>
+                  Performance Improvements
+                </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I also led a performance track that cut P95 latency by 56% (account
                 selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle

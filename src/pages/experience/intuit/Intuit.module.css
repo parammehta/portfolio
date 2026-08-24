@@ -19,14 +19,10 @@
 }
 
 .identityColumns {
-  /* `stretch` (grid's default, restated for clarity): both columns take the
-     row's full height, not just their own content's. That's what lets
-     `.identityColumn .stats`'s `margin-top: auto` below push each column's
-     stat row down to a shared baseline — with `align-items: start` there is
-     no extra height in the shorter column for that margin to push into, so
-     the stats would land right after each column's own paragraph instead of
-     lining up with each other. */
-  align-items: stretch;
+  /* Grid items just start at the row's top now — both columns get the same
+     fixed gaps below instead of the stats being pushed to a shared bottom
+     line, so there's no need to stretch a column past its own content. */
+  align-items: start;
 
   /* The shared `hyphens: auto` is tuned for narrower image+caption columns;
      at this measure it breaks plain words ("en-gineers", "prod-uct") for no
@@ -40,11 +36,16 @@
   display: flex;
   flex-direction: column;
 
-  /* The right column has one more stat than the left, so its own copy is a
-     touch shorter — this keeps both stat rows sitting at roughly the same
-     height instead of the shorter column's row floating higher. */
+  /* Matches the rhythm of a single-column pane like Passkeys: room after the
+     heading before the copy starts, and a deliberate break before the stats
+     rather than them trailing straight off the last line. */
+  & h2,
+  & h3 {
+    margin-bottom: var(--space3XL);
+  }
+
   & .stats {
-    margin-top: auto;
+    margin-top: var(--space5XL);
   }
 }
 
