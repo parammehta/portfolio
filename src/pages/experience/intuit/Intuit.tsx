@@ -37,6 +37,12 @@ const designSystemStats = [
   { value: '4', label: 'Products on the library' },
 ];
 
+const passkeyStats = [
+  { value: '8', label: 'Cross-product launches shipped' },
+  { value: '26%', label: 'Of active customers on passkeys, up from 10%' },
+  { value: '100M+', label: 'Customer platform the work shipped to' },
+];
+
 const identity20Stats = [
   { value: '85%', label: 'GTM velocity gain from the Identity 2.0 migration' },
 ];
@@ -136,6 +142,16 @@ export const Intuit = () => {
               alt="A passkey enrollment confirmation screen, and an identity verification screen using a digital driver's license from a phone wallet."
               heading={<>Leading Passkeys across Intuit</>}
               models={phoneModels(intuitPasskeyEnrollment, intuitMdlVerification)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {passkeyStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 I led the passkeys initiative across Intuit, architecting and shipping 8
@@ -143,51 +159,19 @@ export const Intuit = () => {
                 streamlined registration, post-enrollment education, and a centralized
                 post-auth surface for managing sign-in methods.
               </ExperienceSectionText>
+              <ExperienceSectionText>
+                The rollout drove passkey adoption from 10% to 26% of active Intuit
+                customers, meaningfully strengthening Intuit&apos;s phishing-resistant
+                authentication posture across the platform.
+              </ExperienceSectionText>
+              <ExperienceSectionText>
+                Alongside passkeys, I shipped digital ID (mDL) verification, letting
+                customers prove their identity with the driver&apos;s license or ID
+                already saved in their phone&apos;s wallet instead of manually uploading a
+                document photo &mdash; a faster path through identity verification with
+                fewer drop-offs.
+              </ExperienceSectionText>
             </ExperienceDevices>
-          </ExperienceSectionContent>
-        </ExperienceSection>
-        <ExperienceSection>
-          <ExperienceSectionContent width="xl">
-            <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
-              <div className={styles.identityColumn}>
-                <ExperienceSectionHeading>Passkey adoption</ExperienceSectionHeading>
-                <ExperienceSectionText>
-                  The rollout drove passkey adoption from 10% to 26% of active Intuit
-                  customers, meaningfully strengthening Intuit&apos;s phishing-resistant
-                  authentication posture across the platform.
-                </ExperienceSectionText>
-              </div>
-              <div className={styles.identityColumn}>
-                <ExperienceSectionHeading>Digital ID verification</ExperienceSectionHeading>
-                <ExperienceSectionText>
-                  Alongside passkeys, I shipped digital ID (mDL) verification, letting
-                  customers prove their identity with the driver&apos;s license or ID
-                  already saved in their phone&apos;s wallet instead of manually uploading a
-                  document photo &mdash; a faster path through identity verification with
-                  fewer drop-offs.
-                </ExperienceSectionText>
-              </div>
-            </ExperienceSectionColumns>
-            <div className={styles.stats}>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>8</span>
-                <ExperienceSectionText>
-                  Cross-product launches shipped
-                </ExperienceSectionText>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>26%</span>
-                <ExperienceSectionText>
-                  Of active customers on passkeys, up from 10%
-                </ExperienceSectionText>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>100M+</span>
-                <ExperienceSectionText>
-                  Customer platform the work shipped to
-                </ExperienceSectionText>
-              </div>
-            </div>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
