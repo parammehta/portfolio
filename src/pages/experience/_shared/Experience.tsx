@@ -291,6 +291,7 @@ export const ExperienceTextRow = ({
 interface ExperienceSectionColumnsProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   centered?: boolean;
+  width?: string;
 }
 
 export const ExperienceSectionColumns = ({

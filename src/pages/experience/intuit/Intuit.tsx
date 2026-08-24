@@ -232,52 +232,50 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
-          <ExperienceSectionContent width="xl">
-            <ExperienceSectionColumns className={styles.identityColumns}>
-              <div className={styles.identityColumn}>
-                <ExperienceSectionHeading>
-                  Identity 2.0: the GraphQL migration
-                </ExperienceSectionHeading>
-                <ExperienceSectionText>
-                  For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
-                  account-manager flows onto GraphQL, leading 8 engineers across backend,
-                  frontend, and product through it. Collapsing that many flows onto one
-                  schema is what bought the scalability headroom and an 85% GTM velocity
-                  gain, and the migration SOPs we set became the pattern other products
-                  followed.
-                </ExperienceSectionText>
-                <div className={styles.stats}>
-                  {identity20Stats.map(stat => (
-                    <div className={styles.stat} key={stat.label}>
-                      <span className={styles.statNumber}>{stat.value}</span>
-                      <ExperienceSectionText>{stat.label}</ExperienceSectionText>
-                    </div>
-                  ))}
-                </div>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Identity 2.0: the GraphQL migration
+              </ExperienceSectionHeading>
+              <ExperienceSectionText>
+                For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
+                account-manager flows onto GraphQL, leading 8 engineers across backend,
+                frontend, and product through it. Collapsing that many flows onto one
+                schema is what bought the scalability headroom and an 85% GTM velocity
+                gain, and the migration SOPs we set became the pattern other products
+                followed.
+              </ExperienceSectionText>
+              <div className={styles.stats}>
+                {identity20Stats.map(stat => (
+                  <div className={styles.stat} key={stat.label}>
+                    <span className={styles.statNumber}>{stat.value}</span>
+                    <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                  </div>
+                ))}
               </div>
-              <div className={styles.identityColumn}>
-                <ExperienceSectionHeading>
-                  Performance and the Storybook environment
-                </ExperienceSectionHeading>
-                <ExperienceSectionText>
-                  I also led a performance track that cut P95 latency by 56% (account
-                  selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
-                  splitting, lazy loading, and render optimization, and I maintain the
-                  Storybook environment across 10+ identity repositories that lets Design
-                  and PM partners prototype, validate, and sign off on identity experiences
-                  before anything ships.
-                </ExperienceSectionText>
-                <div className={styles.stats}>
-                  {performanceStats.map(stat => (
-                    <div className={styles.stat} key={stat.label}>
-                      <span className={styles.statNumber}>{stat.value}</span>
-                      <ExperienceSectionText>{stat.label}</ExperienceSectionText>
-                    </div>
-                  ))}
-                </div>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Performance and the Storybook environment
+              </ExperienceSectionHeading>
+              <ExperienceSectionText>
+                I also led a performance track that cut P95 latency by 56% (account
+                selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
+                splitting, lazy loading, and render optimization, and I maintain the
+                Storybook environment across 10+ identity repositories that lets Design
+                and PM partners prototype, validate, and sign off on identity experiences
+                before anything ships.
+              </ExperienceSectionText>
+              <div className={styles.stats}>
+                {performanceStats.map(stat => (
+                  <div className={styles.stat} key={stat.label}>
+                    <span className={styles.statNumber}>{stat.value}</span>
+                    <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                  </div>
+                ))}
               </div>
-            </ExperienceSectionColumns>
-          </ExperienceSectionContent>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
         <Footer />
       </ExperienceContainer>
