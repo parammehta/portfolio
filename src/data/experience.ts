@@ -71,7 +71,7 @@ export const companies: Company[] = [
       },
       {
         id: 'intuit-identity',
-        title: 'Senior Software Engineer, Identity Authentication Experiences',
+        title: 'Staff Software Engineer, Identity Authentication Experiences',
         dateRange: 'Jan 2024 – Present',
         highlights: [
           'Shipped passkey registration, post-enrollment education and a centralized post-auth surface across 8 Intuit products, lifting adoption from 10% to 26% of active customers',
