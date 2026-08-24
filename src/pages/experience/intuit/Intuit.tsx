@@ -15,7 +15,6 @@ import {
   ExperienceSectionContent,
   ExperienceSectionHeading,
   ExperienceSectionText,
-  ExperienceTextRow,
   laptopModel,
   phoneModels,
 } from 'pages/experience/_shared';
@@ -101,10 +100,10 @@ export const Intuit = () => {
         </ExperienceSection>
         <ExperienceSection>
           <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Storybook, Figma tooling, and on-call ownership
-              </ExperienceSectionHeading>
+            <ExperienceSectionHeading>
+              Storybook, Figma tooling, and on-call ownership
+            </ExperienceSectionHeading>
+            <ExperienceSectionColumns className={styles.splitColumns}>
               <ExperienceSectionText>
                 I owned the team&apos;s Storybook as the source of truth for usage
                 guidance and accessibility notes, and held weekly office hours to help
@@ -121,7 +120,7 @@ export const Intuit = () => {
                 I was the primary on-call point of contact for the design system, owning
                 production support and SLAs for the products built on top of it.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceSectionColumns>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
@@ -144,10 +143,10 @@ export const Intuit = () => {
         </ExperienceSection>
         <ExperienceSection>
           <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Passkey adoption and digital ID verification
-              </ExperienceSectionHeading>
+            <ExperienceSectionHeading>
+              Passkey adoption and digital ID verification
+            </ExperienceSectionHeading>
+            <ExperienceSectionColumns className={styles.splitColumns}>
               <ExperienceSectionText>
                 The rollout drove passkey adoption from 10% to 26% of active Intuit
                 customers, meaningfully strengthening Intuit&apos;s phishing-resistant
@@ -160,7 +159,7 @@ export const Intuit = () => {
                 document photo &mdash; a faster path through identity verification with
                 fewer drop-offs.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceSectionColumns>
             <div className={styles.stats}>
               <div className={styles.stat}>
                 <span className={styles.statNumber}>8</span>
@@ -211,10 +210,10 @@ export const Intuit = () => {
         </ExperienceSection>
         <ExperienceSection>
           <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Agentic AI &amp; MCP-based authentication
-              </ExperienceSectionHeading>
+            <ExperienceSectionHeading>
+              Agentic AI &amp; MCP-based authentication
+            </ExperienceSectionHeading>
+            <ExperienceSectionColumns className={styles.splitColumns}>
               <ExperienceSectionText>
                 I currently lead the agentic AI track for Intuit Identity, integrating
                 MCP-based agent authentication. I built hands-on LLM-powered prototypes
@@ -228,7 +227,7 @@ export const Intuit = () => {
                 Skills, agents, and agent-context-building workflows, yielding an
                 estimated 3x velocity improvement for the team.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceSectionColumns>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>

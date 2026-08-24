@@ -1,3 +1,20 @@
+/* A single heading spanning both columns, with two parallel paragraphs below
+   it side by side — for panes that were one heading over two paragraphs
+   rather than two separately-headed topics (compare `.identityColumns`,
+   which needs its own per-column heading rule). */
+.splitColumns {
+  /* `.sectionColumns`'s own `align-items: center` centers each paragraph
+     within the row's full height, which for two unequal-length paragraphs
+     centers the *shorter* one lower than the taller one's top instead of
+     lining both paragraphs up at the heading below them. */
+  align-items: start;
+  margin-top: var(--space3XL);
+
+  & p {
+    hyphens: none;
+  }
+}
+
 /* Sits under the laptop in the device column, so it stays a compact row even
    though it is narrower than the full-width stats block below. */
 .deviceStats {
