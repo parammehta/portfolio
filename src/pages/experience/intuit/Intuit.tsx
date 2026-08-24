@@ -43,6 +43,12 @@ const passkeyStats = [
   { value: '100M+', label: 'Customer platform the work shipped to' },
 ];
 
+const ssoStats = [
+  { value: '4+', label: 'Org boundaries spanned' },
+  { value: '100K+', label: 'Gross new subscribers from Amazon Business Prime' },
+  { value: '0', label: 'Escalations' },
+];
+
 const identity20Stats = [
   { value: '85%', label: 'GTM velocity gain from the Identity 2.0 migration' },
 ];
@@ -182,6 +188,16 @@ export const Intuit = () => {
               alt="An identity console showing linked partner accounts and sign-in sessions."
               heading={<>Cross-identity SSO for Amazon partnerships</>}
               models={laptopModel(intuitIdentityConsole)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {ssoStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded
