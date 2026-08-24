@@ -1,0 +1,82 @@
+.devices {
+  max-width: var(--maxWidthL);
+  width: 100%;
+  text-align: left;
+
+  /* Contain the float so the next section is not pulled up beside it. */
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+.model {
+  float: right;
+  width: 46%;
+  margin: 0 0 var(--spaceXL) var(--space3XL);
+  shape-margin: var(--spaceL);
+
+  .devices[data-side='left'] & {
+    float: left;
+    margin: 0 var(--space3XL) var(--spaceXL) 0;
+  }
+
+  /* Trace the device silhouette rather than its bounding box, so the copy
+     tucks into the stagger instead of leaving a rectangular hole. */
+  .devices[data-device='phone'] & {
+    aspect-ratio: 1 / 1.06;
+    shape-outside: polygon(
+      19% 0%,
+      59% 0%,
+      59% 27%,
+      81% 27%,
+      81% 100%,
+      42% 100%,
+      42% 72%,
+      19% 72%
+    );
+  }
+
+  .devices[data-device='laptop'] & {
+    width: 52%;
+    aspect-ratio: 1 / 0.78;
+    shape-outside: polygon(
+      19% 14%,
+      82% 14%,
+      82% 69%,
+      100% 69%,
+      100% 83%,
+      0% 83%,
+      0% 69%,
+      19% 69%
+    );
+  }
+
+  @media (--mediaLaptop) {
+    margin-left: var(--space2XL);
+
+    .devices[data-side='left'] & {
+      margin-right: var(--space2XL);
+    }
+  }
+
+  /* Below tablet there is not enough measure left beside a floated device for
+     the wrapped text to stay readable, so stack instead. */
+  @media (--mediaTablet) {
+    float: none;
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto var(--space2XL);
+
+    .devices[data-side='left'] & {
+      float: none;
+      margin: 0 auto var(--space2XL);
+    }
+
+    .devices[data-device='laptop'] & {
+      width: 100%;
+      max-width: 560px;
+    }
+  }
+}

@@ -5,21 +5,20 @@ import intuitIdentityConsole from 'assets/intuit-identity-console-1.png';
 import intuitMdlVerification from 'assets/intuit-mdl-verification.png';
 import intuitPasskeyEnrollment from 'assets/intuit-passkey-enrollment.png';
 import { Footer, Meta } from 'components';
-import { Image } from 'refract-ui';
 import {
   ExperienceBackground,
   ExperienceContainer,
+  ExperienceDevices,
   ExperienceHeader,
-  ExperienceImage,
   ExperienceSection,
-  ExperienceSectionColumns,
   ExperienceSectionContent,
   ExperienceSectionHeading,
   ExperienceSectionText,
   ExperienceTextRow,
+  laptopModel,
+  phoneModels,
 } from 'pages/experience/_shared';
 import { Fragment } from 'react';
-import { media } from 'utils/style';
 import styles from './Intuit.module.css';
 
 const title = 'Staff Software Engineer at Intuit';
@@ -55,16 +54,13 @@ export const Intuit = () => {
         />
         <ExperienceSection padding="top" light>
           <ExperienceSectionContent>
-            <ExperienceImage
-              srcSet={[intuitDesignSystem]}
-              placeholder={intuitDesignSystem}
+            <ExperienceDevices
+              device="laptop"
+              side="right"
               alt="A component library documentation site showing button variants, theme tokens, and the products that use them."
-              sizes={`(max-width: ${media.mobile}px) 100vw, (max-width: ${media.tablet}px) 90vw, 80vw`}
-            />
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Before Identity: the Intuit Design System
-              </ExperienceSectionHeading>
+              heading={<>Before Identity: the Intuit Design System</>}
+              models={laptopModel(intuitDesignSystem)}
+            >
               <ExperienceSectionText>
                 My first two years at Intuit were on the Design System team, building and
                 maintaining 100+ reusable components used across QuickBooks, TurboTax,
@@ -89,38 +85,18 @@ export const Intuit = () => {
                 I was the primary on-call point of contact for the design system, owning
                 production support and SLAs for the products built on top of it.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionColumns centered className={styles.columns}>
-            <div className={styles.sidebarImages}>
-              <Image
-                reveal
-                className={styles.sidebarImage}
-                srcSet={[intuitPasskeyEnrollment]}
-                placeholder={intuitPasskeyEnrollment}
-                alt="A confirmation screen after enrolling a passkey, showing sign-in with face, fingerprint, or PIN."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-              <Image
-                reveal
-                delay={100}
-                className={styles.sidebarImage}
-                srcSet={[intuitMdlVerification]}
-                placeholder={intuitMdlVerification}
-                alt="An identity verification screen using a digital driver's license from a phone wallet."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-            </div>
-          </ExperienceSectionColumns>
-        </ExperienceSection>
-        <ExperienceSection light>
           <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Leading Passkeys across Intuit
-              </ExperienceSectionHeading>
+            <ExperienceDevices
+              device="phone"
+              side="left"
+              alt="A passkey enrollment confirmation screen, and an identity verification screen using a digital driver's license from a phone wallet."
+              heading={<>Leading Passkeys across Intuit</>}
+              models={phoneModels(intuitPasskeyEnrollment, intuitMdlVerification)}
+            >
               <ExperienceSectionText>
                 I led the passkeys initiative across Intuit, architecting and shipping 8
                 cross-product frontend launches with a team of 5 engineers &mdash;
@@ -139,7 +115,7 @@ export const Intuit = () => {
                 document photo &mdash; a faster path through identity verification with
                 fewer drop-offs.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceDevices>
             <div className={styles.stats}>
               <div className={styles.stat}>
                 <span className={styles.statNumber}>8</span>
@@ -162,18 +138,15 @@ export const Intuit = () => {
             </div>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
-            <ExperienceImage
-              srcSet={[intuitIdentityConsole]}
-              placeholder={intuitIdentityConsole}
+            <ExperienceDevices
+              device="laptop"
+              side="right"
               alt="An identity console showing linked partner accounts and sign-in sessions."
-              sizes={`(max-width: ${media.mobile}px) 100vw, (max-width: ${media.tablet}px) 90vw, 80vw`}
-            />
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Cross-identity SSO for Amazon partnerships
-              </ExperienceSectionHeading>
+              heading={<>Cross-identity SSO for Amazon partnerships</>}
+              models={laptopModel(intuitIdentityConsole)}
+            >
               <ExperienceSectionText>
                 I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded
                 directly inside Amazon&apos;s domain, with Intuit authentication handled
@@ -188,10 +161,10 @@ export const Intuit = () => {
                 Prime and a positive incremental activation lift from Amazon Seller
                 Central, with zero escalations.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection>
           <ExperienceSectionContent>
             <ExperienceTextRow>
               <ExperienceSectionHeading>
@@ -213,7 +186,7 @@ export const Intuit = () => {
             </ExperienceTextRow>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceTextRow>
               <ExperienceSectionHeading>

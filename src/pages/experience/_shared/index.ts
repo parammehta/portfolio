@@ -10,3 +10,9 @@ export {
   ExperienceTextRow,
   ExperienceSectionColumns,
 } from './Experience';
+export {
+  ExperienceDevices,
+  deviceScreenAspect,
+  laptopModel,
+  phoneModels,
+} from './ExperienceDevices';
