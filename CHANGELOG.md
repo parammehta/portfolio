@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/parammehta/portfolio/compare/v1.17.0...v1.18.0) (2026-08-24)
+
+
+### Features
+
+* give the device models real estate on the home and experience pages ([#84](https://github.com/parammehta/portfolio/issues/84)) ([535331f](https://github.com/parammehta/portfolio/commit/535331f347abf18e6971ba7eb7c0715eb72c1d1c))
+
 ## [1.17.0](https://github.com/parammehta/portfolio/compare/v1.16.0...v1.17.0) (2026-08-24)
 
 
