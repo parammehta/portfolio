@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/parammehta/portfolio/compare/v1.16.0...v1.17.0) (2026-08-24)
+
+
+### Features
+
+* put the 3D device models to work on the experience pages ([#79](https://github.com/parammehta/portfolio/issues/79)) ([429fd14](https://github.com/parammehta/portfolio/commit/429fd14ff7d431bb9a70d7c9cd61161930da5796))
+
 ## [1.16.0](https://github.com/parammehta/portfolio/compare/v1.15.0...v1.16.0) (2026-08-21)
 
 
