@@ -1,11 +1,69 @@
-.stats {
+/* Sits under the laptop in the device column, so it stays a compact row even
+   though it is narrower than the full-width stats block below. */
+.deviceStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: var(--spaceM);
+
+  @media (--mediaMobile) {
+    gap: var(--spaceS);
+  }
+}
+
+.deviceStatNumber {
+  font-size: var(--fontSizeH4);
+  font-weight: var(--fontWeightBold);
+  color: rgb(var(--rgbAccent));
+  display: block;
+  margin-bottom: 4px;
+}
+
+.identityColumns {
+  /* Grid items just start at the row's top now — both columns get the same
+     fixed gaps below instead of the stats being pushed to a shared bottom
+     line, so there's no need to stretch a column past its own content. */
+  align-items: start;
+
+  /* The shared `hyphens: auto` is tuned for narrower image+caption columns;
+     at this measure it breaks plain words ("en-gineers", "prod-uct") for no
+     real gain since the text isn't justified. */
+  & p {
+    hyphens: none;
+  }
+}
+
+.identityColumn {
+  display: flex;
+  flex-direction: column;
+
+  /* Matches the rhythm of a single-column pane like Passkeys: room after the
+     heading before the copy starts, and a deliberate break before the stats
+     rather than them trailing straight off the last line. */
+  & h2,
+  & h3 {
+    margin-bottom: var(--space3XL);
+  }
+
+  & .stats {
+    margin-top: var(--space5XL);
+  }
+}
+
+.stats {
+  /* `grid-auto-columns` + `justify-content: center` rather than a fixed
+     `repeat(3, 1fr)`: a row with fewer than 3 stats (Identity 2.0 split into
+     its own pane, one stat each) would otherwise stretch across all 3 tracks
+     and sit flush left instead of reading as a deliberate, centered group. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(160px, 220px);
+  justify-content: center;
   gap: 40px;
   margin: 40px 0;
 
   @media (--mediaTablet) {
-    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
     gap: 24px;
   }
 }
@@ -20,4 +78,28 @@
   color: rgb(var(--rgbAccent));
   display: block;
   margin-bottom: 8px;
+}
+
+/* This pane's copy is three stacked paragraphs — merging "Leading Passkeys"
+   with the adoption/digital-ID copy (so the stats have one clear pane to
+   belong to, rather than floating under two separated columns) pushed it
+   past a short viewport's available height. `--lineHeightBody` and
+   `--spaceL` are read by the Text component and the paragraph-gap rule
+   respectively; overriding them locally tightens only this pane's copy
+   without touching the tokens (or every other pane using them) globally. */
+.passkeyDense {
+  --lineHeightBody: 1.4;
+  --spaceL: var(--spaceM);
+
+  & h2 {
+    margin-bottom: 0.4em;
+  }
+
+  /* `.aside`'s own `padding-top` is `--space2XL` (48px) — that token is also
+     the horizontal gap between this pane's two grid columns, so it can't be
+     redefined locally without narrowing the device/copy gap too. Pulling the
+     stats block up with a negative margin instead only touches this element. */
+  & .deviceStats {
+    margin-top: calc(-1 * var(--spaceL));
+  }
 }

@@ -1,6 +1,7 @@
 import { type UIEvent, useEffect, useRef, useState } from 'react';
 import { Meta, StructuredData } from 'components';
 import { personSchema } from 'utils/structuredData';
+import { ExperienceCarousel } from './ExperienceCarousel';
 import { Intro } from './Intro';
 import { Profile } from './Profile';
 import { Contact } from './Contact';
@@ -12,6 +13,7 @@ const disciplines = ['Leader', 'Mentor', 'Full-Stack', 'Coffee ☕'];
 const pageSections = [
   { id: 'intro', label: 'Intro' },
   { id: 'profile', label: 'About' },
+  { id: 'experience', label: 'Experience' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -20,15 +22,16 @@ export const Home = () => {
   const [scrollIndicatorHidden, setScrollIndicatorHidden] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const intro = useRef<HTMLElement>(null);
+  const experience = useRef<HTMLElement>(null);
   const profile = useRef<HTMLElement>(null);
   const contact = useRef<HTMLElement>(null);
-  const sectionRefs = [intro, profile, contact];
+  const sectionRefs = [intro, profile, experience, contact];
 
   const isVisible = (ref: React.RefObject<HTMLElement | null>) =>
     visibleSections.includes(ref.current!);
 
   useEffect(() => {
-    const sections = [intro, profile];
+    const sections = [intro, profile, experience];
 
     const sectionObserver = new IntersectionObserver(
       (entries, observer) => {
@@ -84,6 +87,12 @@ export const Home = () => {
         // eslint-disable-next-line react-hooks/refs
         visible={isVisible(profile)}
         id="profile"
+      />
+      <ExperienceCarousel
+        id="experience"
+        sectionRef={experience}
+        // eslint-disable-next-line react-hooks/refs
+        visible={isVisible(experience)}
       />
       <Contact id="contact" sectionRef={contact} />
       <nav className={styles.sectionDots} aria-label="Page sections">

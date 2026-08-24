@@ -9,24 +9,19 @@ import rivianFleetScreen2 from 'assets/rivian-fleet-os-2.webp';
 import rivianFleetScreen3 from 'assets/rivian-fleet-os-3.webp';
 import rivianFleetScreen4 from 'assets/rivian-fleet-os-4.webp';
 import { Footer, Meta } from 'components';
-import { Image } from 'refract-ui';
 import {
   ExperienceBackground,
   ExperienceContainer,
   ExperienceDevices,
   ExperienceHeader,
-  ExperienceImage,
   ExperienceSection,
-  ExperienceSectionColumns,
   ExperienceSectionContent,
-  ExperienceSectionHeading,
   ExperienceSectionText,
   laptopModel,
+  laptopModels,
   phoneModels,
 } from 'pages/experience/_shared';
 import { Fragment } from 'react';
-import { media } from 'utils/style';
-import styles from './Rivian.module.css';
 
 const title = 'Senior Software Engineer at Rivian';
 const description =
@@ -42,7 +37,7 @@ export const Rivian = () => {
   return (
     <Fragment>
       <Meta title={title} prefix="Experiences" description={description} />
-      <ExperienceContainer className={styles.slice}>
+      <ExperienceContainer>
         <ExperienceBackground
           src={rivianBackground}
           srcSet={`${rivianBackground.src} 1280w, ${rivianBackground.src} 2560w`}
@@ -61,22 +56,12 @@ export const Rivian = () => {
         />
         <ExperienceSection padding="top">
           <ExperienceSectionContent>
-            <ExperienceImage
-              srcSet={[rivianFleetScreen1]}
-              placeholder={rivianFleetScreen1}
-              alt="The Rivian web application showing the dashboard."
-              sizes={`(max-width: ${media.mobile}px) 100vw, (max-width: ${media.tablet}px) 90vw, 80vw`}
-            />
-          </ExperienceSectionContent>
-        </ExperienceSection>
-        <ExperienceSection>
-          <ExperienceSectionContent>
             <ExperienceDevices
-              device="phone"
-              side="left"
-              alt="The mobile notifications inbox showing recent vehicle alerts, and a push notification for a tire pressure warning."
+              device="laptop"
+              side="right"
+              alt="The Rivian web application showing the fleet dashboard."
               heading={<>Problem Statement</>}
-              models={phoneModels(rivianFleetMobileScreen1, rivianFleetMobileScreen2)}
+              models={laptopModel(rivianFleetScreen1)}
             >
               <ExperienceSectionText>
                 Fleet operators using Rivian&apos;s software had no way to know about
@@ -85,6 +70,17 @@ export const Rivian = () => {
                 Rivian&apos;s rapid scaling phase, I joined Fleet Core as a founding
                 engineer to solve this.
               </ExperienceSectionText>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
+        </ExperienceSection>
+        <ExperienceSection light>
+          <ExperienceSectionContent>
+            <ExperienceDevices
+              device="phone"
+              side="left"
+              alt="The mobile notifications inbox showing recent vehicle alerts, and a push notification for a tire pressure warning."
+              models={phoneModels(rivianFleetMobileScreen1, rivianFleetMobileScreen2)}
+            >
               <ExperienceSectionText>
                 Our solution was a cross-platform notifications system covering push,
                 email, an in-app inbox, and Slack, so fleet managers get real-time alerts
@@ -93,7 +89,7 @@ export const Rivian = () => {
             </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection>
           <ExperienceSectionContent>
             <ExperienceDevices
               device="laptop"
@@ -117,37 +113,26 @@ export const Rivian = () => {
             </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
-          <ExperienceSectionColumns centered className={styles.columns}>
-            <div className={styles.imagesText}>
-              <ExperienceSectionHeading>Outcomes</ExperienceSectionHeading>
+        <ExperienceSection light>
+          <ExperienceSectionContent>
+            <ExperienceDevices
+              device="laptop"
+              side="left"
+              alt="The fleet dashboard showing a vehicle location alert, and a Slack notification for a sensor incident."
+              heading={<>Outcomes</>}
+              models={laptopModels(rivianFleetScreen4, rivianFleetScreen3)}
+            >
               <ExperienceSectionText>
                 Fleet managers gained real-time visibility into vehicle location, tire
                 pressure, and sensor incidents without needing to keep a dashboard open,
                 shipped end-to-end within 6 months of the team standing up as part of
                 Rivian&apos;s rapid scaling phase.
               </ExperienceSectionText>
-            </div>
-            <div className={styles.sidebarImages}>
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[rivianFleetScreen4]}
-                placeholder={rivianFleetScreen4}
-                alt="The fleet dashboard showing a vehicle location alert."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-              <Image
-                className={styles.sidebarImage}
-                srcSet={[rivianFleetScreen3]}
-                placeholder={rivianFleetScreen3}
-                alt="A Slack notification for a sensor incident."
-                sizes={`(max-width: ${media.mobile}px) 200px, 343px`}
-              />
-            </div>
-          </ExperienceSectionColumns>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
         </ExperienceSection>
+        <Footer />
       </ExperienceContainer>
-      <Footer />
     </Fragment>
   );
 };

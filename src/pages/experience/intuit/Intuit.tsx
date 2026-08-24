@@ -11,10 +11,10 @@ import {
   ExperienceDevices,
   ExperienceHeader,
   ExperienceSection,
+  ExperienceSectionColumns,
   ExperienceSectionContent,
   ExperienceSectionHeading,
   ExperienceSectionText,
-  ExperienceTextRow,
   laptopModel,
   phoneModels,
 } from 'pages/experience/_shared';
@@ -29,6 +29,34 @@ const roles = [
   'Identity & Auth',
   'AI/MCP Prototyping',
   'Team Leadership',
+];
+
+const designSystemStats = [
+  { value: '2 yrs', label: 'On the Design System team' },
+  { value: '100+', label: 'Reusable components' },
+  { value: '4', label: 'Products on the library' },
+];
+
+const passkeyStats = [
+  { value: '8', label: 'Cross-product launches shipped' },
+  { value: '26%', label: 'Of active customers on passkeys, up from 10%' },
+  { value: '100M+', label: 'Customer platform the work shipped to' },
+];
+
+const ssoStats = [
+  { value: '4+', label: 'Org boundaries spanned' },
+  { value: '100K+', label: 'Gross new subscribers from Amazon Business Prime' },
+  { value: '0', label: 'Escalations' },
+];
+
+const identity20Stats = [
+  { value: '85%', label: 'GTM velocity gain from the Identity 2.0 migration' },
+];
+
+/** One per subject in the section heading, each already stated in its copy. */
+const performanceStats = [
+  { value: '56%', label: 'P95 latency cut across the identity surfaces' },
+  { value: '10+', label: 'Identity repositories on the Storybook environment' },
 ];
 
 export const Intuit = () => {
@@ -60,6 +88,16 @@ export const Intuit = () => {
               alt="A component library documentation site showing button variants, theme tokens, and the products that use them."
               heading={<>Before Identity: the Intuit Design System</>}
               models={laptopModel(intuitDesignSystem)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {designSystemStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 My first two years at Intuit were on the Design System team, building and
@@ -69,6 +107,15 @@ export const Intuit = () => {
                 of the same shared components, so teams got consistency without giving up
                 their product identity.
               </ExperienceSectionText>
+            </ExperienceDevices>
+          </ExperienceSectionContent>
+        </ExperienceSection>
+        <ExperienceSection>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Storybook &amp; office hours
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I owned the team&apos;s Storybook as the source of truth for usage
                 guidance and accessibility notes, and held weekly office hours to help
@@ -76,6 +123,11 @@ export const Intuit = () => {
                 component-first, Storybook-driven habits I carried into the Identity org
                 afterward.
               </ExperienceSectionText>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Figma tooling &amp; on-call
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 Beyond the components themselves, I built internal Figma plugins that
                 synced design tokens and component specs directly from Figma into the
@@ -85,17 +137,28 @@ export const Intuit = () => {
                 I was the primary on-call point of contact for the design system, owning
                 production support and SLAs for the products built on top of it.
               </ExperienceSectionText>
-            </ExperienceDevices>
-          </ExperienceSectionContent>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceDevices
               device="phone"
               side="left"
+              className={styles.passkeyDense}
               alt="A passkey enrollment confirmation screen, and an identity verification screen using a digital driver's license from a phone wallet."
               heading={<>Leading Passkeys across Intuit</>}
               models={phoneModels(intuitPasskeyEnrollment, intuitMdlVerification)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {passkeyStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 I led the passkeys initiative across Intuit, architecting and shipping 8
@@ -116,26 +179,6 @@ export const Intuit = () => {
                 fewer drop-offs.
               </ExperienceSectionText>
             </ExperienceDevices>
-            <div className={styles.stats}>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>8</span>
-                <ExperienceSectionText>
-                  Cross-product launches shipped
-                </ExperienceSectionText>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>26%</span>
-                <ExperienceSectionText>
-                  Of active customers on passkeys, up from 10%
-                </ExperienceSectionText>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>100M+</span>
-                <ExperienceSectionText>
-                  Customer platform the work shipped to
-                </ExperienceSectionText>
-              </div>
-            </div>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
@@ -146,6 +189,16 @@ export const Intuit = () => {
               alt="An identity console showing linked partner accounts and sign-in sessions."
               heading={<>Cross-identity SSO for Amazon partnerships</>}
               models={laptopModel(intuitIdentityConsole)}
+              aside={
+                <div className={styles.deviceStats}>
+                  {ssoStats.map(stat => (
+                    <div className={styles.stat} key={stat.label}>
+                      <span className={styles.deviceStatNumber}>{stat.value}</span>
+                      <ExperienceSectionText size="s">{stat.label}</ExperienceSectionText>
+                    </div>
+                  ))}
+                </div>
+              }
             >
               <ExperienceSectionText>
                 I built Intuit&apos;s first cross-identity SSO: QuickBooks embedded
@@ -165,11 +218,9 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Agentic AI &amp; MCP-based authentication
-              </ExperienceSectionHeading>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>Agentic AI &amp; MCP</ExperienceSectionHeading>
               <ExperienceSectionText>
                 I currently lead the agentic AI track for Intuit Identity, integrating
                 MCP-based agent authentication. I built hands-on LLM-powered prototypes
@@ -177,20 +228,23 @@ export const Intuit = () => {
                 protocol-level guidance for non-human principals, and unblocked 3 teams
                 building agentic experiences on top of it.
               </ExperienceSectionText>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>AI-assisted engineering</ExperienceSectionHeading>
               <ExperienceSectionText>
                 I also lead the AI-assisted engineering track for the Identity frontend
                 org &mdash; running workshops and demos that introduced Claude, Claude
                 Skills, agents, and agent-context-building workflows, yielding an
                 estimated 3x velocity improvement for the team.
               </ExperienceSectionText>
-            </ExperienceTextRow>
-          </ExperienceSectionContent>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
         <ExperienceSection light>
-          <ExperienceSectionContent>
-            <ExperienceTextRow>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
               <ExperienceSectionHeading>
-                Identity 2.0, performance, and Storybook
+                Identity 2.0: the GraphQL migration
               </ExperienceSectionHeading>
               <ExperienceSectionText>
                 For Identity 2.0 I migrated 40 REST endpoints spanning 20 signup and
@@ -200,6 +254,19 @@ export const Intuit = () => {
                 gain, and the migration SOPs we set became the pattern other products
                 followed.
               </ExperienceSectionText>
+              <div className={styles.stats}>
+                {identity20Stats.map(stat => (
+                  <div className={styles.stat} key={stat.label}>
+                    <span className={styles.statNumber}>{stat.value}</span>
+                    <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Performance Improvements
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I also led a performance track that cut P95 latency by 56% (account
                 selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
@@ -208,11 +275,19 @@ export const Intuit = () => {
                 and PM partners prototype, validate, and sign off on identity experiences
                 before anything ships.
               </ExperienceSectionText>
-            </ExperienceTextRow>
-          </ExperienceSectionContent>
+              <div className={styles.stats}>
+                {performanceStats.map(stat => (
+                  <div className={styles.stat} key={stat.label}>
+                    <span className={styles.statNumber}>{stat.value}</span>
+                    <ExperienceSectionText>{stat.label}</ExperienceSectionText>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
+        <Footer />
       </ExperienceContainer>
-      <Footer />
     </Fragment>
   );
 };

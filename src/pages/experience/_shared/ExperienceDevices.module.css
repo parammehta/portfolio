@@ -1,82 +1,159 @@
 .devices {
+  display: grid;
+
+  /* The copy takes the larger share: an even split leaves a ~40 character
+     measure at this container width, which reads as a thin tall ribbon next to
+     a device that then looks marooned beside it. */
+  grid-template-columns: 1fr 1.3fr;
+  gap: var(--space3XL);
+  align-items: center;
   max-width: var(--maxWidthL);
   width: 100%;
   text-align: left;
 
-  /* Contain the float so the next section is not pulled up beside it. */
-  &::after {
-    content: '';
-    display: block;
-    clear: both;
-  }
-}
-
-.model {
-  float: right;
-  width: 46%;
-  margin: 0 0 var(--spaceXL) var(--space3XL);
-  shape-margin: var(--spaceL);
-
-  .devices[data-side='left'] & {
-    float: left;
-    margin: 0 var(--space3XL) var(--spaceXL) 0;
+  /* A lone phone is far narrower than its screenshot pair, so it does not need
+     to hold a full half of the row. */
+  &[data-side='right'] {
+    grid-template-columns: 1.3fr 1fr;
   }
 
-  /* Trace the device silhouette rather than its bounding box, so the copy
-     tucks into the stagger instead of leaving a rectangular hole. */
-  .devices[data-device='phone'] & {
-    aspect-ratio: 1 / 1.06;
-    shape-outside: polygon(
-      19% 0%,
-      59% 0%,
-      59% 27%,
-      81% 27%,
-      81% 100%,
-      42% 100%,
-      42% 72%,
-      19% 72%
-    );
+  /* A lone phone is far narrower than its screenshot pair, so it needs even
+     less of the row. */
+  &[data-device='phone'][data-count='1'] {
+    grid-template-columns: 1fr 2fr;
   }
 
-  .devices[data-device='laptop'] & {
-    width: 52%;
-    aspect-ratio: 1 / 0.78;
-    shape-outside: polygon(
-      19% 14%,
-      82% 14%,
-      82% 69%,
-      100% 69%,
-      100% 83%,
-      0% 83%,
-      0% 69%,
-      19% 69%
-    );
+  &[data-device='phone'][data-count='1'][data-side='right'] {
+    grid-template-columns: 2fr 1fr;
   }
 
   @media (--mediaLaptop) {
-    margin-left: var(--space2XL);
-
-    .devices[data-side='left'] & {
-      margin-right: var(--space2XL);
-    }
+    gap: var(--space2XL);
   }
 
-  /* Below tablet there is not enough measure left beside a floated device for
-     the wrapped text to stay readable, so stack instead. */
+  /* Below tablet the columns leave neither the device nor the copy enough
+     room, so stack them — device first, copy under it. */
   @media (--mediaTablet) {
-    float: none;
-    width: 100%;
-    max-width: 460px;
-    margin: 0 auto var(--space2XL);
+    grid-template-columns: 100%;
+    gap: var(--space2XL);
 
-    .devices[data-side='left'] & {
-      float: none;
-      margin: 0 auto var(--space2XL);
+    &[data-side='right'],
+    &[data-device='phone'][data-count='1'],
+    &[data-device='phone'][data-count='1'][data-side='right'] {
+      grid-template-columns: 100%;
+    }
+  }
+}
+
+/* Two rows so the aside can sit under the device on desktop but drop below the
+   copy on mobile — nesting it inside the device column would pin it above the
+   heading once the columns collapse. */
+.model {
+  grid-row: 1;
+  width: 100%;
+
+  /* With an aside the two share the column and hug the row boundary, which
+     lands the pair near the middle of the copy. Without one the device is the
+     whole column and centres on its own. */
+  align-self: center;
+
+  .devices[data-aside='true'] & {
+    align-self: end;
+  }
+
+  .devices[data-side='left'] & {
+    grid-column: 1;
+  }
+
+  .devices[data-side='right'] & {
+    grid-column: 2;
+  }
+
+  .devices[data-device='phone'] & {
+    aspect-ratio: 1 / 1.06;
+  }
+
+  .devices[data-device='phone'][data-count='1'] & {
+    aspect-ratio: 1 / 1.9;
+  }
+
+  .devices[data-device='laptop'] & {
+    aspect-ratio: 1 / 0.78;
+  }
+
+  .devices[data-device='laptop'][data-count='2'] & {
+    aspect-ratio: 1 / 1.02;
+  }
+
+  @media (--mediaTablet) {
+    justify-self: center;
+    align-self: center;
+    max-width: 460px;
+
+    .devices[data-side='left'] &,
+    .devices[data-side='right'] & {
+      grid-column: 1;
+    }
+
+    .devices[data-device='phone'][data-count='1'] & {
+      max-width: 280px;
     }
 
     .devices[data-device='laptop'] & {
-      width: 100%;
       max-width: 560px;
+    }
+  }
+}
+
+.aside {
+  grid-row: 2;
+  align-self: start;
+  width: 100%;
+  padding-top: var(--space2XL);
+
+  .devices[data-side='left'] & {
+    grid-column: 1;
+  }
+
+  .devices[data-side='right'] & {
+    grid-column: 2;
+  }
+
+  @media (--mediaTablet) {
+    grid-row: 3;
+    padding-top: 0;
+
+    .devices[data-side='left'] &,
+    .devices[data-side='right'] & {
+      grid-column: 1;
+    }
+  }
+}
+
+.copy {
+  /* Only span the aside's row when there is one — an empty second row still
+     takes a share of this item's height and pins the device to the top. */
+  grid-row: 1;
+  align-self: center;
+
+  .devices[data-aside='true'] & {
+    grid-row: 1 / span 2;
+  }
+
+  .devices[data-side='left'] & {
+    grid-column: 2;
+  }
+
+  .devices[data-side='right'] & {
+    grid-column: 1;
+  }
+
+  @media (--mediaTablet) {
+    grid-row: 2;
+
+    .devices[data-side='left'] &,
+    .devices[data-side='right'] & {
+      grid-column: 1;
     }
   }
 }

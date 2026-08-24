@@ -11,23 +11,19 @@ import walmartBabyRegistry1 from 'assets/walmart-baby-registry-1.png';
 import walmartBabyRegistry2 from 'assets/walmart-baby-registry-2.png';
 import walmartCoreComponents from 'assets/walmart-core-components-1.png';
 import { Footer, Meta } from 'components';
-import { Image } from 'refract-ui';
 import {
   ExperienceBackground,
   ExperienceContainer,
   ExperienceDevices,
   ExperienceHeader,
-  ExperienceImage,
   ExperienceSection,
   ExperienceSectionContent,
-  ExperienceSectionHeading,
   ExperienceSectionText,
-  ExperienceTextRow,
   laptopModel,
+  phoneModel,
   phoneModels,
 } from 'pages/experience/_shared';
 import { Fragment } from 'react';
-import { media } from 'utils/style';
 
 const title = 'Senior Software Engineer at Walmart';
 const description =
@@ -57,13 +53,22 @@ export const Walmart = () => {
         />
         <ExperienceSection padding="top">
           <ExperienceSectionContent>
-            <ExperienceImage
-              raised
-              srcSet={[walmartHome1, walmartHome2]}
-              placeholder={walmartHome1}
-              sizes={`(max-width: ${media.mobile}px) 100vw, (max-width: ${media.tablet}px) 800px, 1000px`}
+            <ExperienceDevices
+              device="laptop"
+              side="left"
               alt="The Walmart marketplace seller experience homepage."
-            />
+              heading={<>Re-platforming the 3P seller experience</>}
+              models={laptopModel([walmartHome1, walmartHome2])}
+            >
+              <ExperienceSectionText>
+                On the Marketplace &amp; User Generated Content team, I led the re-platform
+                of Walmart&apos;s third-party seller experience onto GraphQL, React,
+                TypeScript, and Next.js &mdash; serving 3.1M+ customers. I architected
+                end-to-end seller workflows across the homepage, search, item page, cart,
+                and checkout with multiple product and platform teams, and led holiday
+                capacity planning and observability setup for peak traffic.
+              </ExperienceSectionText>
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection light>
@@ -93,42 +98,23 @@ export const Walmart = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceTextRow>
-            <ExperienceSectionHeading>
-              Re-platforming the 3P seller experience
-            </ExperienceSectionHeading>
-            <ExperienceSectionText>
-              On the Marketplace &amp; User Generated Content team, I led the re-platform
-              of Walmart&apos;s third-party seller experience onto GraphQL, React,
-              TypeScript, and Next.js &mdash; serving 3.1M+ customers. I architected
-              end-to-end seller workflows across the homepage, search, item page, cart,
-              and checkout with multiple product and platform teams, and led holiday
-              capacity planning and observability setup for peak traffic.
-            </ExperienceSectionText>
-          </ExperienceTextRow>
-        </ExperienceSection>
-        <ExperienceSection light>
           <ExperienceSectionContent>
-            <Image
-              raised
-              srcSet={[walmartSeller1, walmartSeller2]}
-              placeholder={walmartSeller1}
+            <ExperienceDevices
+              device="laptop"
+              side="right"
               alt="The seller ratings and reviews page on a product listing."
-              sizes="100vw"
-            />
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Seller ratings and reviews
-              </ExperienceSectionHeading>
+              heading={<>Seller ratings and reviews</>}
+              models={laptopModel([walmartSeller1, walmartSeller2])}
+            >
               <ExperienceSectionText>
                 I built the seller ratings and reviews page, which was ranked the #1
                 feature on the marketplace roadmap in Q2 2021 &mdash; giving buyers trust
                 signals about third-party sellers before checking out.
               </ExperienceSectionText>
-            </ExperienceTextRow>
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceDevices
               device="phone"
@@ -146,12 +132,15 @@ export const Walmart = () => {
             </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection light>
+        <ExperienceSection>
           <ExperienceSectionContent>
-            <ExperienceTextRow>
-              <ExperienceSectionHeading>
-                Seller communication and tooling
-              </ExperienceSectionHeading>
+            <ExperienceDevices
+              device="phone"
+              side="right"
+              alt="A product page with review and messaging components."
+              heading={<>Seller communication and tooling</>}
+              models={phoneModel(walmartProduct1)}
+            >
               <ExperienceSectionText>
                 I independently built an internal email routing system for sellers,
                 eliminating the dependency on external email clients, unifying the
@@ -163,17 +152,10 @@ export const Walmart = () => {
                 Prettier, StyleLint) across the team, reducing style-related review
                 friction and enforcing consistent code quality.
               </ExperienceSectionText>
-            </ExperienceTextRow>
-            <Image
-              raised
-              srcSet={[walmartProduct1]}
-              placeholder={walmartProduct1}
-              alt="A product page with review and messaging components."
-              sizes={`(max-width: ${media.mobile}px) 300px, 400px`}
-            />
+            </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
-        <ExperienceSection>
+        <ExperienceSection light>
           <ExperienceSectionContent>
             <ExperienceDevices
               device="phone"
@@ -195,8 +177,8 @@ export const Walmart = () => {
             </ExperienceDevices>
           </ExperienceSectionContent>
         </ExperienceSection>
+        <Footer />
       </ExperienceContainer>
-      <Footer />
     </Fragment>
   );
 };
