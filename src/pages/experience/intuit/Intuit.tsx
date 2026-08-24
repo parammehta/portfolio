@@ -99,11 +99,11 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionContent>
-            <ExperienceSectionHeading>
-              Storybook, Figma tooling, and on-call ownership
-            </ExperienceSectionHeading>
-            <ExperienceSectionColumns className={styles.splitColumns}>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Storybook &amp; office hours
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I owned the team&apos;s Storybook as the source of truth for usage
                 guidance and accessibility notes, and held weekly office hours to help
@@ -111,6 +111,11 @@ export const Intuit = () => {
                 component-first, Storybook-driven habits I carried into the Identity org
                 afterward.
               </ExperienceSectionText>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>
+                Figma tooling &amp; on-call
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 Beyond the components themselves, I built internal Figma plugins that
                 synced design tokens and component specs directly from Figma into the
@@ -120,8 +125,8 @@ export const Intuit = () => {
                 I was the primary on-call point of contact for the design system, owning
                 production support and SLAs for the products built on top of it.
               </ExperienceSectionText>
-            </ExperienceSectionColumns>
-          </ExperienceSectionContent>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
         <ExperienceSection light>
           <ExperienceSectionContent>
@@ -142,23 +147,26 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionContent>
-            <ExperienceSectionHeading>
-              Passkey adoption and digital ID verification
-            </ExperienceSectionHeading>
-            <ExperienceSectionColumns className={styles.splitColumns}>
-              <ExperienceSectionText>
-                The rollout drove passkey adoption from 10% to 26% of active Intuit
-                customers, meaningfully strengthening Intuit&apos;s phishing-resistant
-                authentication posture across the platform.
-              </ExperienceSectionText>
-              <ExperienceSectionText>
-                Alongside passkeys, I shipped digital ID (mDL) verification, letting
-                customers prove their identity with the driver&apos;s license or ID
-                already saved in their phone&apos;s wallet instead of manually uploading a
-                document photo &mdash; a faster path through identity verification with
-                fewer drop-offs.
-              </ExperienceSectionText>
+          <ExperienceSectionContent width="xl">
+            <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+              <div className={styles.identityColumn}>
+                <ExperienceSectionHeading>Passkey adoption</ExperienceSectionHeading>
+                <ExperienceSectionText>
+                  The rollout drove passkey adoption from 10% to 26% of active Intuit
+                  customers, meaningfully strengthening Intuit&apos;s phishing-resistant
+                  authentication posture across the platform.
+                </ExperienceSectionText>
+              </div>
+              <div className={styles.identityColumn}>
+                <ExperienceSectionHeading>Digital ID verification</ExperienceSectionHeading>
+                <ExperienceSectionText>
+                  Alongside passkeys, I shipped digital ID (mDL) verification, letting
+                  customers prove their identity with the driver&apos;s license or ID
+                  already saved in their phone&apos;s wallet instead of manually uploading a
+                  document photo &mdash; a faster path through identity verification with
+                  fewer drop-offs.
+                </ExperienceSectionText>
+              </div>
             </ExperienceSectionColumns>
             <div className={styles.stats}>
               <div className={styles.stat}>
@@ -209,11 +217,9 @@ export const Intuit = () => {
           </ExperienceSectionContent>
         </ExperienceSection>
         <ExperienceSection>
-          <ExperienceSectionContent>
-            <ExperienceSectionHeading>
-              Agentic AI &amp; MCP-based authentication
-            </ExperienceSectionHeading>
-            <ExperienceSectionColumns className={styles.splitColumns}>
+          <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>Agentic AI &amp; MCP</ExperienceSectionHeading>
               <ExperienceSectionText>
                 I currently lead the agentic AI track for Intuit Identity, integrating
                 MCP-based agent authentication. I built hands-on LLM-powered prototypes
@@ -221,14 +227,17 @@ export const Intuit = () => {
                 protocol-level guidance for non-human principals, and unblocked 3 teams
                 building agentic experiences on top of it.
               </ExperienceSectionText>
+            </div>
+            <div className={styles.identityColumn}>
+              <ExperienceSectionHeading>AI-assisted engineering</ExperienceSectionHeading>
               <ExperienceSectionText>
                 I also lead the AI-assisted engineering track for the Identity frontend
                 org &mdash; running workshops and demos that introduced Claude, Claude
                 Skills, agents, and agent-context-building workflows, yielding an
                 estimated 3x velocity improvement for the team.
               </ExperienceSectionText>
-            </ExperienceSectionColumns>
-          </ExperienceSectionContent>
+            </div>
+          </ExperienceSectionColumns>
         </ExperienceSection>
         <ExperienceSection light>
           <ExperienceSectionColumns width="xl" className={styles.identityColumns}>
@@ -255,8 +264,8 @@ export const Intuit = () => {
             </div>
             <div className={styles.identityColumn}>
               <ExperienceSectionHeading>
-                  Performance Improvements
-                </ExperienceSectionHeading>
+                Performance Improvements
+              </ExperienceSectionHeading>
               <ExperienceSectionText>
                 I also led a performance track that cut P95 latency by 56% (account
                 selector: 8s &rarr; 3.5s, account manager: 11s &rarr; 7.2s) through bundle
