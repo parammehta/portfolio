@@ -19,7 +19,14 @@
 }
 
 .identityColumns {
-  align-items: start;
+  /* `stretch` (grid's default, restated for clarity): both columns take the
+     row's full height, not just their own content's. That's what lets
+     `.identityColumn .stats`'s `margin-top: auto` below push each column's
+     stat row down to a shared baseline — with `align-items: start` there is
+     no extra height in the shorter column for that margin to push into, so
+     the stats would land right after each column's own paragraph instead of
+     lining up with each other. */
+  align-items: stretch;
 
   /* The shared `hyphens: auto` is tuned for narrower image+caption columns;
      at this measure it breaks plain words ("en-gineers", "prod-uct") for no
