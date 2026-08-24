@@ -79,3 +79,27 @@
   display: block;
   margin-bottom: 8px;
 }
+
+/* This pane's copy is three stacked paragraphs — merging "Leading Passkeys"
+   with the adoption/digital-ID copy (so the stats have one clear pane to
+   belong to, rather than floating under two separated columns) pushed it
+   past a short viewport's available height. `--lineHeightBody` and
+   `--spaceL` are read by the Text component and the paragraph-gap rule
+   respectively; overriding them locally tightens only this pane's copy
+   without touching the tokens (or every other pane using them) globally. */
+.passkeyDense {
+  --lineHeightBody: 1.4;
+  --spaceL: var(--spaceM);
+
+  & h2 {
+    margin-bottom: 0.4em;
+  }
+
+  /* `.aside`'s own `padding-top` is `--space2XL` (48px) — that token is also
+     the horizontal gap between this pane's two grid columns, so it can't be
+     redefined locally without narrowing the device/copy gap too. Pulling the
+     stats block up with a negative margin instead only touches this element. */
+  & .deviceStats {
+    margin-top: calc(-1 * var(--spaceL));
+  }
+}

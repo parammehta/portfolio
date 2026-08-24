@@ -145,6 +145,7 @@ export const Intuit = () => {
             <ExperienceDevices
               device="phone"
               side="left"
+              className={styles.passkeyDense}
               alt="A passkey enrollment confirmation screen, and an identity verification screen using a digital driver's license from a phone wallet."
               heading={<>Leading Passkeys across Intuit</>}
               models={phoneModels(intuitPasskeyEnrollment, intuitMdlVerification)}
