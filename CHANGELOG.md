@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.1](https://github.com/parammehta/portfolio/compare/v1.19.0...v1.19.1) (2026-08-25)
+
+
+### Bug Fixes
+
+* count contact CTA clicks from every entrance ([#91](https://github.com/parammehta/portfolio/issues/91)) ([b5af814](https://github.com/parammehta/portfolio/commit/b5af81425cd0ba14dbcee748b8f365bf2bc5033e))
+
 ## [1.19.0](https://github.com/parammehta/portfolio/compare/v1.18.0...v1.19.0) (2026-08-25)
 
 
