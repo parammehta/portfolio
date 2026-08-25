@@ -21,7 +21,7 @@ export const ALLOWED_EVENTS = new Set([
   'nav_link_click',
   'social_link_click',
   'theme_toggle',
-  'profile_contact_click',
+  'contact_cta_click',
   'home_experience_slide',
   'experience_tab_select',
   'experience_details_click',
@@ -96,15 +96,26 @@ export async function handleEvent(request, env) {
     payload.props && typeof payload.props === 'object' ? payload.props : {};
   const reason = field(props.reason);
   // A single free-text field for whichever prop identifies *what* was
-  // clicked (nav/social label, experience company, skills tool link, or the
-  // resulting theme on a theme_toggle).
-  const detail = field(props.label ?? props.company ?? props.tool ?? props.theme);
+  // clicked (nav/social label, experience company, skills tool link, the
+  // resulting theme on a theme_toggle, or which CTA led to the contact form).
+  const detail = field(
+    props.label ?? props.company ?? props.tool ?? props.theme ?? props.source
+  );
 
   const referer = field(request.headers.get('Referer') || '', 256);
   const ua = parseUserAgent(
     request.headers.get('User-Agent') || '',
     request.headers.get('Sec-CH-UA-Mobile') || ''
   );
+
+  // Verifying the deployed ingest path used to mean writing to the real
+  // dataset, and Analytics Engine has no delete API — so smoke-testing
+  // production permanently polluted it. `X-Dry-Run: 1` runs every check above
+  // (origin, size, JSON, allowlist) and the UA parsing, then returns the same
+  // 204 without recording anything.
+  if (request.headers.get('X-Dry-Run') === '1') {
+    return new Response(null, { status: 204, headers: { ...cors, 'X-Dry-Run': 'accepted' } });
+  }
 
   // `writeDataPoint` is only bound in deployed/`wrangler dev` runs; guard so
   // a missing binding degrades to a no-op instead of a 500.

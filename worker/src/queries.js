@@ -152,6 +152,15 @@ export function dashboardQueries(rawRange = DEFAULT_RANGE, rawEvent = '') {
     funnel: `SELECT blob1 AS label, sum(_sample_interval) AS n
              FROM ${DATASET} ${where(range, '')} GROUP BY label ORDER BY n DESC`,
 
+    // Which CTA led people to the form. The funnel's top step used to be the
+    // profile CTA alone, which read as a broken button: it is one of three
+    // entrances, and the busiest two (the hero buttons) were untracked, so the
+    // step showed 0 above a row of real submissions.
+    ctaSources: `SELECT blob5 AS label, sum(_sample_interval) AS n
+                 FROM ${DATASET}
+                 ${where(range, '', { extra: "blob1 = 'contact_cta_click' AND blob5 != ''" })}
+                 GROUP BY label ORDER BY n DESC`,
+
     recent: `SELECT timestamp, blob1 AS event, blob5 AS detail, blob7 AS page,
                     blob4 AS country, blob8 AS device
              FROM ${DATASET} ${where(range, event)}

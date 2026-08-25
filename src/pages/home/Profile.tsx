@@ -61,7 +61,7 @@ export const Profile = ({ id, visible, sectionRef }: ProfileProps) => {
 
   const handleContactClick = (event: MouseEvent) => {
     event.preventDefault();
-    trackEvent(analyticsEvents.profileContactClick);
+    trackEvent(analyticsEvents.contactCtaClick, { source: 'profile' });
     scrollToHash('#contact');
   };
 

@@ -457,8 +457,9 @@ export const CLIENT_JS = `
 
     // The CTA click is the top of the funnel: it is what gets someone to the
     // form at all, so the interesting drop-off is clicked -> submitted.
+    // Counted across every entrance (hero, profile, nav) — see ctaSources.
     var steps = [
-      { label: 'CTA clicked', n: by.profile_contact_click || 0 },
+      { label: 'CTA clicked', n: by.contact_cta_click || 0 },
       { label: 'Submitted', n: by.contact_submit || 0 },
       { label: 'Succeeded', n: by.contact_success || 0 }
     ];
@@ -490,6 +491,19 @@ export const CLIENT_JS = `
     var foot = el('p', 'foot');
     foot.appendChild(document.createTextNode('Failed submissions: '));
     foot.appendChild(el('strong', null, n(failed)));
+
+    // Naming the entrances makes a low top step readable as "the hero button
+    // is doing the work" rather than as a broken funnel.
+    var sources = rows('ctaSources');
+    if (sources.length) {
+      foot.appendChild(document.createTextNode(' · via '));
+      sources.forEach(function (r, i) {
+        if (i) foot.appendChild(document.createTextNode(', '));
+        foot.appendChild(document.createTextNode(r.label + ' '));
+        foot.appendChild(el('strong', null, n(r.n)));
+      });
+    }
+
     var out = el('div');
     out.appendChild(wrap);
     out.appendChild(foot);
