@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/parammehta/portfolio/compare/v1.18.0...v1.19.0) (2026-08-25)
+
+
+### Features
+
+* overhaul the analytics dashboard ([#89](https://github.com/parammehta/portfolio/issues/89)) ([4736a3c](https://github.com/parammehta/portfolio/commit/4736a3c52ce2ef5ea1b2978723144d82a435a645))
+
 ## [1.18.0](https://github.com/parammehta/portfolio/compare/v1.17.0...v1.18.0) (2026-08-24)
 
 
