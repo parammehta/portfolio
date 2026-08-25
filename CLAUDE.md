@@ -24,6 +24,8 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 | Deploy site | `npm run deploy` |
 | Deploy API functions | `npm run deploy:functions` |
 | Deploy analytics Worker | `npm run deploy:worker` |
+| Worker tests | `cd worker && npm test` |
+| Worker SQL check (live) | `cd worker && CF_API_TOKEN=<token> npm run verify` |
 
 ## Node version
 
@@ -40,7 +42,7 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 - **Component library**: `refract-ui` ([repo](https://github.com/parammehta/refract-ui), [Storybook](https://storybook.parammehta.com)) supplies the primitives extracted from this site. `LinkProvider` (from `refract-ui`) is wired in `_app.page.tsx` with `src/shell/NextLinkAdapter.tsx` so `Link`/`Button` route through `next/link` without the library depending on Next directly. `src/shell/fonts.ts` supplies `--brandFontStack` (Gotham) locally — the library is font-agnostic since Gotham is commercially licensed and can't ship in a public package. `refract-ui/styles.css` is imported once in `_app.page.tsx`; `tokenStyles` (also from `refract-ui`) is inlined into `<head>` in `_document.page.tsx` alongside `fontStyles`.
 - **3D**: Three.js for the hero displacement sphere (local, `src/pages/home/HeroSphere.tsx`) and device models / carousel (`refract-ui`'s `Model`/`Carousel`, currently unused on any page but available). Draco decoder and device `.glb` files are copied from `node_modules/refract-ui/dist/assets` to `public/draco/` and `public/models/` at build time by `scripts/draco.js`.
 - **SVG**: imported as React components via `@svgr/webpack`. Use `?url` query to force asset URL import instead.
-- **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`. Custom events are POSTed to a Cloudflare Worker (`worker/`) that records them to a Workers Analytics Engine dataset; CF Web Analytics itself has no event API.
+- **Analytics**: Cloudflare Web Analytics (client-side beacon in SPA mode, env var `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN`). Custom events go through `utils/analytics`. Custom events are POSTed to a Cloudflare Worker (`worker/`) that records them to a Workers Analytics Engine dataset; CF Web Analytics itself has no event API. Event names live in `analyticsEvents` (`src/utils/analytics.ts`) **and** in the Worker's `ALLOWED_EVENTS` allowlist, which 422s anything else — `src/utils/analyticsEvents.test.ts` asserts the two match, because they silently drifted once and two events were dropped for months.
 
 ## Project structure
 
@@ -57,7 +59,9 @@ src/
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder,
                   device .glb models — the latter two populated at build time, see scripts/draco.js)
 functions/      — serverless API functions (separate deploy via serverless framework)
-worker/         — Cloudflare Worker: custom-event sink to Analytics Engine (separate deploy via wrangler)
+worker/         — Cloudflare Worker: custom-event sink to Analytics Engine, plus the
+                  dashboard it serves at /dashboard (separate deploy via wrangler; has its
+                  own `npm test` and `npm run verify` — see worker/README.md)
 scripts/        — build-time scripts (sitemap generation, draco/model copy, CloudFront invalidation)
 ```
 

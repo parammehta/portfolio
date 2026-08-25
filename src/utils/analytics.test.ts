@@ -48,19 +48,95 @@ describe('trackEvent', () => {
 describe('createBeaconSink', () => {
   const url = 'https://analytics.example.com';
 
-  it('sends the event as JSON via sendBeacon when available', () => {
+  function beaconBody(sendBeacon: jest.Mock) {
+    return JSON.parse(sendBeacon.mock.calls[0][1]);
+  }
+
+  function stubBeacon() {
     const sendBeacon = jest.fn().mockReturnValue(true);
     Object.defineProperty(navigator, 'sendBeacon', {
       configurable: true,
       value: sendBeacon,
     });
+    return sendBeacon;
+  }
+
+  it('sends the event as JSON via sendBeacon when available', () => {
+    const sendBeacon = stubBeacon();
 
     createBeaconSink(url)({ name: 'resume_open', props: { reason: 'x' } });
 
-    expect(sendBeacon).toHaveBeenCalledWith(
-      url,
-      JSON.stringify({ name: 'resume_open', props: { reason: 'x' } })
-    );
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+    expect(sendBeacon.mock.calls[0][0]).toBe(url);
+    expect(beaconBody(sendBeacon)).toMatchObject({
+      name: 'resume_open',
+      props: { reason: 'x' },
+    });
+  });
+
+  // The Worker can't derive the external referrer itself — the Referer header
+  // on a beacon is our own page. Only the client sees document.referrer.
+  it('attaches the referrer hostname when the visitor came from elsewhere', () => {
+    const sendBeacon = stubBeacon();
+    jest.spyOn(document, 'referrer', 'get').mockReturnValue('https://news.ycombinator.com/item?id=1');
+
+    createBeaconSink(url)({ name: 'nav_link_click', props: { label: 'Resume' } });
+
+    expect(beaconBody(sendBeacon).props).toMatchObject({
+      label: 'Resume',
+      ref: 'news.ycombinator.com',
+    });
+  });
+
+  it('omits the referrer for same-origin navigation', () => {
+    const sendBeacon = stubBeacon();
+    jest
+      .spyOn(document, 'referrer', 'get')
+      .mockReturnValue(`${window.location.origin}/resume/`);
+
+    createBeaconSink(url)({ name: 'nav_link_click' });
+
+    expect(beaconBody(sendBeacon).props.ref).toBeUndefined();
+  });
+
+  it('reuses one session id across events in the same tab', () => {
+    const sendBeacon = stubBeacon();
+    const sink = createBeaconSink(url);
+
+    sink({ name: 'contact_submit' });
+    sink({ name: 'contact_success' });
+
+    const first = JSON.parse(sendBeacon.mock.calls[0][1]).props.sid;
+    const second = JSON.parse(sendBeacon.mock.calls[1][1]).props.sid;
+    expect(first).toEqual(expect.any(String));
+    expect(second).toBe(first);
+  });
+
+  // Safari's private mode throws on sessionStorage; an event with no session
+  // id is still an event worth recording.
+  it('still sends the event when sessionStorage is unavailable', () => {
+    const sendBeacon = stubBeacon();
+    const real = window.sessionStorage;
+    // Reading the property itself throws in locked-down privacy modes, so
+    // replace the whole object rather than spying on one method.
+    Object.defineProperty(window, 'sessionStorage', {
+      configurable: true,
+      get() {
+        throw new Error('denied');
+      },
+    });
+
+    try {
+      createBeaconSink(url)({ name: 'contact_submit' });
+    } finally {
+      Object.defineProperty(window, 'sessionStorage', {
+        configurable: true,
+        value: real,
+      });
+    }
+
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+    expect(beaconBody(sendBeacon).props.sid).toBeUndefined();
   });
 
   // When the user-agent queue is full sendBeacon returns false; we must not
