@@ -13,6 +13,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useInterval, usePrevious, useScrollToHash } from 'hooks';
 import dynamic from 'next/dynamic';
 import RouterLink from 'next/link';
+import { analyticsEvents, trackEvent } from 'utils/analytics';
 import { cssProps } from 'utils/style';
 import styles from './Intro.module.css';
 
@@ -62,7 +63,15 @@ export function Intro({
 
   const handleScrollClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    scrollToHash(event.currentTarget.href);
+    const { href } = event.currentTarget;
+    // This handler serves every in-page CTA, so the contact ones are picked out
+    // by their target rather than by wiring a second handler onto them. The
+    // hero buttons are the busiest route to the form and went untracked for
+    // months, which made the dashboard's contact funnel look empty at the top.
+    if (href.includes('#contact')) {
+      trackEvent(analyticsEvents.contactCtaClick, { source: 'hero' });
+    }
+    scrollToHash(href);
   };
 
   return (

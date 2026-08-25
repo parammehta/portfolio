@@ -62,3 +62,8 @@ test('the allowlist covers the events that were previously dropped', () => {
   assert.ok(ALLOWED_EVENTS.has('scheduling_open'));
   assert.ok(ALLOWED_EVENTS.has('home_experience_slide'));
 });
+
+test('the CTA event replaced the profile-only one on the allowlist', () => {
+  assert.ok(ALLOWED_EVENTS.has('contact_cta_click'));
+  assert.ok(!ALLOWED_EVENTS.has('profile_contact_click'));
+});

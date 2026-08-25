@@ -71,3 +71,14 @@ test('counts are sampling-adjusted, and distinct counts use the one supported sp
     assert.doesNotMatch(sql, /\bconcat\(/i);
   }
 });
+
+test('the funnel counts CTA clicks from every entrance, not just the profile', () => {
+  const q = dashboardQueries('30d');
+  // The old top step read profile_contact_click alone — one of three routes to
+  // the form, and not the busy one, so the funnel showed 0 above real
+  // submissions. contact_cta_click is emitted by all of them.
+  assert.doesNotMatch(q.funnel, /profile_contact_click/);
+  assert.match(q.ctaSources, /blob1 = 'contact_cta_click'/);
+  // blob5 carries the `source` prop, so the split survives without a new blob.
+  assert.match(q.ctaSources, /blob5 AS label/);
+});

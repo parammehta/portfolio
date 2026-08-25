@@ -38,7 +38,7 @@ export const analyticsEvents = {
   navLinkClick: 'nav_link_click',
   socialLinkClick: 'social_link_click',
   themeToggle: 'theme_toggle',
-  profileContactClick: 'profile_contact_click',
+  contactCtaClick: 'contact_cta_click',
   homeExperienceSlide: 'home_experience_slide',
   experienceTabSelect: 'experience_tab_select',
   experienceDetailsClick: 'experience_details_click',

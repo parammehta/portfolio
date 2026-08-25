@@ -16,6 +16,10 @@ is Cloudflare infrastructure.
   `www.parammehta.com`); everything else gets `403`.
 - Rejects any event name not on the allowlist (kept in sync with
   `analyticsEvents` in `src/utils/analytics.ts`).
+- Honours `X-Dry-Run: 1` on `POST /`: runs every check and returns the same
+  204, but records nothing. Analytics Engine has no delete API, so this is how
+  the deployed ingest path gets smoke-tested without leaving synthetic rows in
+  the dataset forever.
 - Writes the fields below, indexed by event name (the sampling key). The blob
   list is **append-only** — a new field goes on the end so existing rows keep
   their meaning.

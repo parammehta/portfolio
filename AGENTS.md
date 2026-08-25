@@ -23,6 +23,8 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 | Typecheck | `npm run typecheck` |
 | Deploy site | `npm run deploy` |
 | Deploy API functions | `npm run deploy:functions` |
+| All CI checks locally | `npm run preflight` |
+| Verify a deploy is live | `npm run verify:deploy` |
 | Deploy analytics Worker | `npm run deploy:worker` |
 | Worker tests | `cd worker && npm test` |
 | Worker SQL check (live) | `cd worker && CF_API_TOKEN=<token> npm run verify` |
@@ -124,6 +126,25 @@ Three layers, each with its own runner and its own job in CI.
 Those five job names are the **required status checks** on `main` — a PR cannot merge until all five are green.
 
 The workflow also declares `workflow_call`, and `deploy.yml` calls it as a `verify` job that `Build & Deploy` depends on. So the full suite runs again against the released commit before anything reaches S3, including for a manual `workflow_dispatch` deploy.
+
+## Verification
+
+`npm run preflight` runs everything CI runs, in order, in one command: a
+lockfile-vs-node_modules freshness check first (a stale local install produces
+failures that look exactly like source bugs), then lint, stylelint, typecheck,
+unit, integration, worker tests, and finally build + e2e. It uses
+`set -euo pipefail` so a failure inside a pipeline can't be masked by the
+exit code of the last command. Export `CF_API_TOKEN` to include the live
+Analytics Engine SQL check.
+
+`npm run verify:deploy` asks the deployed site what it is actually serving
+rather than trusting a green workflow badge — it compares the served Next.js
+build id against `build/BUILD_ID` and can assert that a marker string is
+present in the served JS:
+
+```bash
+npm run verify:deploy -- --expect contact_cta_click
+```
 
 ## Deployment
 

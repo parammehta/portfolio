@@ -159,6 +159,12 @@ export const Navbar = () => {
     trackEvent(analyticsEvents.navLinkClick, {
       label: event.currentTarget.textContent?.trim() ?? '',
     });
+    // Deliberately a second event on the same click: nav_link_click answers
+    // "which nav items get used", contact_cta_click answers "how did people
+    // reach the form". The nav is one of three routes to it.
+    if (hash === 'contact') {
+      trackEvent(analyticsEvents.contactCtaClick, { source: 'nav' });
+    }
     setTarget(null);
 
     if (hash && route === '/') {
