@@ -16,12 +16,76 @@ is Cloudflare infrastructure.
   `www.parammehta.com`); everything else gets `403`.
 - Rejects any event name not on the allowlist (kept in sync with
   `analyticsEvents` in `src/utils/analytics.ts`).
-- Writes `blob1=name`, `blob2=reason`, `blob3=referer`, `blob4=country`,
-  `blob5=detail`, `blob6=visitor`, `blob7=page`, `double1=1`, indexed by event
-  name (the sampling key). The blob list is **append-only** — a new field goes
-  on the end so existing rows keep their meaning.
-- Serves a protected `GET /dashboard` that charts the events (see
-  [Query the data](#query-the-data)).
+- Writes the fields below, indexed by event name (the sampling key). The blob
+  list is **append-only** — a new field goes on the end so existing rows keep
+  their meaning.
+- Serves a protected `GET /dashboard` (page) and `GET /dashboard/data` (JSON)
+  that chart the events (see [Query the data](#query-the-data)).
+
+### Fields
+
+| Field | Meaning | Source |
+|---|---|---|
+| `index1` | event name | the sampling key — Analytics Engine allows exactly one |
+| `blob1` | event name | |
+| `blob2` | `props.reason` | only `contact_error` sets it |
+| `blob3` | `Referer` header | our own page URL, **not** the external source |
+| `blob4` | country | `request.cf.country` |
+| `blob5` | detail | `props.label ?? company ?? tool ?? theme` — one polymorphic slot |
+| `blob6` | visitor id | see [About `blob6`](#about-blob6-visitor) |
+| `blob7` | page path | pathname of `blob3` |
+| `blob8` | device | `mobile` / `tablet` / `desktop` |
+| `blob9` | browser | Chrome / Safari / Firefox / Edge / Opera / Other |
+| `blob10` | OS | iOS / Android / macOS / Windows / Linux / Other |
+| `blob11` | external referrer host | `props.ref` from the client |
+| `blob12` | session id | `props.sid` from the client (per tab) |
+| `double1` | `1` | unused — every count is `sum(_sample_interval)` |
+
+`blob8`–`blob10` are derived server-side from the `User-Agent` and
+`Sec-CH-UA-Mobile` (see `parseUserAgent` in `src/ingest.js`).
+
+`blob11` and `blob12` **have to come from the client**: the `Referer` header on
+a beacon is the page the event fired on — our own URL — so the Worker cannot
+see where a visitor actually came from. `createBeaconSink` in
+`src/utils/analytics.ts` attaches `ref` (the referrer hostname, blank when
+same-origin) and `sid` (a `sessionStorage` id) to every event.
+
+> **These five fields are blank for every row written before they were added.**
+> The dashboard says so rather than showing a breakdown of whatever happens to
+> be filled in — the `coverage` query reports what fraction of the range has
+> each field, and the panels carry that as a note.
+
+### Modules
+
+`src/index.js` is the router and nothing else:
+
+| File | Contains |
+|---|---|
+| `src/index.js` | route table, the shared Access + config gate, response helpers |
+| `src/ingest.js` | `ALLOWED_EVENTS`, `handleEvent`, `visitorId`, `pagePath`, `parseUserAgent` |
+| `src/access.js` | Cloudflare Access JWT verification |
+| `src/queries.js` | `RANGES`, `dashboardQueries(range, event)`, the SQL runner |
+| `src/render/shell.js` | the HTML document + the inlined bootstrap payload |
+| `src/render/styles.js` | the stylesheet |
+| `src/render/client.js` | the client app, as a string |
+
+### Tests
+
+```bash
+cd worker && npm test          # node --test, no dependencies
+```
+
+Covers `parseUserAgent`'s ordering traps (every Edge UA also says "Chrome";
+every Chrome UA also says "Safari") and `dashboardQueries` — that each range
+builds a predicate, that an unknown range or an off-allowlist event filter is
+dropped rather than interpolated into SQL, and that no query uses a function
+the dialect rejects.
+
+The allowlist is separately pinned by `src/utils/analyticsEvents.test.ts` in
+the site's Jest suite, which compares it against `analyticsEvents`. The two
+lists drifted once already — `scheduling_open` and `home_experience_slide` were
+emitted by the site and 422'd here for as long as they existed, so no rows were
+ever recorded for them.
 
 ### About `blob6` (visitor)
 
@@ -65,9 +129,14 @@ Two checks catch that before it reaches the live dashboard:
 
 ```bash
 cd worker
-CF_API_TOKEN=<token> npm run verify   # runs every dashboardQueries() entry against the live SQL API
+npm test                              # pure-function checks, no network
+CF_API_TOKEN=<token> npm run verify   # every dashboardQueries() entry, for every range, against the live SQL API
 npx wrangler dev                      # then hit /dashboard once locally against real data
 ```
+
+`verify` sweeps all five ranges, not just the default — the ranges differ in
+their time predicate and their bucketing function, so a query that only breaks
+on `24h` (hourly buckets) or `all` (no predicate at all) still fails the check.
 
 `verify` needs the same token as `CF_API_TOKEN` (Account Analytics: Read) —
 export it locally, it isn't read from the deployed secret. A query that fails
@@ -104,11 +173,18 @@ SELECT toStartOfDay(timestamp) AS day, blob1 AS event, sum(_sample_interval) AS 
 FROM portfolio_events WHERE timestamp > now() - INTERVAL '30' DAY
 GROUP BY day, event ORDER BY day;
 
--- top referrers / countries
-SELECT blob3 AS referer, sum(_sample_interval) AS n FROM portfolio_events
-WHERE blob3 != '' GROUP BY referer ORDER BY n DESC LIMIT 10;
+-- traffic sources (blob11) and countries. NB blob3 is the Referer *header*,
+-- which on a beacon is our own page — it is not where the visitor came from.
+SELECT blob11 AS source, sum(_sample_interval) AS n FROM portfolio_events
+WHERE blob11 != '' GROUP BY source ORDER BY n DESC LIMIT 10;
 SELECT blob4 AS country, sum(_sample_interval) AS n FROM portfolio_events
 WHERE blob4 != '' GROUP BY country ORDER BY n DESC LIMIT 10;
+
+-- unique visitors / sessions. count(DISTINCT x) is the ONLY spelling that
+-- works: uniq(), uniqExact() and countDistinct() are all rejected as unknown
+-- functions. A distinct count can't be un-sampled, so treat it as a floor.
+SELECT count(DISTINCT blob6) AS visitors, count(DISTINCT blob12) AS sessions
+FROM portfolio_events WHERE timestamp > now() - INTERVAL '168' HOUR;
 
 -- top interactions (blob5 = the label/company/tool/theme prop on click events)
 -- note: this SQL dialect has no concat() or || — use format() with {} placeholders
@@ -135,9 +211,27 @@ FROM portfolio_events;
 
 ### Built-in dashboard — `GET /dashboard`
 
-The Worker serves a small server-rendered dashboard (event totals, a 30-day
-sparkline, top referrers and countries) at
-`https://portfolio-analytics.<subdomain>.workers.dev/dashboard`.
+`https://portfolio-analytics.<subdomain>.workers.dev/dashboard` serves the
+dashboard: six KPI tiles with deltas against the previous window of equal
+length, a time-series chart (events or visitors), and panels for events, pages,
+countries, traffic sources, devices/browsers/OS, interactions, the contact
+funnel, new-vs-returning visitors, theme choice, submission errors, a day×hour
+heatmap, and the latest 50 raw events.
+
+Two routes back it:
+
+| Route | Returns |
+|---|---|
+| `GET /dashboard?range=&event=` | the page, with the first payload inlined |
+| `GET /dashboard/data?range=&event=` | the same payload as JSON |
+
+`range` is one of `24h`, `7d`, `30d` (default), `90d`, `all`; `event` is any
+name on the allowlist. Both are validated against a fixed set before they reach
+the SQL, and anything unrecognised falls back to the default. The page embeds
+its first payload as JSON so the initial paint has real data with no request
+waterfall; every later range/filter change is a `fetch` of the JSON route, so
+there is one rendering path rather than a server one and a client one that
+drift apart.
 
 It reads the SQL API server-side, so it needs:
 
