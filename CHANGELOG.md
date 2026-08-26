@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.6](https://github.com/parammehta/portfolio/compare/v1.20.5...v1.20.6) (2026-08-26)
+
+
+### Bug Fixes
+
+* align page content columns on wide viewports ([#105](https://github.com/parammehta/portfolio/issues/105)) ([1ec6d62](https://github.com/parammehta/portfolio/commit/1ec6d62e5361cf82f619c58bf07f433c7fe7c2f8))
+
 ## [1.20.5](https://github.com/parammehta/portfolio/compare/v1.20.4...v1.20.5) (2026-08-26)
 
 
