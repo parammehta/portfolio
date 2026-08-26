@@ -156,6 +156,11 @@ export const ExperienceTimeline = ({
         onActiveChange={onActiveChange}
         label="Work history"
         scrollRatio={0.8}
+        // Cards alternate sides purely by index, which means nothing on its
+        // own — but starting above would put the Senior Identity role over the
+        // Staff role beside it, and two adjacent titles at the same company
+        // read as a ranking whether or not one is meant.
+        startSide="below"
       >
         <Heading className={styles.title} level={3} id={titleId}>
           Where I&apos;ve worked
