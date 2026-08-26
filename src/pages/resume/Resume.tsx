@@ -44,11 +44,11 @@ export const Resume = () => {
     <>
       <Meta
         title="Resume"
-        description="Resume of Param Mehta — senior software engineer specialising in identity, frontend, and AI-native experiences."
+        description="Resume of Param Mehta — full-stack web engineer specialising in frontend architecture, design systems, and AI-native experiences."
       />
       <PageHeader
         title="Resume"
-        description="Software engineer with 8+ years building identity, frontend, and AI-native experiences — including the design system below."
+        description="Full-stack web engineer with 8+ years building product, design system, and AI-native experiences — including the design system below."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Resume', href: '/resume' },

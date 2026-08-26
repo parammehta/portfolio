@@ -94,7 +94,7 @@ export const Home = () => {
     >
       <Meta
         title="Developer + Leader"
-        description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences."
+        description="Personal website of Param Mehta – a full-stack web engineer building frontend, design system, and AI-native experiences."
       />
       <StructuredData schema={personSchema()} />
       <Intro

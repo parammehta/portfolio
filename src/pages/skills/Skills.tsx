@@ -57,8 +57,9 @@ export const Skills = () => (
             <TableRow>
               <TableHeadCell>Domains</TableHeadCell>
               <TableCell>
-                AI &amp; LLM Prototyping, UX Engineering, Design Systems &amp; Storybook,
-                Consumer Web Products, Identity &amp; Authentication.
+                Frontend Architecture &amp; Web Performance, Design Systems &amp;
+                Storybook, UX Engineering &amp; Accessibility, Consumer Web &amp;
+                Commerce, AI &amp; LLM Prototyping, Identity &amp; Authentication.
               </TableCell>
             </TableRow>
             <TableRow>
