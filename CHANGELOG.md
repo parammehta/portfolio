@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.3](https://github.com/parammehta/portfolio/compare/v1.20.2...v1.20.3) (2026-08-26)
+
+
+### Bug Fixes
+
+* update resume PDF ([#99](https://github.com/parammehta/portfolio/issues/99)) ([b849597](https://github.com/parammehta/portfolio/commit/b84959708f2edce06ad448a887d6b8468356e473))
+
 ## [1.20.2](https://github.com/parammehta/portfolio/compare/v1.20.1...v1.20.2) (2026-08-26)
 
 
