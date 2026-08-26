@@ -50,13 +50,19 @@
 
 /* The experience timeline reserves a runway several viewports tall so its track
    has something to travel over, so it is the one pane that cannot be sized to
-   the snapport. It still snaps at its top edge — a snap area larger than the
-   snapport lets the scroller rest anywhere inside it — but `scroll-snap-stop:
-   always` has to go: it would arrest the scroll on entry every time and make
-   the runway feel like it was fighting back. */
+   the snapport.
+
+   `scroll-snap-stop: always` is kept, and matters more here than on the other
+   panes. `normal` lets a fling pass over a snap position, so a momentum scroll
+   arriving from Profile sails past the section's top edge and into the runway —
+   landing mid-pan with the first role already scrolled off. `always` forbids
+   passing over, so entry always lands at the start with the first node centred.
+
+   It cannot then "fight" the runway: this snap area is taller than the snapport,
+   so once the scroller is inside it there is no further snap position to arrest
+   on, and the pan runs freely. `always` only bites on the way in. */
 .home > section[data-runway] {
   height: auto;
-  scroll-snap-stop: normal;
 }
 
 .sectionDots {
