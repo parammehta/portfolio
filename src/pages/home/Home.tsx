@@ -1,7 +1,7 @@
 import { type UIEvent, useEffect, useRef, useState } from 'react';
 import { Meta, StructuredData } from 'components';
 import { personSchema } from 'utils/structuredData';
-import { ExperienceCarousel } from './ExperienceCarousel';
+import { ExperienceTimeline } from './ExperienceTimeline';
 import { Intro } from './Intro';
 import { Profile } from './Profile';
 import { Contact } from './Contact';
@@ -21,6 +21,7 @@ export const Home = () => {
   const [visibleSections, setVisibleSections] = useState<Element[]>([]);
   const [scrollIndicatorHidden, setScrollIndicatorHidden] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
+  const container = useRef<HTMLDivElement>(null);
   const intro = useRef<HTMLElement>(null);
   const experience = useRef<HTMLElement>(null);
   const profile = useRef<HTMLElement>(null);
@@ -57,12 +58,27 @@ export const Home = () => {
   }, [visibleSections]);
 
   // Read the container directly rather than using an IntersectionObserver: the
-  // panes are exactly one snapport tall, so an observer would be measuring a
-  // degenerate boundary rect that engines disagree about.
+  // panes are one snapport tall, so an observer would be measuring a degenerate
+  // boundary rect that engines disagree about.
+  //
+  // Which pane is current comes from each section's own offsetTop, not from
+  // `scrollTop / clientHeight`. That division assumed every section was exactly
+  // one viewport tall, which stopped being true when the experience timeline
+  // took a multi-viewport runway — it would have reported sections 2, 3, 4 and
+  // 5 while you were still inside the third one.
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, clientHeight } = event.currentTarget;
     setScrollIndicatorHidden(scrollTop > 0);
-    setActiveSection(Math.round(scrollTop / clientHeight));
+
+    // Half a viewport in, so a pane counts as current once it leads the screen
+    // rather than the moment its top edge crosses.
+    const marker = scrollTop + clientHeight / 2;
+    const current = sectionRefs.reduce(
+      (found, ref, index) =>
+        ref.current && ref.current.offsetTop <= marker ? index : found,
+      0
+    );
+    setActiveSection(current);
   };
 
   const scrollToSection = (index: number) => {
@@ -70,7 +86,12 @@ export const Home = () => {
   };
 
   return (
-    <div className={styles.home} data-scroll-container onScroll={handleScroll}>
+    <div
+      className={styles.home}
+      data-scroll-container
+      ref={container}
+      onScroll={handleScroll}
+    >
       <Meta
         title="Developer + Leader"
         description="Personal website of Param Mehta – a software engineer building identity, frontend, and AI-native experiences."
@@ -88,9 +109,10 @@ export const Home = () => {
         visible={isVisible(profile)}
         id="profile"
       />
-      <ExperienceCarousel
+      <ExperienceTimeline
         id="experience"
         sectionRef={experience}
+        scrollContainerRef={container}
         // eslint-disable-next-line react-hooks/refs
         visible={isVisible(experience)}
       />

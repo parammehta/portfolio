@@ -17,6 +17,14 @@
   height: 100svh;
   overflow-y: auto;
 
+  /* Required, not cosmetic. framer-motion's scroll tracking locates a target
+     inside a custom scroll container by walking `offsetParent` up from the
+     target until it reaches the container. A static container is never in that
+     chain, so the walk runs off the top of the document and the experience
+     timeline's progress silently pins at 0 — the track renders but never
+     moves. Positioning this makes it the offsetParent the walk terminates on. */
+  position: relative;
+
   /* overflow-y: auto computes overflow-x from `visible` to `auto`, and
      body { overflow-x: hidden } no longer covers content inside this box. */
   overflow-x: hidden;
@@ -38,6 +46,17 @@
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+/* The experience timeline reserves a runway several viewports tall so its track
+   has something to travel over, so it is the one pane that cannot be sized to
+   the snapport. It still snaps at its top edge — a snap area larger than the
+   snapport lets the scroller rest anywhere inside it — but `scroll-snap-stop:
+   always` has to go: it would arrest the scroll on entry every time and make
+   the runway feel like it was fighting back. */
+.home > section[data-runway] {
+  height: auto;
+  scroll-snap-stop: normal;
 }
 
 .sectionDots {

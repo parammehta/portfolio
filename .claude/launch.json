@@ -4,22 +4,26 @@
     {
       "name": "portfolio",
       "runtimeExecutable": "/Users/parammehta/.nvm/versions/node/v24.12.0/bin/node",
-      "runtimeArgs": ["node_modules/.bin/next", "dev", "--webpack"],
+      "runtimeArgs": [
+        "node_modules/.bin/next",
+        "dev",
+        "--webpack"
+      ],
       "url": "http://localhost:3000",
       "port": 3000,
       "autoPort": true
     },
     {
-      "name": "storybook",
-      "runtimeExecutable": "/Users/parammehta/.nvm/versions/node/v24.12.0/bin/node",
-      "runtimeArgs": ["node_modules/.bin/storybook", "dev", "-p", "9009", "-h", "localhost"],
-      "url": "http://localhost:9009",
-      "port": 9009
-    },
-    {
       "name": "analytics-worker",
       "runtimeExecutable": "/Users/parammehta/.nvm/versions/node/v24.12.0/bin/node",
-      "runtimeArgs": ["worker/node_modules/.bin/wrangler", "dev", "--config", "worker/wrangler.toml", "--port", "8787"],
+      "runtimeArgs": [
+        "worker/node_modules/.bin/wrangler",
+        "dev",
+        "--config",
+        "worker/wrangler.toml",
+        "--port",
+        "8787"
+      ],
       "url": "http://localhost:8787",
       "port": 8787
     }
