@@ -23,7 +23,7 @@ import styles from './Intuit.module.css';
 
 const title = 'Staff Software Engineer at Intuit';
 const description =
-  'Built and scaled the Intuit Design System — 100+ components, Figma plugins, and AI-assisted tooling adopted across QuickBooks, TurboTax, Credit Karma, and Mailchimp — before leading passkey adoption and agentic AI prototyping for Intuit’s Identity Authentication Experiences team.';
+  'Builds and scales the Intuit Design System — 100+ components, Figma plugins, and AI-assisted tooling adopted across QuickBooks, TurboTax, Credit Karma, and Mailchimp — after leading passkey adoption and agentic AI prototyping for Intuit’s Identity Authentication Experiences team.';
 const roles = [
   'Design Systems',
   'Identity & Auth',
@@ -86,7 +86,7 @@ export const Intuit = () => {
               device="laptop"
               side="right"
               alt="A component library documentation site showing button variants, theme tokens, and the products that use them."
-              heading={<>Before Identity: the Intuit Design System</>}
+              heading={<>Today: the Intuit Design System</>}
               models={laptopModel(intuitDesignSystem)}
               aside={
                 <div className={styles.deviceStats}>

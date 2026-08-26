@@ -49,7 +49,7 @@ export const companies: Company[] = [
     slug: 'intuit',
     name: 'Intuit',
     shortName: 'Intuit',
-    dateRange: 'Jul 2022 – Present',
+    dateRange: 'Dec 2022 – Present',
     stats: [
       { value: '26%', label: 'passkey adoption' },
       { value: '8', label: 'cross-product launches' },
@@ -58,9 +58,21 @@ export const companies: Company[] = [
     ],
     roles: [
       {
+        id: 'intuit-design-system',
+        title: 'Staff Software Engineer, Intuit Design System',
+        dateRange: 'Aug 2024 – Present',
+        highlights: [
+          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
+          'Built a theming layer so each product could apply its own brand on top of the same components',
+          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
+          'Built internal Figma plugins and piloted AI-assisted tooling to speed up the design-to-code handoff, wired components to GraphQL/REST endpoints with client-side instrumentation, and was the primary on-call contact owning production support and SLAs for the design system',
+        ],
+        tech: ['Design Systems', 'Figma Plugins', 'GraphQL', 'Storybook'],
+      },
+      {
         id: 'intuit-identity',
         title: 'Senior Software Engineer, Identity Authentication Experiences',
-        dateRange: 'Jan 2024 – Present',
+        dateRange: 'Dec 2022 – Aug 2024',
         highlights: [
           'Shipped passkey registration, post-enrollment education and a centralized post-auth surface across 8 Intuit products, lifting adoption from 10% to 26% of active customers',
           "Built Intuit's first cross-identity SSO — embedded QuickBooks inside Amazon's domain with Intuit authentication handled cross-domain — now the canonical partnership-onboarding pattern, driving 100K+ new subscribers",
@@ -71,25 +83,13 @@ export const companies: Company[] = [
         ],
         tech: ['Passkeys', 'SSO', 'MCP', 'Agentic AI'],
       },
-      {
-        id: 'intuit-design-system',
-        title: 'Staff Software Engineer, Intuit Design System',
-        dateRange: 'Jul 2022 – Jan 2024',
-        highlights: [
-          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
-          'Built a theming layer so each product could apply its own brand on top of the same components',
-          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
-          'Built internal Figma plugins and piloted AI-assisted tooling to speed up the design-to-code handoff, wired components to GraphQL/REST endpoints with client-side instrumentation, and was the primary on-call contact owning production support and SLAs for the design system',
-        ],
-        tech: ['Design Systems', 'Figma Plugins', 'GraphQL', 'Storybook'],
-      },
     ],
   },
   {
     slug: 'rivian',
     name: 'Rivian',
     shortName: 'Rivian',
-    dateRange: 'Jan 2022 – Jul 2022',
+    dateRange: 'Mar 2022 – Dec 2022',
     stats: [
       { value: '4', label: 'engineers led' },
       { value: '4', label: 'notification channels' },
@@ -98,7 +98,7 @@ export const companies: Company[] = [
       {
         id: 'rivian-fleet-core',
         title: 'Senior Software Engineer, Full Stack',
-        dateRange: 'Jan 2022 – Jul 2022',
+        dateRange: 'Mar 2022 – Dec 2022',
         highlights: [
           "Joined as a founding engineer on the Fleet Core team during Rivian's rapid scaling phase",
           'Led a team of 4 engineers to ship a cross-platform notifications system (push, email, in-app inbox, Slack) for fleet management software',
@@ -112,7 +112,7 @@ export const companies: Company[] = [
     slug: 'walmart',
     name: 'Walmart Global Tech',
     shortName: 'Walmart',
-    dateRange: 'Jun 2018 – Jan 2022',
+    dateRange: 'Jul 2018 – Mar 2022',
     stats: [
       { value: '3.1M+', label: 'customers served' },
       { value: '100K', label: 'registrants in 30 days' },
@@ -122,7 +122,7 @@ export const companies: Company[] = [
       {
         id: 'walmart-marketplace',
         title: 'Senior Software Engineer, Marketplace & UGC',
-        dateRange: 'Jan 2021 – Jan 2022',
+        dateRange: 'Jan 2021 – Mar 2022',
         highlights: [
           'Re-platformed the 3P seller experience using GraphQL, React, TypeScript, and Next.js, serving 3.1M+ customers',
           'Built the seller ratings and reviews page, ranked the #1 feature in Q2 2021',
@@ -144,7 +144,7 @@ export const companies: Company[] = [
       {
         id: 'walmart-baby-registry',
         title: 'Software Engineer, Wireless Verticals & Baby Registry',
-        dateRange: 'Jun 2018 – Jan 2020',
+        dateRange: 'Jul 2018 – Jan 2020',
         highlights: [
           'Launched Walmart Baby Registry, reaching 100K new registrants within 30 days',
           'First team at Walmart to adopt TypeScript, earning the internal Tech Evangelist Award',
