@@ -98,7 +98,7 @@ export const ExperienceIndex = () => {
     <ViewportPage title="Experience" breadcrumbs={breadcrumbs}>
       <Meta
         title="Experience"
-        description="Where Param Mehta has worked — identity and authentication at Intuit, fleet software at Rivian, and marketplace and design systems at Walmart Global Tech."
+        description="Where Param Mehta has worked — design systems and identity at Intuit, fleet software at Rivian, and marketplace and core components at Walmart Global Tech."
       />
       <div className={styles.layout}>
         <div

@@ -30,9 +30,10 @@ const ProfileText = ({ visible, titleId }: ProfileTextProps) => (
       <ScrambleReveal text="Hi there" start={visible} delay={500} />
     </Heading>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
-      I&apos;m Param, a software engineer with 8+ years across engineering, design, and
-      AI. Based in the SF Bay Area, I build identity experiences and AI-native patterns,
-      and maintain the Storybook environment Design and PM partners use to sign off on
+      I&apos;m Param, a full-stack web engineer with 8+ years across engineering, design,
+      and AI. Based in the SF Bay Area, I build product experiences in React, TypeScript,
+      and GraphQL — from commerce and account flows to the design system behind them — and
+      maintain the Storybook environment Design and PM partners use to sign off on
       components. Curious what I use day to day? Check out my{' '}
       <Link href="/skills">skills page</Link>.
     </Text>
