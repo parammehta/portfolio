@@ -1,4 +1,12 @@
 .page {
+  /* The one content column for the route: breadcrumbs, title, and content all
+     sit in it, so the heading always lines up with the content it heads. A page
+     whose content needs a different width overrides `--pageColumn` from its own
+     class rather than centring its inner wrapper independently — doing that is
+     what left the title flush to the section padding while the body floated in
+     the middle of a wide screen. */
+  --pageColumn: var(--maxWidthL);
+
   /* Exactly one viewport: the shell never scrolls, only regions inside it can.
      `dvh` rather than `vh`/`lvh` because those resolve to the toolbar-hidden
      height on mobile, which would push content past the visual viewport. */
@@ -31,6 +39,9 @@
 
 .breadcrumbs {
   flex: 0 0 auto;
+  width: 100%;
+  max-width: var(--pageColumn);
+  margin-inline: auto;
   margin-bottom: var(--spaceXL);
 
   @media (--mediaMobile), (--mediaMobileLS) {
@@ -40,6 +51,9 @@
 
 .title {
   flex: 0 0 auto;
+  width: 100%;
+  max-width: var(--pageColumn);
+  margin-inline: auto;
   margin-bottom: var(--space2XL);
   opacity: 0;
   transition-property: opacity;
@@ -71,6 +85,8 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
+  max-width: var(--pageColumn);
+  margin-inline: auto;
 
   /* Backstop only. Each page condenses its content to fit, so on any viewport
      we actually target this never engages — but clipping content outright is

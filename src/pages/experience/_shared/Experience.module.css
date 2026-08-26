@@ -197,6 +197,14 @@
 }
 
 .header {
+  /* Padding matches `.sectionInner`'s tiers, and matches top to bottom. This
+     pane centres its content like every other pane in the deck, so uneven
+     padding doesn't add breathing room at the top — it shifts the whole
+     centred block down by half the difference. The header used to inherit
+     `components/Page`'s top-only padding, where the content really is anchored
+     to the top, and sat ~96px below the centre of its pane as a result. */
+  --headerPadding: calc(var(--space5XL) + var(--space3XL));
+
   /* The header is a pane too (`.experience > section`), so it needs the same
      overflow safety net as `.sectionInner`: on a short viewport with a long
      description, scroll inside the pane rather than clip. */
@@ -208,23 +216,30 @@
   flex-direction: column;
   align-items: center;
   justify-content: safe center;
-  padding-top: calc(var(--space5XL) + var(--space3XL));
-  padding-bottom: 0;
+  padding-top: var(--headerPadding);
+  padding-bottom: var(--headerPadding);
 
   @media (--mediaLaptop) {
-    padding-top: var(--space5XL);
-    padding-bottom: var(--space2XL);
+    --headerPadding: var(--space5XL);
   }
 
   @media (--mediaTablet) {
-    padding-top: var(--space4XL);
-    padding-bottom: 0;
+    --headerPadding: var(--space3XL);
   }
 
   @media (--mediaMobile) {
-    padding-top: var(--space5XL);
-    padding-bottom: var(--spaceXL);
+    --headerPadding: var(--space2XL);
   }
+}
+
+/* `.header` centres its children, but the breadcrumb list stretches to the full
+   padded width, so its text stayed pinned to the section padding while the title
+   centred — hundreds of px apart on a wide screen. Give it the same column the
+   title uses so it sits directly above it. */
+.headerBreadcrumbs {
+  width: 100%;
+  max-width: var(--maxWidthL);
+  margin-inline: auto;
 }
 
 .headerContent {

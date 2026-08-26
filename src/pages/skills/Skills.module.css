@@ -1,7 +1,8 @@
 .inner {
+  /* No cap or centring of its own — `ViewportPage` owns the column this sits
+     in, which is what keeps the two blocks under the page title rather than
+     centred independently of it. */
   width: 100%;
-  max-width: var(--maxWidthL);
-  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: var(--space3XL);

@@ -169,12 +169,27 @@
   }
 }
 
+/* Breadcrumbs sit in the header's column, not the section's padding box, so
+   they land directly above the title rather than a few hundred px to its left. */
+.headerBreadcrumbs {
+  width: 100%;
+  max-width: var(--maxWidthL);
+  margin-inline: auto;
+}
+
 .headerContent {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: var(--space4XL);
+
+  /* Same width and centring as `.sectionContent` below it. The header sits in a
+     plain `Section` rather than the flex-centred `.sectionInner`, so without the
+     auto margins it stays flush to the section padding while the body it heads
+     centres itself — a gap that only opens up past ~1900px. */
+  width: 100%;
   max-width: var(--maxWidthL);
+  margin-inline: auto;
 
   @media (--mediaDesktop) {
     grid-template-columns: 1fr 400px;

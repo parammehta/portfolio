@@ -88,7 +88,7 @@ export const Post = ({
         ]}
       />
       <Section className={styles.breadcrumbSection}>
-        <Breadcrumbs items={breadcrumbItems} />
+        <Breadcrumbs className={styles.breadcrumbs} items={breadcrumbItems} />
         {banner && (
           <div className={styles.banner} ref={imageRef}>
             <div className={styles.bannerImage}>

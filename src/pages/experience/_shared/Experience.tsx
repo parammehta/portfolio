@@ -51,7 +51,7 @@ export function ExperienceHeader({
     <Section className={classes(styles.header, className)} as="section">
       {!!breadcrumbs?.length && (
         <>
-          <Breadcrumbs items={breadcrumbs} />
+          <Breadcrumbs className={styles.headerBreadcrumbs} items={breadcrumbs} />
           <StructuredData schema={breadcrumbListSchema(breadcrumbs)} />
         </>
       )}

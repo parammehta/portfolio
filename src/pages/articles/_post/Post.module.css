@@ -24,6 +24,20 @@
   overflow-x: hidden;
 }
 
+/* The breadcrumb list stretches the full padded width on its own, which left it
+   pinned to the section padding while the post text sat in the centred content
+   column. Above tablet it takes that same column so it lines up with the title
+   below it; at tablet the column collapses (`--mainColumn: 1`) and so does this. */
+.breadcrumbs {
+  width: 100%;
+  max-width: var(--contentWidth);
+  margin-inline: auto;
+
+  @media (--mediaTablet) {
+    max-width: none;
+  }
+}
+
 .breadcrumbSection {
   padding-top: calc(var(--space5XL) + var(--space3XL));
 
