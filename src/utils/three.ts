@@ -8,6 +8,7 @@ import {
   WebGLRenderer,
   Scene,
 } from 'three';
+import type { WebGLRendererParameters } from 'three';
 import { DRACOLoader, GLTFLoader } from 'three-stdlib';
 
 // Enable caching for all loaders
@@ -83,10 +84,46 @@ export const cleanMaterial = (material: Material): void => {
 };
 
 /**
- * Clean up and dispose of a renderer
+ * Create a renderer that owns its canvas and mount it into `container`.
+ *
+ * The renderer has to make the canvas itself rather than being handed one that
+ * React rendered. Those are two different lifetimes: a renderer lives and dies
+ * with an effect, a JSX canvas lives and dies with the component's output, and
+ * the two do not line up. StrictMode tears an effect down and re-runs it
+ * against the element React is still holding, so a renderer that released its
+ * context on teardown would leave the next run holding a canvas that can never
+ * produce another one — three throws on the null context that comes back.
+ *
+ * When the renderer owns the element every run starts from a fresh canvas, and
+ * `cleanRenderer` can hand the context back unconditionally.
+ */
+export const mountRenderer = (
+  container: HTMLElement,
+  { className, ...parameters }: WebGLRendererParameters & { className?: string } = {}
+): WebGLRenderer => {
+  const renderer = new WebGLRenderer(parameters);
+
+  if (className) renderer.domElement.className = className;
+  container.append(renderer.domElement);
+
+  return renderer;
+};
+
+/**
+ * Tear down a renderer created by `mountRenderer`, releasing its WebGL context
+ * and removing its canvas.
+ *
+ * `dispose()` on its own frees three's GPU objects but leaves the context alive
+ * until the canvas is garbage collected, which can be many seconds later.
+ * Browsers cap live contexts (~16 in Chrome) and evict the *oldest* once that
+ * cap is passed, so a component that mounts and unmounts a renderer as it
+ * scrolls will eventually kill an unrelated, still-visible canvas elsewhere on
+ * the page.
  */
 export const cleanRenderer = (renderer: WebGLRenderer): void => {
   renderer.dispose();
+  renderer.forceContextLoss();
+  renderer.domElement.remove();
 };
 
 /**

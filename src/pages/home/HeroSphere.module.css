@@ -1,6 +1,7 @@
-.canvas {
+/* The renderer owns the canvas and replaces it whenever it rebuilds, so the
+   reveal lives on this wrapper — the one element that outlives a rebuild. */
+.canvasWrapper {
   position: absolute;
-  width: 100%;
   inset: 0;
   opacity: 0;
   transition-property: opacity;
@@ -10,4 +11,12 @@
   &[data-visible='true'] {
     opacity: 1;
   }
+}
+
+/* Sized in pixels by the renderer, which is 30% taller than the pane and
+   top-aligned, so it deliberately overflows the wrapper. */
+.canvas {
+  position: absolute;
+  width: 100%;
+  inset: 0;
 }

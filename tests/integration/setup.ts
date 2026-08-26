@@ -14,15 +14,32 @@ delete process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY;
 // jsdom has no WebGL context, so any component that spins up a Three.js
 // renderer (hero sphere, device models, carousel) would throw on mount. Swap
 // only the renderer for a no-op; the rest of Three.js stays real.
+
+// Exported so a test can assert which canvases have had their WebGL context
+// released — a bare call count cannot say whether the one still on screen is
+// among them. Named `mock*` because jest.mock factories may only reference
+// out-of-scope variables under that prefix.
+export const mockReleasedCanvases: HTMLCanvasElement[] = [];
+
 jest.mock('three', () => {
   const three = jest.requireActual('three');
 
   // A Proxy rather than a hand-written stub: the renderer surface these
   // components touch is wide and keeps growing, and every missing method would
   // otherwise fail a page test for a reason that has nothing to do with the page.
-  function MockWebGLRenderer(this: Record<string, unknown>) {
+  function MockWebGLRenderer(
+    this: Record<string, unknown>,
+    parameters?: { canvas?: HTMLCanvasElement }
+  ) {
+    // Mirrors the real renderer: it uses the canvas it was given, or makes one
+    // and owns it. The hero sphere takes the second path, and the lifecycle
+    // tests assert against those very elements, so a stand-in would make them
+    // vacuous.
+    const domElement = parameters?.canvas ?? document.createElement('canvas');
+
     const target: Record<string, unknown> = {
-      domElement: document.createElement('canvas'),
+      domElement,
+      forceContextLoss: () => mockReleasedCanvases.push(domElement),
       shadowMap: { enabled: false, type: null },
       capabilities: { getMaxAnisotropy: () => 1, isWebGL2: true },
       outputColorSpace: three.SRGBColorSpace,
