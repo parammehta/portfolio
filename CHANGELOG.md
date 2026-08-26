@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/parammehta/portfolio/compare/v1.20.0...v1.20.1) (2026-08-26)
+
+
+### Bug Fixes
+
+* correct experience dates and titles, and the home timeline they surfaced ([#95](https://github.com/parammehta/portfolio/issues/95)) ([372825e](https://github.com/parammehta/portfolio/commit/372825e40d43887fcff42083ecab7024514607bb))
+
 ## [1.20.0](https://github.com/parammehta/portfolio/compare/v1.19.1...v1.20.0) (2026-08-26)
 
 
