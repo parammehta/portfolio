@@ -1,14 +1,29 @@
-.layout {
-  height: 100%;
-  max-width: var(--maxWidthXL);
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  column-gap: var(--space3XL);
+/* The route's content column, consumed by `ViewportPage` for the breadcrumbs
+   and title as well as by `.layout` below, so all three share one edge. It is
+   sized to what the page actually draws — rail + gap + the panel's readable
+   measure — rather than to a generic max-width, because a wider column would
+   centre the *box* and leave the visible content sitting off to the left. */
+.page {
+  --railWidth: 240px;
+  --columnGap: var(--space3XL);
+  --pageColumn: calc(var(--railWidth) + var(--columnGap) + var(--maxWidthL));
 
   @media (--mediaLaptop) {
-    grid-template-columns: 200px 1fr;
-    column-gap: var(--space2XL);
+    --railWidth: 200px;
+    --columnGap: var(--space2XL);
   }
+
+  @media (--mediaTablet) {
+    --pageColumn: none;
+  }
+}
+
+.layout {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: var(--railWidth) 1fr;
+  column-gap: var(--columnGap);
 
   /* Below tablet there isn't room for a rail beside the content, so it becomes
      a horizontal strip above it. */

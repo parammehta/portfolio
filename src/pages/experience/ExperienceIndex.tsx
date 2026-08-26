@@ -95,7 +95,7 @@ export const ExperienceIndex = () => {
   };
 
   return (
-    <ViewportPage title="Experience" breadcrumbs={breadcrumbs}>
+    <ViewportPage title="Experience" breadcrumbs={breadcrumbs} className={styles.page}>
       <Meta
         title="Experience"
         description="Where Param Mehta has worked — design systems and identity at Intuit, fleet software at Rivian, and marketplace and core components at Walmart Global Tech."

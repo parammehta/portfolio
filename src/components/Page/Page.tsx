@@ -48,7 +48,9 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <Section className={classes(styles.header, className)} as="section">
-      {!!breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
+      {!!breadcrumbs?.length && (
+        <Breadcrumbs className={styles.headerBreadcrumbs} items={breadcrumbs} />
+      )}
       <div
         className={styles.headerContent}
         style={cssProps({ initDelay: numToMs(initDelay) })}
