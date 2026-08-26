@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/parammehta/portfolio/compare/v1.19.1...v1.20.0) (2026-08-26)
+
+
+### Features
+
+* replace the home experience carousel with a scroll-driven timeline ([#93](https://github.com/parammehta/portfolio/issues/93)) ([360301a](https://github.com/parammehta/portfolio/commit/360301ae52291cb7fa3b842921c1441866720bac))
+
 ## [1.19.1](https://github.com/parammehta/portfolio/compare/v1.19.0...v1.19.1) (2026-08-25)
 
 
