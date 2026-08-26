@@ -14,17 +14,21 @@
 
   /* Room at both ends for the heading and the call to action pinned in the
      overlay, so the tallest card stops short of them instead of sliding under. */
-  --timelineInset: 68px;
+  --timelineInset: 96px;
 
-  /* Enough for the heading plus the fixed mobile navbar it sits below. */
+  /* The heading is much taller here than elsewhere: it carries
+     --mobileNavOffset of its own top padding to clear the fixed navbar, on top
+     of the overlay's padding and the text itself. Reserve all of that plus a
+     gap, or the topmost card starts before the heading has finished. */
   @media (--mediaMobile) {
-    --timelineInset: calc(var(--mobileNavOffset) + var(--spaceXL));
+    --timelineInset: calc(var(--mobileNavOffset) + 76px);
   }
 
-  /* Landscape phones have the least height of anything, so the chrome has to
-     give the cards back as much of it as it can. */
+  /* Landscape phones have the least height of anything, so the chrome gives the
+     cards back as much as it can — but still not less than the heading occupies,
+     which is the overlay padding plus one line of --fontSizeH4. */
   @media (--mediaMobileLS) {
-    --timelineInset: 44px;
+    --timelineInset: 64px;
   }
 
   /* Wide enough to clear the navbar's fixed rail on the left, which the track
@@ -110,7 +114,9 @@
   margin: 0;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
+
+  /* Same mix as the chips below, for the same light-theme contrast reason. */
+  color: color-mix(in sRGB, var(--accent) 70%, rgb(var(--rgbText)));
 }
 
 .role {
@@ -130,9 +136,33 @@
 
   & li {
     font-size: var(--fontSizeBodyS);
-    color: rgb(var(--rgbText) / 0.6);
-    border: 1px solid rgb(var(--rgbText) / 0.15);
+
+    /* Carries the company's accent, mixed toward the foreground rather than
+       used raw. The accents are picked against the dark theme, and amber or
+       teal at full strength sits under 3:1 on the light theme's #f2f2f2.
+       Mixing with --rgbText lightens them in dark and darkens them in light,
+       so one set of values stays legible in both. */
+    color: color-mix(in sRGB, var(--accent) 70%, rgb(var(--rgbText)));
+    background: color-mix(in sRGB, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in sRGB, var(--accent) 32%, transparent);
     border-radius: 100px;
     padding: 2px 10px;
+  }
+}
+
+/* A landscape phone is too short for a device plus a caption: half the axis is
+   barely taller than the caption on its own, so the model ends up a few pixels
+   tall and the chips push the text straight across the axis into the cards
+   opposite. Give the caption the whole card there, and size it off width —
+   which is the dimension landscape has to spare — so the title stops wrapping
+   to three lines. */
+@media (--mediaMobileLS) {
+  .card {
+    width: min(340px, 44vw);
+  }
+
+  .stage,
+  .tech {
+    display: none;
   }
 }

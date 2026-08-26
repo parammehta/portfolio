@@ -2,25 +2,46 @@ import { type RefObject, useCallback, useMemo, useState } from 'react';
 import { Button, Heading, Section, Text, VisuallyHidden } from 'refract-ui';
 import { ScrollTimeline, type ScrollTimelineItem } from 'refract-ui';
 import { Model } from 'refract-ui/model';
-import intuitLaptop from 'assets/intuit-design-system-1.png';
-import intuitPhone from 'assets/intuit-passkey-enrollment.png';
-import rivianLaptop from 'assets/rivian-fleet-os-1.png';
-import rivianPhone from 'assets/rivian-fleet-os-mobile-1.png';
-import walmartLaptop from 'assets/walmart-home-1.png';
-import walmartPhone from 'assets/walmart-mobile-seller-1.png';
+import intuitDesignSystem from 'assets/intuit-design-system-1.png';
+import intuitPasskeyEnrollment from 'assets/intuit-passkey-enrollment.png';
+import rivianFleetOs from 'assets/rivian-fleet-os-1.png';
+import walmartHome from 'assets/walmart-home-1.png';
+import walmartCoreComponents from 'assets/walmart-core-components-1.png';
+import walmartBabyRegistry from 'assets/walmart-baby-registry-1.png';
 import { companies, type CompanySlug, companyHref } from 'data/experience';
-import { laptopWithPhone } from 'pages/experience/_shared';
+import { laptopModel, phoneModel } from 'pages/experience/_shared';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './ExperienceTimeline.module.css';
 
 /**
- * Screens are keyed by slug rather than listed inline so the order always
- * follows `data/experience`, which is the source of truth for work history.
+ * One device per card, keyed by role rather than by company — each role gets the
+ * shot of its *own* work, not a screenshot shared across the company.
+ *
+ * Which device follows the work: passkey enrollment and Baby Registry were phone
+ * flows, a design system and a fleet dashboard are desktop. This matches how the
+ * matching `/experience` section frames each one, so the two pages agree.
+ *
+ * A role added to `data/experience` without an entry here renders no model, and
+ * fails the integration test that walks every role — which is the intended guard.
  */
-const screens = {
-  intuit: { laptop: intuitLaptop, phone: intuitPhone },
-  rivian: { laptop: rivianLaptop, phone: rivianPhone },
-  walmart: { laptop: walmartLaptop, phone: walmartPhone },
+const screens: Record<string, { device: 'laptop' | 'phone'; src: { src: string } }> = {
+  'intuit-design-system': { device: 'laptop', src: intuitDesignSystem },
+  'intuit-identity': { device: 'phone', src: intuitPasskeyEnrollment },
+  'rivian-fleet-core': { device: 'laptop', src: rivianFleetOs },
+  'walmart-marketplace': { device: 'laptop', src: walmartHome },
+  'walmart-core-components': { device: 'laptop', src: walmartCoreComponents },
+  'walmart-baby-registry': { device: 'phone', src: walmartBabyRegistry },
+};
+
+/**
+ * Framing per device, for a card far wider than it is tall. The camera's
+ * vertical FOV is fixed, so distance alone sets how much of the scene shows:
+ * each of these is as close as that device gets before the short card height
+ * starts clipping it.
+ */
+const cameraPositions = {
+  laptop: { x: 0, y: 0, z: 5.1 },
+  phone: { x: 0, y: 0, z: 6.4 },
 };
 
 const accents: Record<CompanySlug, string> = {
@@ -35,7 +56,8 @@ interface RoleNode extends ScrollTimelineItem {
   title: string;
   dateRange: string;
   tech: string[];
-  models: ReturnType<typeof laptopWithPhone>;
+  device: 'laptop' | 'phone';
+  models: ReturnType<typeof laptopModel>;
 }
 
 /**
@@ -59,7 +81,11 @@ const nodes: RoleNode[] = companies.flatMap(company =>
     title: role.title,
     dateRange: role.dateRange,
     tech: role.tech.slice(0, 3),
-    models: laptopWithPhone(screens[company.slug].laptop, screens[company.slug].phone),
+    device: screens[role.id]?.device ?? 'laptop',
+    models:
+      screens[role.id]?.device === 'phone'
+        ? phoneModel(screens[role.id].src)
+        : laptopModel(screens[role.id].src),
   }))
 );
 
@@ -105,19 +131,17 @@ export const ExperienceTimeline = ({
             {withModel && (
               <Model
                 className={styles.model}
-                alt={`${node.companyName} — the product on desktop and mobile.`}
-                // Closer than the carousel's 10.4: a timeline card is far
-                // wider than it is tall, and the camera's vertical FOV is
-                // fixed, so the old framing left the devices small in a wide
-                // empty box. This fills the width without clipping the height.
-                cameraPosition={{ x: 0.5, y: 0, z: 7.8 }}
+                alt={`${node.title} at ${node.companyName}.`}
+                cameraPosition={cameraPositions[node.device]}
                 show
                 showDelay={200}
                 models={node.models}
               />
             )}
           </div>
-          <Text className={styles.dates} size="s" secondary as="p">
+          {/* Not `secondary`: that sets colour via `[data-secondary]`, which
+              outranks this class and would drop the accent tint on the floor. */}
+          <Text className={styles.dates} size="s" as="p">
             {node.dateRange}
           </Text>
           <Text className={styles.role} size="l" as="p">
@@ -157,10 +181,10 @@ export const ExperienceTimeline = ({
         label="Work history"
         scrollRatio={0.8}
         // Cards alternate sides purely by index, which means nothing on its
-        // own — but starting above would put the Senior Identity role over the
-        // Staff role beside it, and two adjacent titles at the same company
-        // read as a ranking whether or not one is meant.
-        startSide="below"
+        // own — but the first two nodes are the same company's Staff and Senior
+        // roles, and two adjacent titles at one employer read as a ranking
+        // whether or not one is meant. Starting above keeps Staff on top.
+        startSide="above"
       >
         <Heading className={styles.title} level={3} id={titleId}>
           Where I&apos;ve worked

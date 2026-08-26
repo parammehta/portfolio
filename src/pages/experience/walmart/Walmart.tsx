@@ -27,7 +27,7 @@ import { Fragment } from 'react';
 
 const title = 'Senior Software Engineer at Walmart';
 const description =
-  "I re-platformed Walmart's 3P seller experience on GraphQL, React, and Next.js, then went on to launch Walmart Baby Registry earlier in my time on Marketplace & UGC.";
+  "I re-platformed Walmart's 3P seller experience on GraphQL, React, and Next.js, after building shared components for Walmart.com and launching Walmart Baby Registry.";
 const roles = ['Full Stack', 'Design Systems', 'React + GraphQL', 'Next.js'];
 
 export const Walmart = () => {
