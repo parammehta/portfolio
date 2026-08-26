@@ -58,18 +58,6 @@ export const companies: Company[] = [
     ],
     roles: [
       {
-        id: 'intuit-design-system',
-        title: 'Staff Software Engineer, Intuit Design System',
-        dateRange: 'Jul 2022 – Jan 2024',
-        highlights: [
-          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
-          'Built a theming layer so each product could apply its own brand on top of the same components',
-          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
-          'Built internal Figma plugins and piloted AI-assisted tooling to speed up the design-to-code handoff, wired components to GraphQL/REST endpoints with client-side instrumentation, and was the primary on-call contact owning production support and SLAs for the design system',
-        ],
-        tech: ['Design Systems', 'Figma Plugins', 'GraphQL', 'Storybook'],
-      },
-      {
         id: 'intuit-identity',
         title: 'Senior Software Engineer, Identity Authentication Experiences',
         dateRange: 'Jan 2024 – Present',
@@ -82,6 +70,18 @@ export const companies: Company[] = [
           'Cut P95 latency 56% (8s → 3.5s account selector, 11s → 7.2s account manager) through bundle splitting, lazy loading and render optimization',
         ],
         tech: ['Passkeys', 'SSO', 'MCP', 'Agentic AI'],
+      },
+      {
+        id: 'intuit-design-system',
+        title: 'Staff Software Engineer, Intuit Design System',
+        dateRange: 'Jul 2022 – Jan 2024',
+        highlights: [
+          'Built and maintained 100+ reusable components shared across QuickBooks, TurboTax, Credit Karma, and Mailchimp',
+          'Built a theming layer so each product could apply its own brand on top of the same components',
+          "Owned the team's Storybook as the source of truth for usage and accessibility guidance, and held weekly office hours to help other teams adopt the library",
+          'Built internal Figma plugins and piloted AI-assisted tooling to speed up the design-to-code handoff, wired components to GraphQL/REST endpoints with client-side instrumentation, and was the primary on-call contact owning production support and SLAs for the design system',
+        ],
+        tech: ['Design Systems', 'Figma Plugins', 'GraphQL', 'Storybook'],
       },
     ],
   },
