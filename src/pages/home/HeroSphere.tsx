@@ -19,7 +19,7 @@ import {
 } from 'three';
 import type { IUniform } from 'three';
 import { media } from 'utils/style';
-import { cleanRenderer, cleanScene, removeLights } from 'utils/three';
+import { cleanRenderer, cleanScene, mountRenderer, removeLights } from 'utils/three';
 import styles from './HeroSphere.module.css';
 import fragShader from './heroSphere.frag.glsl';
 
@@ -31,13 +31,23 @@ const OVERHANG = 0.2;
 const MOBILE_DOME_RADIUS = 0.7;
 const MOBILE_DOME_COVERAGE = 0.62;
 
+/**
+ * How many times the hero will rebuild itself after the browser drops its WebGL
+ * context. Loss here is usually eviction rather than a GPU crash: browsers cap
+ * live contexts (~16 in Chrome) and kill the *oldest* when something opens too
+ * many, and the hero, being the first canvas on the page, is always the oldest.
+ * Rebuilding is cheap, but if the page is genuinely over the cap a new context
+ * just evicts another one, so give up rather than ping-pong forever.
+ */
+const MAX_CONTEXT_RECOVERIES = 3;
+
 const springConfig = {
   stiffness: 30,
   damping: 20,
   mass: 2,
 };
 
-export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
+export const HeroSphere = (props: HTMLAttributes<HTMLDivElement>) => {
   const theme = useTheme();
   const { themeId, colorWhite, rgbAccent } = theme as unknown as {
     themeId: string;
@@ -46,7 +56,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   };
   // eslint-disable-next-line react-hooks/purity
   const start = useRef<number>(Date.now());
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const mouse = useRef<Vector2>(null!);
   const renderer = useRef<WebGLRenderer>(null!);
   const camera = useRef<PerspectiveCamera>(null!);
@@ -59,21 +69,27 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   const baseScale = useRef(1);
   const baseRotationY = useRef(0);
   const reduceMotion = useReducedMotion();
-  const isInViewport = useInViewport(canvasRef);
+  const isInViewport = useInViewport(wrapperRef);
   // Measured off the pane rather than useWindowSize: that hook's iOS ruler
   // reports the *large* viewport height, but the pane is sized in `dvh`, so on
   // mobile the canvas would be 30% taller than intended and the dome maths
   // below would place the sphere against the wrong height.
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  // Bumped to rebuild the renderer after a context loss; -1 once we stop trying.
+  const [generation, setGeneration] = useState(0);
+  const recoveries = useRef(0);
+  const disabled = generation === -1;
   const rotationX = useSpring(0, springConfig);
   const rotationY = useSpring(0, springConfig);
   const { measureFps, isLowFps } = useFps(isInViewport);
 
   useEffect(() => {
+    if (!wrapperRef.current) return;
+
     const { innerWidth, innerHeight } = window;
     mouse.current = new Vector2(0.8, 0.5);
-    renderer.current = new WebGLRenderer({
-      canvas: canvasRef.current!,
+    renderer.current = mountRenderer(wrapperRef.current, {
+      className: styles.canvas,
       antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
@@ -109,14 +125,42 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
       scene.current!.add(polyhedron.current);
     });
 
+    // A canvas whose context has been lost can never hand out another one, so
+    // recovery means running this effect again: the renderer owns its canvas,
+    // so a new run brings a new one with it.
+    const { domElement } = renderer.current;
+
+    const handleContextLost = (event: Event) => {
+      // Without this the loss is final and the browser paints its dead-canvas
+      // placeholder — a small broken-image glyph in the corner of the hero.
+      event.preventDefault();
+
+      if (recoveries.current >= MAX_CONTEXT_RECOVERIES) {
+        setGeneration(-1);
+        return;
+      }
+
+      recoveries.current += 1;
+      setGeneration(value => value + 1);
+    };
+
+    domElement.addEventListener('webglcontextlost', handleContextLost);
+
     return () => {
+      // Ahead of cleanRenderer, which releases the context by forcing a loss —
+      // otherwise teardown looks exactly like the eviction this listener is
+      // here to recover from, and the two would chase each other.
+      domElement.removeEventListener('webglcontextlost', handleContextLost);
       cleanScene(scene.current!);
       cleanRenderer(renderer.current!);
+      renderer.current = null!;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [generation]);
 
   useEffect(() => {
+    if (!scene.current) return;
+
     const dirLight = new DirectionalLight(colorWhite, themeId === 'light' ? 1.6 : 2.0);
     const ambientLight = new AmbientLight(colorWhite, themeId === 'light' ? 2.0 : 1.6);
 
@@ -130,7 +174,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     return () => {
       removeLights(lights.current!);
     };
-  }, [colorWhite, themeId]);
+  }, [colorWhite, themeId, generation]);
 
   useEffect(() => {
     if (!uniforms.current) return;
@@ -139,7 +183,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   }, [rgbAccent]);
 
   useEffect(() => {
-    const parent = canvasRef.current?.parentElement;
+    const parent = wrapperRef.current?.parentElement;
     if (!parent) return;
 
     // offsetWidth/offsetHeight, not entry.contentRect: the pane is a Section
@@ -158,7 +202,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
 
   useEffect(() => {
     const { width, height } = canvasSize;
-    if (!width || !height) return;
+    if (!width || !height || !renderer.current) return;
 
     const adjustedHeight = height + height * 0.3;
     renderer.current!.setSize(width, adjustedHeight);
@@ -201,7 +245,7 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     if (reduceMotion) {
       renderer.current!.render(scene.current!, camera.current!);
     }
-  }, [reduceMotion, canvasSize]);
+  }, [reduceMotion, canvasSize, generation]);
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {
@@ -224,6 +268,8 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
   }, [isInViewport, reduceMotion, rotationX, rotationY]);
 
   useEffect(() => {
+    if (!renderer.current) return;
+
     let animation: number;
 
     const animate = () => {
@@ -260,16 +306,26 @@ export const HeroSphere = (props: HTMLAttributes<HTMLCanvasElement>) => {
     return () => {
       cancelAnimationFrame(animation);
     };
-  }, [isInViewport, measureFps, reduceMotion, isLowFps, rotationX, rotationY]);
+  }, [
+    isInViewport,
+    measureFps,
+    reduceMotion,
+    isLowFps,
+    rotationX,
+    rotationY,
+    generation,
+  ]);
+
+  if (disabled) return null;
 
   return (
     <Transition in timeout={3000}>
       {(visible: boolean) => (
-        <canvas
+        <div
           aria-hidden
-          className={styles.canvas}
+          className={styles.canvasWrapper}
           data-visible={visible}
-          ref={canvasRef}
+          ref={wrapperRef}
           {...props}
         />
       )}
