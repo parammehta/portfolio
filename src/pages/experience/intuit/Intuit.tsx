@@ -23,7 +23,7 @@ import styles from './Intuit.module.css';
 
 const title = 'Staff Software Engineer at Intuit';
 const description =
-  'Builds and scales the Intuit Design System — 100+ components, Figma plugins, and AI-assisted tooling adopted across QuickBooks, TurboTax, Credit Karma, and Mailchimp — after leading passkey adoption and agentic AI prototyping for Intuit’s Identity Authentication Experiences team.';
+  'Built and scaled the Intuit Design System — 100+ components, Figma plugins, and AI-assisted tooling adopted across QuickBooks, TurboTax, Credit Karma, and Mailchimp — after leading passkey adoption and agentic AI prototyping for Intuit’s Identity Authentication Experiences team.';
 const roles = [
   'Design Systems',
   'Identity & Auth',
