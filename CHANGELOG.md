@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.5](https://github.com/parammehta/portfolio/compare/v1.20.4...v1.20.5) (2026-08-26)
+
+
+### Bug Fixes
+
+* keep the hero sphere alive when its WebGL context is lost ([#103](https://github.com/parammehta/portfolio/issues/103)) ([7640b05](https://github.com/parammehta/portfolio/commit/7640b05e6f0793110e4034855154b7333d1bd450))
+
 ## [1.20.4](https://github.com/parammehta/portfolio/compare/v1.20.3...v1.20.4) (2026-08-26)
 
 
