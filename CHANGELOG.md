@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.2](https://github.com/parammehta/portfolio/compare/v1.20.1...v1.20.2) (2026-08-26)
+
+
+### Bug Fixes
+
+* broaden site positioning toward full-stack web ([#97](https://github.com/parammehta/portfolio/issues/97)) ([8cb9444](https://github.com/parammehta/portfolio/commit/8cb944478654d916c01688fa6e667fa854712566))
+
 ## [1.20.1](https://github.com/parammehta/portfolio/compare/v1.20.0...v1.20.1) (2026-08-26)
 
 
