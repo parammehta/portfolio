@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/parammehta/portfolio/compare/v1.20.7...v1.21.0) (2026-08-27)
+
+
+### Features
+
+* follow the system light/dark preference until the toggle is used ([#110](https://github.com/parammehta/portfolio/issues/110)) ([1a26122](https://github.com/parammehta/portfolio/commit/1a26122bb7fa1d1b094ce9903995426aeeda75c8))
+
 ## [1.20.7](https://github.com/parammehta/portfolio/compare/v1.20.6...v1.20.7) (2026-08-27)
 
 
