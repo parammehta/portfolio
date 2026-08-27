@@ -207,6 +207,18 @@ CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy:functions
 ```
 The secret is stored as a Lambda environment variable via `serverless.yml`'s `${env:CLOUDFLARE_TURNSTILE_SECRET, ''}` reference. If the variable is absent the Lambda skips Turnstile verification (honeypot still active).
 
+`functions/` runs **Serverless Framework v4**, which refuses to run any command —
+`deploy`, and even `print` — until the machine is authenticated. This is a one-time
+`npx serverless login` (free below their revenue threshold, but it does require an
+account), or a `SERVERLESS_ACCESS_KEY` env var for non-interactive use. v3 needed
+none of this; it was dropped because it is EOL and carried two critical advisories
+in its own dependency tree.
+
+`build.esbuild: false` in `serverless.yml` keeps v4 from bundling the handler.
+It would not bundle a `.js` handler by default, but renaming `index.js` to
+TypeScript would silently switch packaging on, and `jsdom` does not survive being
+bundled into a single file.
+
 ## Commit conventions
 
 All commits use [Conventional Commits](https://www.conventionalcommits.org/):
