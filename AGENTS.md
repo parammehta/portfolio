@@ -208,6 +208,33 @@ CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy:functions
 ```
 The secret is stored as a Lambda environment variable via `serverless.yml`'s `${env:CLOUDFLARE_TURNSTILE_SECRET, ''}` reference. If the variable is absent the Lambda skips Turnstile verification (honeypot still active).
 
+A deploy that forgets the secret is silent: the form keeps working, but every
+submission passes the security check. The value already lives on the deployed
+function, so pipe it straight back in rather than handling it:
+
+```bash
+CLOUDFLARE_TURNSTILE_SECRET=$(aws lambda get-function-configuration \
+  --function-name parammehta-portfolio-production-api \
+  --query 'Environment.Variables.CLOUDFLARE_TURNSTILE_SECRET' --output text) \
+  npm run deploy:functions
+```
+
+The original is in the Cloudflare dashboard under Turnstile → the widget matching
+`NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` → Settings → Secret Key.
+
+Afterwards, confirm Turnstile is actually verifying rather than failing open. The
+handler checks the token before it validates the email, so an invalid token plus
+an invalid email tells you which branch ran, and neither can reach SES:
+
+```bash
+curl -s -X POST https://api.parammehta.com/message -H 'Content-Type: application/json' \
+  -H 'Origin: https://parammehta.com' \
+  -d '{"email":"not-an-email","message":"probe","turnstileToken":"invalid"}'
+```
+
+`Security check failed` means the secret is live. `Please enter a valid email
+address` means it deployed empty.
+
 `functions/` runs **Serverless Framework v4**, which refuses to run any command —
 `deploy`, and even `print` — until the machine is authenticated. This is a one-time
 `npx serverless login` (free below their revenue threshold, but it does require an
