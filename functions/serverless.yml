@@ -9,7 +9,10 @@ build:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  # AWS auto-migrates functions off runtimes it is deprecating, so the live
+  # function had already moved to nodejs22.x on its own. Kept in step here so a
+  # deploy stops silently rolling it back.
+  runtime: nodejs22.x
   stage: dev
   region: us-east-1
   memorySize: 128
