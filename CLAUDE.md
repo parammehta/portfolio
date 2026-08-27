@@ -59,13 +59,28 @@ src/
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder,
-                  device .glb models — the latter two populated at build time, see scripts/draco.js)
+                  device .glb models — the latter two populated at build time, see scripts/draco.js;
+                  param-mehta-resume.pdf is machine-synced, see "The resume PDF" below)
 functions/      — serverless API functions (separate deploy via serverless framework)
 worker/         — Cloudflare Worker: custom-event sink to Analytics Engine, plus the
                   dashboard it serves at /dashboard (separate deploy via wrangler; has its
                   own `npm test` and `npm run verify` — see worker/README.md)
 scripts/        — build-time scripts (sitemap generation, draco/model copy, CloudFront invalidation)
 ```
+
+## The resume PDF
+
+`public/param-mehta-resume.pdf` (served by `src/pages/resume/Resume.tsx`) is **not
+maintained here**. It is built from LaTeX in [parammehta/resume](https://github.com/parammehta/resume)
+and pushed over by that repo's `Sync PDF to portfolio` CI job, which opens a PR titled
+`fix: update resume PDF` on branch `chore/sync-resume-pdf` whenever the resume changes.
+
+- Don't hand-edit the file — the next sync overwrites it. Resume changes go in the `.tex`
+  source in the other repo.
+- The sync PR is titled `fix:` rather than `chore:` on purpose: `chore:` gets no
+  release-please bump, so no release fires and `deploy.yml` never runs, leaving the new PDF
+  on `main` but not on S3.
+- Merging the PR is the manual step — it's what puts the new resume live.
 
 ## Component conventions
 
@@ -224,3 +239,7 @@ These commit types also drive automated versioning and changelog generation — 
 - If you need to change a `refract-ui` component's behavior, that's a PR against the
   `refract-ui` repo followed by a version bump here (`npm i refract-ui@latest`) — not a
   local patch or a re-implementation in this repo.
+- MDX images get their intrinsic size from `src/utils/rehypeImgSize.ts`, a local plugin
+  that replaced the unmaintained `rehype-img-size`. `image-size` has open DoS advisories
+  with no fixed release, so the plugin calls `disableTypes` on the affected ICNS/JXL/HEIF
+  parsers — don't reinstate the package or drop that call.
