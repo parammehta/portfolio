@@ -23,6 +23,7 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 | Typecheck | `npm run typecheck` |
 | Deploy site | `npm run deploy` |
 | Deploy API functions | `npm run deploy:functions` |
+| Deploy CloudFront security headers | `npm run deploy:headers` |
 | All CI checks locally | `npm run preflight` |
 | Verify a deploy is live | `npm run verify:deploy` |
 | Deploy analytics Worker | `npm run deploy:worker` |
@@ -59,13 +60,28 @@ src/
   utils/        — pure helpers (clamp, date, style, throttle, etc.)
   assets/       — images and static assets imported by components
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder,
-                  device .glb models — the latter two populated at build time, see scripts/draco.js)
+                  device .glb models — the latter two populated at build time, see scripts/draco.js;
+                  param-mehta-resume.pdf is machine-synced, see "The resume PDF" below)
 functions/      — serverless API functions (separate deploy via serverless framework)
 worker/         — Cloudflare Worker: custom-event sink to Analytics Engine, plus the
                   dashboard it serves at /dashboard (separate deploy via wrangler; has its
                   own `npm test` and `npm run verify` — see worker/README.md)
 scripts/        — build-time scripts (sitemap generation, draco/model copy, CloudFront invalidation)
 ```
+
+## The resume PDF
+
+`public/param-mehta-resume.pdf` (served by `src/pages/resume/Resume.tsx`) is **not
+maintained here**. It is built from LaTeX in [parammehta/resume](https://github.com/parammehta/resume)
+and pushed over by that repo's `Sync PDF to portfolio` CI job, which opens a PR titled
+`fix: update resume PDF` on branch `chore/sync-resume-pdf` whenever the resume changes.
+
+- Don't hand-edit the file — the next sync overwrites it. Resume changes go in the `.tex`
+  source in the other repo.
+- The sync PR is titled `fix:` rather than `chore:` on purpose: `chore:` gets no
+  release-please bump, so no release fires and `deploy.yml` never runs, leaving the new PDF
+  on `main` but not on S3.
+- Merging the PR is the manual step — it's what puts the new resume live.
 
 ## Component conventions
 
@@ -192,6 +208,39 @@ CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy:functions
 ```
 The secret is stored as a Lambda environment variable via `serverless.yml`'s `${env:CLOUDFLARE_TURNSTILE_SECRET, ''}` reference. If the variable is absent the Lambda skips Turnstile verification (honeypot still active).
 
+`functions/` runs **Serverless Framework v4**, which refuses to run any command —
+`deploy`, and even `print` — until the machine is authenticated. This is a one-time
+`npx serverless login` (free below their revenue threshold, but it does require an
+account), or a `SERVERLESS_ACCESS_KEY` env var for non-interactive use. v3 needed
+none of this; it was dropped because it is EOL and carried two critical advisories
+in its own dependency tree.
+
+`build.esbuild: false` in `serverless.yml` keeps v4 from bundling the handler.
+It would not bundle a `.js` handler by default, but renaming `index.js` to
+TypeScript would silently switch packaging on, and `jsdom` does not survive being
+bundled into a single file.
+
+## Security headers
+
+The site's security headers (HSTS, `X-Content-Type-Options`, `X-Frame-Options`,
+`Referrer-Policy`, a `upgrade-insecure-requests` CSP) come from a **CloudFront
+response headers policy**, defined in `scripts/deploy-headers-policy.mjs` and
+applied with `npm run deploy:headers`. The script is idempotent — it updates the
+policy in place and only touches the distribution when the policy is not already
+attached.
+
+They used to come from a Lambda@Edge (`functions/headers.js`) on origin-response.
+That function was dropped from `serverless.yml` in `2ee6b8a` and nothing replaced
+it, so the distribution served **no** security headers until the policy above.
+Edit the header values in the script, not in the CloudFront console, or the next
+run will overwrite them.
+
+The retired Lambda@Edge also set `Cache-Control` per file extension (a year for
+hashed assets, `max-age=0` for everything else). A response headers policy cannot
+vary a header by path, so that has **not** been restored — assets are still served
+without `Cache-Control`, and it wants fixing at upload time in the `aws s3 sync`
+step instead.
+
 ## Commit conventions
 
 All commits use [Conventional Commits](https://www.conventionalcommits.org/):
@@ -224,3 +273,7 @@ These commit types also drive automated versioning and changelog generation — 
 - If you need to change a `refract-ui` component's behavior, that's a PR against the
   `refract-ui` repo followed by a version bump here (`npm i refract-ui@latest`) — not a
   local patch or a re-implementation in this repo.
+- MDX images get their intrinsic size from `src/utils/rehypeImgSize.ts`, a local plugin
+  that replaced the unmaintained `rehype-img-size`. `image-size` has open DoS advisories
+  with no fixed release, so the plugin calls `disableTypes` on the affected ICNS/JXL/HEIF
+  parsers — don't reinstate the package or drop that call.

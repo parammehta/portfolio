@@ -1,5 +1,12 @@
 service: parammehta-portfolio
 
+# The handler is plain `.js`, so v4's built-in esbuild would not run on it
+# anyway (it only builds TypeScript handlers by default). Pinning it off keeps
+# packaging identical to v3: jsdom resolves its resource files at runtime and
+# does not survive being bundled into a single file.
+build:
+  esbuild: false
+
 provider:
   name: aws
   runtime: nodejs20.x
