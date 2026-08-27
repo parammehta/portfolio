@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.7](https://github.com/parammehta/portfolio/compare/v1.20.6...v1.20.7) (2026-08-27)
+
+
+### Bug Fixes
+
+* clear dependency advisories and restore the site's security headers ([#107](https://github.com/parammehta/portfolio/issues/107)) ([7545ac4](https://github.com/parammehta/portfolio/commit/7545ac44ccd19208fdf9f6710ded1e3bdd2cffdd))
+
 ## [1.20.6](https://github.com/parammehta/portfolio/compare/v1.20.5...v1.20.6) (2026-08-26)
 
 
