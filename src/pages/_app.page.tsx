@@ -9,10 +9,11 @@ import 'shell/fonts';
 import { Navbar } from 'components/Navbar';
 import { LinkProvider, ThemeProvider, tokens, VisuallyHidden } from 'refract-ui';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
-import { useLocalStorage } from 'hooks';
+import { useLocalStorage, useSystemTheme } from 'hooks';
 import styles from 'shell/App.module.css';
 import { initialState, reducer } from 'shell/reducer';
-import type { AppContextValue } from 'shell/types';
+import { themePreferenceKey } from 'shell/theme';
+import type { AppContextValue, ThemeId } from 'shell/types';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -44,7 +45,9 @@ const repoPrompt = `
 let repoPromptLogged = false;
 
 const App = ({ Component, pageProps }: AppProps) => {
-  const [storedTheme] = useLocalStorage('theme', 'dark');
+  // Absent = the visitor has never used the toggle, so the system decides.
+  const [storedTheme] = useLocalStorage<ThemeId | null>(themePreferenceKey, null);
+  const systemTheme = useSystemTheme();
   const [state, dispatch] = useReducer(reducer, initialState);
   const { route, asPath } = useRouter();
   const canonicalRoute = route === '/' ? '' : `${asPath}`;
@@ -72,8 +75,16 @@ const App = ({ Component, pageProps }: AppProps) => {
     }
   }, []);
 
+  // The system preference, kept live: it applies on first visit and keeps
+  // applying as the OS switches, but the reducer drops it once the visitor has
+  // made an explicit choice.
   useEffect(() => {
-    dispatch({ type: 'setTheme', value: (storedTheme || 'dark') as 'light' | 'dark' });
+    dispatch({ type: 'setSystemTheme', value: systemTheme });
+  }, [systemTheme]);
+
+  useEffect(() => {
+    if (!storedTheme) return;
+    dispatch({ type: 'setTheme', value: storedTheme });
   }, [storedTheme]);
 
   return (

@@ -1,7 +1,9 @@
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
 import { Button } from 'refract-ui';
-import { useAppContext } from 'hooks';
+import { useAppContext, useLocalStorage } from 'hooks';
+import { themePreferenceKey } from 'shell/theme';
+import type { ThemeId } from 'shell/types';
 import { analyticsEvents, trackEvent } from 'utils/analytics';
 import styles from './ThemeToggle.module.css';
 
@@ -11,12 +13,16 @@ interface ThemeToggleProps extends ComponentPropsWithoutRef<typeof Button> {
 
 export const ThemeToggle = ({ isMobile, ...rest }: ThemeToggleProps) => {
   const { theme, dispatch } = useAppContext();
+  const [, setStoredTheme] = useLocalStorage<ThemeId | null>(themePreferenceKey, null);
   const id = useId();
   const maskId = `${id}theme-toggle-mask`;
 
   const handleClick = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     trackEvent(analyticsEvents.themeToggle, { theme: nextTheme });
+    // Persisting here is what makes the choice stick: from now on this visitor
+    // is opted out of following the system preference.
+    setStoredTheme(nextTheme);
     dispatch({ type: 'toggleTheme' });
   };
 
