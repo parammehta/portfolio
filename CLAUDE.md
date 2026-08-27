@@ -23,6 +23,7 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 | Typecheck | `npm run typecheck` |
 | Deploy site | `npm run deploy` |
 | Deploy API functions | `npm run deploy:functions` |
+| Deploy CloudFront security headers | `npm run deploy:headers` |
 | All CI checks locally | `npm run preflight` |
 | Verify a deploy is live | `npm run verify:deploy` |
 | Deploy analytics Worker | `npm run deploy:worker` |
@@ -218,6 +219,27 @@ in its own dependency tree.
 It would not bundle a `.js` handler by default, but renaming `index.js` to
 TypeScript would silently switch packaging on, and `jsdom` does not survive being
 bundled into a single file.
+
+## Security headers
+
+The site's security headers (HSTS, `X-Content-Type-Options`, `X-Frame-Options`,
+`Referrer-Policy`, a `upgrade-insecure-requests` CSP) come from a **CloudFront
+response headers policy**, defined in `scripts/deploy-headers-policy.mjs` and
+applied with `npm run deploy:headers`. The script is idempotent — it updates the
+policy in place and only touches the distribution when the policy is not already
+attached.
+
+They used to come from a Lambda@Edge (`functions/headers.js`) on origin-response.
+That function was dropped from `serverless.yml` in `2ee6b8a` and nothing replaced
+it, so the distribution served **no** security headers until the policy above.
+Edit the header values in the script, not in the CloudFront console, or the next
+run will overwrite them.
+
+The retired Lambda@Edge also set `Cache-Control` per file extension (a year for
+hashed assets, `max-age=0` for everything else). A response headers policy cannot
+vary a header by path, so that has **not** been restored — assets are still served
+without `Cache-Control`, and it wants fixing at upload time in the `aws s3 sync`
+step instead.
 
 ## Commit conventions
 

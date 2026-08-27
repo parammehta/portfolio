@@ -68,6 +68,7 @@
     "test:e2e:only": "playwright test",
     "deploy": "aws s3 sync --delete --exclude '.DS_Store' build/ s3://parammehta-portfolio-site && node scripts/invalidate-cloudfront",
     "deploy:functions": "cd functions && npm run deploy",
+    "deploy:headers": "node scripts/deploy-headers-policy.mjs",
     "deploy:worker": "cd worker && npm run deploy",
     "preflight": "bash scripts/preflight.sh",
     "verify:deploy": "node scripts/verify-deploy.mjs"
