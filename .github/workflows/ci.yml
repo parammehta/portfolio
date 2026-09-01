@@ -73,8 +73,8 @@ jobs:
           # here injects the Cloudflare beacon into this build, and the beacon's
           # RUM request gets CORS-blocked against the e2e job's 127.0.0.1 origin,
           # which the e2e console-error assertion then flags as a failure. This
-          # build only feeds e2e, never a real deploy — the actual production
-          # build (deploy.yml) sets the token so analytics ships to prod.
+          # build only feeds e2e, never a real deploy — Vercel builds production
+          # separately, with the token set on the project, so analytics ships.
           NEXT_PUBLIC_ANALYTICS_EVENTS_URL: ${{ vars.NEXT_PUBLIC_ANALYTICS_EVENTS_URL }}
           NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
       # The e2e job runs against these exact bytes rather than rebuilding.
