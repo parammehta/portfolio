@@ -4,7 +4,7 @@
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js (static export via `output: 'export'`) |
+| Framework | Next.js (prerendered pages + one API route) |
 | Language | TypeScript |
 | UI | React 18 |
 | Shared UI primitives | [refract-ui](https://github.com/parammehta/refract-ui) (published npm package; [Storybook](https://storybook.parammehta.com)) |
@@ -13,30 +13,30 @@
 | 3D | Three.js + three-stdlib (Draco GLTF loader) |
 | Blog | MDX via `mdx-bundler` |
 | Analytics | Cloudflare Web Analytics (client-side beacon) + a custom-event Cloudflare Worker (`worker/`) |
-| Contact API | AWS Lambda + API Gateway (REST), Node 20, `functions/` |
+| Contact API | Vercel function, `src/pages/api/message.api.ts` |
 | Email | AWS SES (`us-east-1`) |
 | Spam protection | Cloudflare Turnstile (managed widget) + honeypot field |
 | Testing | Jest + React Testing Library (unit + integration) and Playwright (e2e) |
 | Linting | ESLint (flat config) + Stylelint + Prettier |
-| Hosting | AWS S3 + CloudFront |
+| Hosting | Vercel |
 
 ## Build Pipeline
 
 ```
-next build --webpack
+push to main
     |
     v
-Static HTML export (out/)
+Vercel build  ->  next build --webpack
     |
     v
-Moved to build/
+.next/ : prerendered HTML for every page
+         + one function for /api/message
     |
     v
-aws s3 sync --delete build/ s3://parammehta-portfolio-site
-    |
-    v
-CloudFront cache invalidation
+Vercel CDN (production)
 ```
+
+Pull requests take the same path to a preview deployment on its own URL instead of production.
 
 Build-time scripts in `scripts/` run during webpack compilation:
 - `generate-sitemap.js` — generates `public/sitemap.xml`
@@ -105,7 +105,7 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`. Initial state is `{ theme: 'da
 
 ## Rendering Strategy
 
-- **Static export only** — no `getServerSideProps` or API routes within the Next.js app.
+- **Prerendered by default** — every page is static at build time (`getStaticProps`/`getStaticPaths`); no `getServerSideProps`. The single exception is `/api/message`, the contact form endpoint, which runs per request.
 - **Page transitions** — `AnimatePresence mode="wait"` wraps page components with opacity fade. This keeps the outgoing page mounted after the route commits, so it depends on the single shared CSS chunk from the [Build Pipeline](#build-pipeline): with per-route chunks Next unloads the outgoing route's styles on commit, and the exiting page loses its grid and `max-width` and stretches to full width. Long-standing Next issue [#17464](https://github.com/vercel/next.js/issues/17464).
 - **Theme flash prevention** — `_document.page.tsx` injects an inline script that reads localStorage before React hydrates, setting `data-theme` on `<body>` to avoid a flash of the wrong theme.
 
@@ -113,23 +113,32 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`. Initial state is `{ theme: 'da
 
 | Target | Infrastructure | Command |
 |---|---|---|
-| Main site | S3 `parammehta-portfolio-site` → CloudFront | `npm run deploy` |
-| API functions | Lambda + API Gateway → `api.parammehta.com` | `cd functions && CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy` |
+| Main site + contact API | Vercel | none — deploys on push to `main` |
 | Analytics Worker | Cloudflare Workers | `npm run deploy:worker` |
 
 Storybook for the shared component library is a separate deploy out of this repo entirely — see [refract-ui](https://github.com/parammehta/refract-ui), which publishes its own Storybook to `storybook.parammehta.com` from its own CI.
 
 ## Contact Form API
 
-The contact form backend lives in `functions/` and is deployed separately via the Serverless Framework (v3).
+The contact form backend is `src/pages/api/message.api.ts`, deployed with the site as a Vercel
+function. It was an Express app on AWS Lambda behind API Gateway at `api.parammehta.com` until the
+site moved off S3; a static host cannot run server code, which is the only reason it lived apart.
 
 | Resource | Detail |
 |---|---|
-| Lambda function | `parammehta-portfolio-production-api` (`us-east-1`, `arm64`) |
-| API Gateway | REST API `a6bwt3cky9`, stage `production` |
-| Custom domain | `api.parammehta.com` → CloudFront distribution `d26zddtw9cku0h.cloudfront.net` |
-| ACM cert | `api.parammehta.com` (`us-east-1`) |
-| SES identity | `param.mehta95@gmail.com` (verified) |
-| Runtime | Node 20 (`nodejs20.x`) |
+| Endpoint | `POST /api/message/` (same origin as the site) |
+| SES identity | `param.mehta95@gmail.com` (verified, `us-east-1`) |
+| Credentials | `PORTFOLIO_AWS_ACCESS_KEY_ID` / `PORTFOLIO_AWS_SECRET_ACCESS_KEY` on the Vercel project |
+| Spam controls | Cloudflare Turnstile (when `CLOUDFLARE_TURNSTILE_SECRET` is set) + honeypot field |
 
-CORS is restricted to `https://parammehta.com` and `https://www.parammehta.com`. To test locally, use a REST client directly against the raw API Gateway URL or temporarily add `http://localhost:3000` to the `ORIGINS` array in `functions/index.js`.
+The **trailing slash is required**: `trailingSlash: true` in `next.config.js` applies to API routes
+as well as pages, so `POST /api/message` answers with a 308 to `/api/message/`.
+
+Requests are accepted from `https://parammehta.com`, `https://www.parammehta.com`, any
+`*.vercel.app` preview origin, and callers that send no `Origin` header at all. The origin check is
+enforced in the handler rather than by CORS: now that the endpoint is same-origin, a cross-site POST
+still reaches it and the browser withholds only the response — which does not un-send an email.
+
+The AWS credentials are mandatory. The handler refuses to construct an SES client without them
+instead of falling back to the SDK's default provider chain, which would read `~/.aws/credentials`
+and let a local dev server send real mail from the developer's own account.
