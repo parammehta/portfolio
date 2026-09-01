@@ -6,7 +6,6 @@
 // or fail depending on what each developer happens to have configured locally.
 // Pin the public env to fixed test values; individual tests opt back in.
 process.env.NEXT_PUBLIC_WEBSITE_URL = 'https://test.parammehta.com';
-process.env.NEXT_PUBLIC_API_URL = 'https://api.test.parammehta.com';
 delete process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN;
 delete process.env.NEXT_PUBLIC_ANALYTICS_EVENTS_URL;
 delete process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY;

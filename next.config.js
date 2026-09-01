@@ -1,5 +1,9 @@
+// No `output: 'export'` here anymore. The site was a static export because its
+// host was an S3 bucket, which can only serve files; on Vercel the same pages
+// still prerender to static HTML at build time, but the app can also carry
+// server code. That is what lets the contact form live at `/api/message` in
+// this repo instead of in a separately deployed Lambda.
 module.exports = {
-  output: 'export',
   reactStrictMode: true,
   trailingSlash: true,
   pageExtensions: ['page.tsx', 'page.ts', 'api.ts'],

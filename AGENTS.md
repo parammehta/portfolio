@@ -11,19 +11,17 @@ ViewportPage, Code) and consumes the rest from `node_modules/refract-ui`.
 | What | Command |
 |---|---|
 | Dev server | `npm run dev` |
-| Build (static export) | `npm run build` |
-| Preview the built site | `npm start` (serves `build/`; run `npm run build` first) |
+| Build | `npm run build` |
+| Preview the built site | `npm start` (runs `next start`; run `npm run build` first) |
 | Tests (unit + integration) | `npm test` |
 | Tests (watch) | `npm run test:watch` |
 | Unit tests only | `npm run test:unit` |
 | Integration tests only | `npm run test:integration` |
 | E2E tests (builds first) | `npm run test:e2e` |
-| E2E against existing `build/` | `npm run test:e2e:only` |
+| E2E against existing `.next/` | `npm run test:e2e:only` |
 | Lint | `npm run lint` / `npm run stylelint` |
 | Typecheck | `npm run typecheck` |
-| Deploy site | `npm run deploy` |
-| Deploy API functions | `npm run deploy:functions` |
-| Deploy CloudFront security headers | `npm run deploy:headers` |
+| Deploy site | none — Vercel ships every push to `main` |
 | All CI checks locally | `npm run preflight` |
 | Verify a deploy is live | `npm run verify:deploy` |
 | Deploy analytics Worker | `npm run deploy:worker` |
@@ -62,11 +60,10 @@ src/
 public/         — static files served at root (favicons, resume PDF, OG images, draco decoder,
                   device .glb models — the latter two populated at build time, see scripts/draco.js;
                   param-mehta-resume.pdf is machine-synced, see "The resume PDF" below)
-functions/      — serverless API functions (separate deploy via serverless framework)
 worker/         — Cloudflare Worker: custom-event sink to Analytics Engine, plus the
                   dashboard it serves at /dashboard (separate deploy via wrangler; has its
                   own `npm test` and `npm run verify` — see worker/README.md)
-scripts/        — build-time scripts (sitemap generation, draco/model copy, CloudFront invalidation)
+scripts/        — build-time scripts (sitemap generation, draco/model copy)
 ```
 
 ## The resume PDF
@@ -79,8 +76,8 @@ and pushed over by that repo's `Sync PDF to portfolio` CI job, which opens a PR 
 - Don't hand-edit the file — the next sync overwrites it. Resume changes go in the `.tex`
   source in the other repo.
 - The sync PR is titled `fix:` rather than `chore:` on purpose: `chore:` gets no
-  release-please bump, so no release fires and `deploy.yml` never runs, leaving the new PDF
-  on `main` but not on S3.
+  release-please bump, so the release history skips the change. (The PDF itself still goes
+  live on merge — Vercel deploys every push to `main` regardless of whether a release is cut.)
 - Merging the PR is the manual step — it's what puts the new resume live.
 
 ## Component conventions
@@ -125,10 +122,10 @@ Three layers, each with its own runner and its own job in CI.
 
 ### E2E — Playwright
 
-- Lives in `tests/e2e/`, config in `playwright.config.ts`. Runs against the **real static export in `build/`** served by `serve` — the exact bytes that get synced to S3, not a dev server.
+- Lives in `tests/e2e/`, config in `playwright.config.ts`. Runs against a **production build served by `next start`** — the same command and the same `.next/` output Vercel runs, not a dev server. (It served `build/` with `serve` when the site was a static export; a static file server cannot run the contact form's API route.)
 - Two projects: `chromium` (desktop) and `mobile` (Pixel 7). Specs skip themselves where a behaviour only exists on one (e.g. the mobile menu toggle).
 - Console-error and failed-request assertions are filtered to same-origin URLs, because analytics and Turnstile are unreachable from CI.
-- `npm run test:e2e` builds first; `npm run test:e2e:only` reuses an existing `build/`.
+- `npm run test:e2e` builds first; `npm run test:e2e:only` reuses an existing `.next/`.
 
 ### Shared config notes
 
@@ -137,11 +134,11 @@ Three layers, each with its own runner and its own job in CI.
 
 ## CI & the merge gate
 
-`.github/workflows/ci.yml` runs on every PR into `main` (and on pushes to `main`) as five jobs: **Lint & types**, **Unit tests**, **Integration tests**, **Build**, **E2E tests**. `Build` uploads the static export as an artifact and `E2E tests` downloads it, so e2e exercises the same bytes CI built rather than rebuilding.
+`.github/workflows/ci.yml` runs on every PR into `main` (and on pushes to `main`) as five jobs: **Lint & types**, **Unit tests**, **Integration tests**, **Build**, **E2E tests**. `Build` uploads `.next/` as an artifact and `E2E tests` downloads it, so e2e exercises the same bytes CI built rather than rebuilding.
 
-Those five job names are the **required status checks** on `main` — a PR cannot merge until all five are green.
+Those five job names are the **required status checks** on `main` — a PR cannot merge until all five are green. That gate is now the *only* thing standing between a commit and production: Vercel deploys `main` on push, so nothing re-runs the suite after merge.
 
-The workflow also declares `workflow_call`, and `deploy.yml` calls it as a `verify` job that `Build & Deploy` depends on. So the full suite runs again against the released commit before anything reaches S3, including for a manual `workflow_dispatch` deploy.
+Vercel also builds every pull request as a **preview deployment** at its own URL, which is a second signal alongside CI — a reviewer can click the change before it merges.
 
 ## Verification
 
@@ -164,109 +161,95 @@ npm run verify:deploy -- --expect contact_cta_click
 
 ## Deployment
 
-Static site deployed to S3 + CloudFront:
-- `npm run build` → `next build` then moves `out/` to `build/`
-- `npm run deploy` → syncs `build/` to S3, invalidates CloudFront cache
+Hosted on **Vercel**, which builds and deploys on its own:
+- every push to `main` → production deployment
+- every pull request → preview deployment at its own URL
+
+There is no deploy command and no deploy workflow. `vercel.json` holds the security headers;
+`src/pages/api/message.api.ts` ships as a Vercel function alongside the prerendered pages.
 
 Storybook is a separate repo/deploy — see [refract-ui](https://github.com/parammehta/refract-ui),
 which publishes its own Storybook to `storybook.parammehta.com` from its own CI.
 
-The site deploy also runs automatically on release — see [Releases](#releases). The `npm run deploy` scripts remain available for manual/out-of-band deploys.
+Deployment is decoupled from releases: release-please still versions the repo and writes the
+changelog, but Vercel ships on push regardless of whether a release was cut — see [Releases](#releases).
 
 ## Releases
 
 Versioning and site deploys are automated with [release-please](https://github.com/googleapis/release-please), split across two workflows (config in `release-please-config.json` + `.release-please-manifest.json`):
 
 - **`.github/workflows/release.yml`** (job _Version & Release_) — runs on every push to `main`.
-- **`.github/workflows/deploy.yml`** (job _Build & Deploy_) — runs on the `release: published` event (or manual `workflow_dispatch`).
 
-Flow: push Conventional Commits to `main` → release-please opens/updates a **Release PR** that bumps `package.json` and regenerates `CHANGELOG.md` → `release.yml` **auto-merges that Release PR** (squash) → the merge re-triggers `release.yml`, which tags the commit and **publishes a GitHub Release** → that published-release event triggers `deploy.yml` (build + `aws s3 sync` + CloudFront invalidation). Deploy runs only when a release is actually cut, not on every push.
+Flow: push Conventional Commits to `main` → release-please opens/updates a **Release PR** that bumps `package.json` and regenerates `CHANGELOG.md` → `release.yml` **auto-merges that Release PR** (squash) → the merge re-triggers `release.yml`, which tags the commit and **publishes a GitHub Release**.
+
+Versioning only. Vercel deploys every push to `main`, so a change goes live when it merges, not when a release is cut — the Release PR's own merge is simply one more push.
 
 Tags and release titles are plain `vX.Y.Z` (no component prefix) via `include-component-in-tag: false` in the config.
 
 - **Auto-merge means no human gate**: every push to `main` containing a `feat:`/`fix:` (etc.) ships to production automatically. There is no batching/review window — the CI suite is the only gate.
 - The merge is scoped to **only** the release-please Release PR (targeted by its exact PR number); it never touches your other PRs.
 - Commit type drives the version bump: `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE:` → major.
-- Auto-merge requires a **PAT** stored as the `RELEASE_PLEASE_TOKEN` secret (Contents + Pull requests read/write), because actions taken with the default `GITHUB_TOKEN` do not trigger further workflows. The PAT is what lets (1) the Release-PR merge re-trigger `release.yml` to tag/publish, and (2) the published GitHub Release fire the `release` event that `deploy.yml` listens for — otherwise the release/tag/deploy would never fire.
+- Auto-merge requires a **PAT** stored as the `RELEASE_PLEASE_TOKEN` secret (Contents + Pull requests read/write), because actions taken with the default `GITHUB_TOKEN` do not trigger further workflows. The PAT is what lets the Release-PR merge re-trigger `release.yml` to tag and publish; without it the tag and release would never fire.
 - The Release PR is merged with `gh pr merge --squash --auto`, which **queues** the merge behind `main`'s required status checks rather than merging immediately (a direct merge would be rejected while CI is pending). This needs the repo-wide **"Allow auto-merge"** setting enabled. `main` requires no PR *reviews* — release-please cannot approve its own PR, and a review requirement would stall every release.
-- The CI build re-supplies the `NEXT_PUBLIC_*` values (stored as repo **Variables**) because they are baked in at build time for the static export. AWS credentials are stored as repo **Secrets** (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`). The CloudFront distribution ID and S3 bucket are hardcoded in the deploy scripts, so they need no secrets.
-- Scope is the **site only** — the `functions/` Lambda is deployed separately via `npm run deploy:functions`.
+- The CI build re-supplies the `NEXT_PUBLIC_*` values (stored as repo **Variables**) because they are baked in at build time. The **production** values live on the Vercel project, not in GitHub — CI's copies only feed the e2e job.
 - Do not hand-edit `CHANGELOG.md`, the `version` in `package.json`, or `.release-please-manifest.json` — release-please owns them.
 
 ## Environment variables
 
 See `.env.example`:
 - `NEXT_PUBLIC_WEBSITE_URL` — canonical site URL
-- `NEXT_PUBLIC_API_URL` — API endpoint for contact form / functions (`https://api.parammehta.com`)
 - `NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` — Cloudflare Web Analytics beacon token (public); if unset, the beacon is never injected
 - `NEXT_PUBLIC_ANALYTICS_EVENTS_URL` — URL of the analytics Worker that receives custom events (public); if unset, `trackEvent` no-ops in prod
 - `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` — Cloudflare Turnstile site key (public); if unset, the widget and check are skipped entirely (safe for local dev without Turnstile configured)
 
-The Lambda (`functions/`) also requires a secret at deploy time — pass it as an env var:
-```bash
-CLOUDFLARE_TURNSTILE_SECRET=<secret> npm run deploy:functions
-```
-The secret is stored as a Lambda environment variable via `serverless.yml`'s `${env:CLOUDFLARE_TURNSTILE_SECRET, ''}` reference. If the variable is absent the Lambda skips Turnstile verification (honeypot still active).
+Server-side variables live on the Vercel project (not in `.env.example`'s public list, and never
+in the repo):
 
-A deploy that forgets the secret is silent: the form keeps working, but every
-submission passes the security check. The value already lives on the deployed
-function, so pipe it straight back in rather than handling it:
+| Variable | Purpose |
+| --- | --- |
+| `PORTFOLIO_AWS_ACCESS_KEY_ID` | IAM user scoped to `ses:SendEmail` |
+| `PORTFOLIO_AWS_SECRET_ACCESS_KEY` | — |
+| `PORTFOLIO_AWS_REGION` | SES region; defaults to `us-east-1` |
+| `CLOUDFLARE_TURNSTILE_SECRET` | Turnstile server key; if unset, Turnstile is not enforced (honeypot still active) |
 
-```bash
-CLOUDFLARE_TURNSTILE_SECRET=$(aws lambda get-function-configuration \
-  --function-name parammehta-portfolio-production-api \
-  --query 'Environment.Variables.CLOUDFLARE_TURNSTILE_SECRET' --output text) \
-  npm run deploy:functions
-```
+`message.api.ts` **requires** the two credential variables and throws without them. That is
+deliberate: leaving `credentials` unset would hand the job to the AWS SDK's default provider
+chain, which reads `~/.aws/credentials` — a local dev server would then send real mail from
+whoever's laptop it was running on. It happened once during the migration; hence the guard.
 
-The original is in the Cloudflare dashboard under Turnstile → the widget matching
-`NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` → Settings → Secret Key.
-
-Afterwards, confirm Turnstile is actually verifying rather than failing open. The
-handler checks the token before it validates the email, so an invalid token plus
-an invalid email tells you which branch ran, and neither can reach SES:
+A deploy that forgets the Turnstile secret is silent: the form keeps working, but every
+submission passes the security check. Confirm it is actually verifying rather than failing
+open — the handler checks the token before it validates the email, so an invalid token plus an
+invalid email tells you which branch ran, and neither can reach SES:
 
 ```bash
-curl -s -X POST https://api.parammehta.com/message -H 'Content-Type: application/json' \
+curl -s -X POST https://parammehta.com/api/message/ -H 'Content-Type: application/json' \
   -H 'Origin: https://parammehta.com' \
   -d '{"email":"not-an-email","message":"probe","turnstileToken":"invalid"}'
 ```
 
-`Security check failed` means the secret is live. `Please enter a valid email
-address` means it deployed empty.
+`Security check failed` means the secret is live. `Please enter a valid email address` means it
+is unset. Note the **trailing slash**: `trailingSlash: true` applies to API routes too, so
+`/api/message` answers with a 308.
 
-`functions/` runs **Serverless Framework v4**, which refuses to run any command —
-`deploy`, and even `print` — until the machine is authenticated. This is a one-time
-`npx serverless login` (free below their revenue threshold, but it does require an
-account), or a `SERVERLESS_ACCESS_KEY` env var for non-interactive use. v3 needed
-none of this; it was dropped because it is EOL and carried two critical advisories
-in its own dependency tree.
-
-`build.esbuild: false` in `serverless.yml` keeps v4 from bundling the handler.
-It would not bundle a `.js` handler by default, but renaming `index.js` to
-TypeScript would silently switch packaging on, and `jsdom` does not survive being
-bundled into a single file.
+The secret's original is in the Cloudflare dashboard under Turnstile → the widget matching
+`NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` → Settings → Secret Key.
 
 ## Security headers
 
 The site's security headers (HSTS, `X-Content-Type-Options`, `X-Frame-Options`,
-`Referrer-Policy`, a `upgrade-insecure-requests` CSP) come from a **CloudFront
-response headers policy**, defined in `scripts/deploy-headers-policy.mjs` and
-applied with `npm run deploy:headers`. The script is idempotent — it updates the
-policy in place and only touches the distribution when the policy is not already
-attached.
+`Referrer-Policy`, an `upgrade-insecure-requests` CSP) are declared in **`vercel.json`**. The
+values were carried over verbatim from the CloudFront response headers policy that served them
+before the move, which in turn restored what a since-retired Lambda@Edge used to set.
 
-They used to come from a Lambda@Edge (`functions/headers.js`) on origin-response.
-That function was dropped from `serverless.yml` in `2ee6b8a` and nothing replaced
-it, so the distribution served **no** security headers until the policy above.
-Edit the header values in the script, not in the CloudFront console, or the next
-run will overwrite them.
+The CSP is deliberately just `upgrade-insecure-requests` — a real `script-src` policy needs
+Next's inline bootstrap, Turnstile, and the analytics beacon accounted for, which is its own
+piece of work.
 
-The retired Lambda@Edge also set `Cache-Control` per file extension (a year for
-hashed assets, `max-age=0` for everything else). A response headers policy cannot
-vary a header by path, so that has **not** been restored — assets are still served
-without `Cache-Control`, and it wants fixing at upload time in the `aws s3 sync`
-step instead.
+`Cache-Control` is not set here. The retired Lambda@Edge varied it by file extension (a year for
+hashed assets, `max-age=0` for everything else), and the CloudFront policy that replaced it
+could not vary a header by path. Vercel sets long-lived immutable caching on `/_next/static/*`
+itself, so the gap that left is now covered by the platform rather than by config.
 
 ## Commit conventions
 

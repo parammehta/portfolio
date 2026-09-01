@@ -32,26 +32,6 @@ jobs:
       - run: npm run stylelint
       - run: npm run typecheck
 
-  # Not one of the required status checks (see the job-name comment above) —
-  # functions/ deploys separately from the site and previously had no CI at
-  # all. Added as a non-blocking signal rather than a gate, since the lint
-  # config here was passing vacuously (a bad ecmaVersion made it fail to
-  # parse the files at all) until that got fixed alongside this job.
-  functions-lint:
-    name: Functions lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.12.0'
-          cache: npm
-          cache-dependency-path: functions/package-lock.json
-      - run: npm ci
-        working-directory: functions
-      - run: npm run lint
-        working-directory: functions
-
   unit:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -89,7 +69,6 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_WEBSITE_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_URL }}
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           # Deliberately NOT NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN: setting it
           # here injects the Cloudflare beacon into this build, and the beacon's
           # RUM request gets CORS-blocked against the e2e job's 127.0.0.1 origin,
@@ -101,8 +80,8 @@ jobs:
       # The e2e job runs against these exact bytes rather than rebuilding.
       - uses: actions/upload-artifact@v4
         with:
-          name: static-export
-          path: build/
+          name: next-build
+          path: .next/
           retention-days: 1
           include-hidden-files: true
 
@@ -119,8 +98,8 @@ jobs:
       - run: npm ci
       - uses: actions/download-artifact@v4
         with:
-          name: static-export
-          path: build/
+          name: next-build
+          path: .next/
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:only
       - uses: actions/upload-artifact@v4

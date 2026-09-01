@@ -52,7 +52,9 @@ describe('contact form on the home page', () => {
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
 
     const [url, init] = (global.fetch as jest.Mock).mock.calls[0];
-    expect(url).toMatch(/\/message$/);
+    // Exact, trailing slash included: `trailingSlash: true` applies to API
+    // routes, so dropping it would cost every submission a 308 round trip.
+    expect(url).toBe('/api/message/');
     expect(init.method).toBe('POST');
     expect(JSON.parse(init.body)).toMatchObject({
       email: 'someone@example.com',
