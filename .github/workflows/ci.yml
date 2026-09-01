@@ -78,10 +78,20 @@ jobs:
           NEXT_PUBLIC_ANALYTICS_EVENTS_URL: ${{ vars.NEXT_PUBLIC_ANALYTICS_EVENTS_URL }}
           NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
       # The e2e job runs against these exact bytes rather than rebuilding.
+      #
+      # `public/` rides along because `next start` serves it from the source
+      # tree rather than copying it into `.next/`, and parts of it only exist
+      # after a build: scripts/generate-sitemap.js writes public/sitemap.xml,
+      # scripts/draco.js copies the decoder and .glb models, and all of those
+      # are gitignored, so a fresh checkout does not have them. (The old
+      # `build/` artifact was a static export, which had already absorbed
+      # public/ — dropping it here 404'd /sitemap.xml in e2e.)
       - uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: .next/
+          path: |
+            .next/
+            public/
           retention-days: 1
           include-hidden-files: true
 
@@ -96,10 +106,12 @@ jobs:
           node-version: '24.12.0'
           cache: npm
       - run: npm ci
+      # Unpacked at the repo root: the artifact carries both .next/ and public/
+      # with their paths, and overlays public/ onto the checkout's own copy.
       - uses: actions/download-artifact@v4
         with:
           name: next-build
-          path: .next/
+          path: .
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:only
       - uses: actions/upload-artifact@v4
