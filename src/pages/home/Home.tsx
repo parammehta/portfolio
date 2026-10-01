@@ -18,7 +18,7 @@ const pageSections = [
 ];
 
 export const Home = () => {
-  const [visibleSections, setVisibleSections] = useState<Element[]>([]);
+  const [visibleSections, setVisibleSections] = useState<string[]>([]);
   const [scrollIndicatorHidden, setScrollIndicatorHidden] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const container = useRef<HTMLDivElement>(null);
@@ -28,34 +28,34 @@ export const Home = () => {
   const contact = useRef<HTMLElement>(null);
   const sectionRefs = [intro, profile, experience, contact];
 
-  const isVisible = (ref: React.RefObject<HTMLElement | null>) =>
-    visibleSections.includes(ref.current!);
+  const isVisible = (id: string) => visibleSections.includes(id);
 
+  // Observed once for the life of the page: each section is revealed the first
+  // time it enters view and then left alone, so the callback only ever appends.
+  // Keyed by section id so render never has to read a ref.
   useEffect(() => {
     const sections = [intro, profile, experience];
 
     const sectionObserver = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const section = entry.target;
-            observer.unobserve(section);
-            if (visibleSections.includes(section)) return;
-            setVisibleSections(prevSections => [...prevSections, section]);
-          }
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          const { id } = entry.target;
+          setVisibleSections(prev => (prev.includes(id) ? prev : [...prev, id]));
         });
       },
       { rootMargin: '0px 0px -10% 0px', threshold: 0.1 }
     );
 
     sections.forEach(section => {
-      sectionObserver.observe(section.current!);
+      if (section.current) sectionObserver.observe(section.current);
     });
 
     return () => {
       sectionObserver.disconnect();
     };
-  }, [visibleSections]);
+  }, []);
 
   // Read the container directly rather than using an IntersectionObserver: the
   // panes are one snapport tall, so an observer would be measuring a degenerate
@@ -93,7 +93,7 @@ export const Home = () => {
       onScroll={handleScroll}
     >
       <Meta
-        title="Developer + Leader"
+        title="Full-Stack Engineer + Leader"
         description="Personal website of Param Mehta – a full-stack web engineer building frontend, design system, and AI-native experiences."
       />
       <StructuredData schema={personSchema()} />
@@ -105,16 +105,14 @@ export const Home = () => {
       />
       <Profile
         sectionRef={profile}
-        // eslint-disable-next-line react-hooks/refs
-        visible={isVisible(profile)}
+        visible={isVisible('profile')}
         id="profile"
       />
       <ExperienceTimeline
         id="experience"
         sectionRef={experience}
         scrollContainerRef={container}
-        // eslint-disable-next-line react-hooks/refs
-        visible={isVisible(experience)}
+        visible={isVisible('experience')}
       />
       <Contact id="contact" sectionRef={contact} />
       <nav className={styles.sectionDots} aria-label="Page sections">
@@ -125,6 +123,7 @@ export const Home = () => {
             data-active={activeSection === index}
             onClick={() => scrollToSection(index)}
             aria-label={`Go to ${section.label}`}
+            aria-current={activeSection === index ? 'true' : undefined}
           />
         ))}
       </nav>

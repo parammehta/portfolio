@@ -1,5 +1,5 @@
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
-import intuitThumbnail from 'assets/intuit-background.png';
+import intuitThumbnail from 'assets/intuit-background.jpg';
 import intuitThumbnailPlaceholder from 'assets/intuit-background-placeholder.png';
 import rivianThumbnail from 'assets/rivian-fleet-os-background.webp';
 import rivianThumbnailPlaceholder from 'assets/rivian-fleet-os-background-placeholder.png';

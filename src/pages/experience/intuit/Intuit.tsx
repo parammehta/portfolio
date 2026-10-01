@@ -1,4 +1,4 @@
-import intuitBackground from 'assets/intuit-background.png';
+import intuitBackground from 'assets/intuit-background.jpg';
 import intuitBackgroundPlaceholder from 'assets/intuit-background-placeholder.png';
 import intuitDesignSystem from 'assets/intuit-design-system-1.png';
 import intuitIdentityConsole from 'assets/intuit-identity-console-1.png';

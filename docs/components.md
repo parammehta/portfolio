@@ -76,7 +76,7 @@ SEO head component (wraps `next/head`).
 | `title` | string | — | Page title |
 | `description` | string | — | Meta description |
 | `prefix` | string | `'Param Mehta'` | Title prefix (joined with ` \| `) |
-| `ogImage` | string | `social-image.png` | OpenGraph image URL |
+| `ogImage` | string | `social-image.jpg` | OpenGraph image URL |
 | `ogType` | `'website' \| 'article'` | `'website'` | OpenGraph type |
 | `publishedTime` | string | — | ISO date; only rendered when `ogType` is `'article'` |
 

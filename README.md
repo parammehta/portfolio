@@ -2,7 +2,7 @@
 
 # Param Mehta — Portfolio
 
-[![Site preview](/public/site-preview.png)](https://parammehta.com)
+[![Site preview](/public/site-preview.jpg)](https://parammehta.com)
 
 My personal portfolio site. Built with [Next.js](https://nextjs.org/), [Three.js](https://threejs.org/), and [Framer Motion](https://www.framer.com/motion/). View the [live site](https://parammehta.com).
 
