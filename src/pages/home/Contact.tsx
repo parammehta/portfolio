@@ -108,9 +108,17 @@ export const Contact = ({ id, sectionRef }: ContactProps) => {
     try {
       setSending(true);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/message`, {
+      // Same-origin now that the handler ships with the site as a Vercel
+      // function (src/pages/api/message.api.ts). It used to be an absolute
+      // NEXT_PUBLIC_API_URL pointing at the API Gateway in front of the Lambda,
+      // which is why this was a `mode: 'cors'` request.
+      //
+      // The trailing slash is load-bearing: `trailingSlash: true` in
+      // next.config.js applies to API routes as well as pages, so '/api/message'
+      // answers with a 308 to '/api/message/'. fetch would follow it and the
+      // form would still work, but every submission would pay for two requests.
+      const response = await fetch('/api/message/', {
         method: 'POST',
-        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },

@@ -1,4 +1,4 @@
-[![Build & Deploy](https://github.com/parammehta/portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/parammehta/portfolio/actions/workflows/deploy.yml)
+[![CI](https://github.com/parammehta/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/parammehta/portfolio/actions/workflows/ci.yml)
 
 # Param Mehta — Portfolio
 
@@ -19,32 +19,34 @@ flowchart LR
   end
 
   subgraph cicd["CI/CD"]
-    Dev["Developer"] -->|"push to main"| GH["GitHub Actions · release-please"]
-    GH -->|"auto-merge Release PR"| Build["Build job · next build"]
+    Dev["Developer"] -->|"push to main"| GH["GitHub Actions · CI"]
+    Dev -->|"open PR"| Preview["Vercel · preview deployment"]
   end
 
-  subgraph aws["AWS"]
-    CF["CloudFront CDN"]
-    S3[("S3 · site bucket")]
-    API["API Gateway"]
-    Lambda["Lambda · contact API"]
-    SES["Amazon SES"]
-    CF --> S3
-    API --> Lambda --> SES
+  subgraph vercel["Vercel"]
+    Edge["Vercel CDN"]
+    Pages[("Prerendered pages")]
+    Fn["Function · /api/message"]
+    Edge --> Pages
+    Edge --> Fn
   end
 
+  SES["Amazon SES"]
   CFV["Cloudflare · siteverify"]
 
-  Visitor -->|"GET page"| CF
+  Visitor -->|"GET page"| Edge
   Visitor -.->|"pageview"| Analytics
   Visitor -.->|"token"| TS
-  Visitor -->|"POST /message"| API
-  Lambda -->|"verify token"| CFV
-  Build -->|"aws s3 sync --delete"| S3
-  Build -->|"invalidate /*"| CF
+  Visitor -->|"POST /api/message/"| Edge
+  Fn -->|"verify token"| CFV
+  Fn -->|"send email"| SES
+  Dev -->|"push to main"| Edge
 ```
 
-Solid arrows are request/deploy paths; dashed arrows are client-side side channels. The site (S3 + CloudFront) ships automatically on release; the contact-form Lambda is deployed separately (`npm run deploy:functions`).
+Solid arrows are request/deploy paths; dashed arrows are client-side side channels. Vercel builds and
+ships every push to `main` on its own, and gives every pull request a preview deployment at its own URL.
+The contact form is no longer a separately deployed service — it is a route in this repo that ships with
+the rest of the site. AWS still sends the mail, via SES, but hosts nothing.
 
 ## Install & run
 
@@ -65,13 +67,13 @@ separate package, [refract-ui](https://github.com/parammehta/refract-ui) — its
 [storybook.parammehta.com](https://storybook.parammehta.com). This repo only holds
 site-specific components (Navbar, Footer, Meta, Page, ...).
 
-To create a production build (static export):
+To create a production build:
 
 ```bash
 npm run build
 ```
 
-To preview that build locally — it's a static export, so this serves the generated files rather than running a Next.js server:
+To serve that build locally, the same way Vercel runs it:
 
 ```bash
 npm start
@@ -79,22 +81,29 @@ npm start
 
 ## Deployment
 
-The site is hosted on AWS (S3 for the static site, Lambda for the contact form). You'll need an AWS account and the AWS CLI installed, and the S3 bucket name in `package.json`'s `deploy` script updated to your own.
+The site is hosted on [Vercel](https://vercel.com), which builds and deploys every push to `main`
+automatically — there is no deploy command to run. Every pull request also gets its own preview
+deployment, so a change is reachable at a real URL before it is merged.
 
-Deploy the site to S3:
+Security headers are declared in `vercel.json` rather than configured in a hosting console, so the
+headers the site serves are reviewable in the repo.
 
-```bash
-npm run deploy
-```
+The contact form (`src/pages/api/message.api.ts`) runs as a Vercel function and needs these
+server-side environment variables set on the project:
 
-Deploy the serverless contact form function (requires `CLOUDFLARE_TURNSTILE_SECRET` env var):
+| Variable | Purpose |
+| --- | --- |
+| `PORTFOLIO_AWS_ACCESS_KEY_ID` | IAM user with `ses:SendEmail` only |
+| `PORTFOLIO_AWS_SECRET_ACCESS_KEY` | — |
+| `PORTFOLIO_AWS_REGION` | SES region, defaults to `us-east-1` |
+| `CLOUDFLARE_TURNSTILE_SECRET` | Turnstile server key; unset means unenforced |
 
-```bash
-cd functions
-CLOUDFLARE_TURNSTILE_SECRET=<your-secret> npm run deploy
-```
+The endpoint requires the two credential variables and fails loudly without them — it deliberately
+does not fall back to the AWS SDK's default credential chain, which would otherwise pick up a
+developer's `~/.aws/credentials` and send real mail from a local dev server.
 
 ## Notes
 
 - The rotating background sphere on the homepage is a Three.js shader; its color comes from the fragment shader in `src/pages/home/heroSphere.frag.glsl`.
-- The contact form is wired up to an AWS Lambda function in `functions/`; see `functions/serverless.yml` for its configuration.
+- The contact form posts to `/api/message/`, handled by `src/pages/api/message.api.ts`. The trailing
+  slash matters: `trailingSlash: true` applies to API routes too, so the slashless URL answers with a 308.

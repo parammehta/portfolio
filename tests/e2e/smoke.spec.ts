@@ -13,7 +13,7 @@ const routes = [
   { path: '/experience/walmart/', title: /Walmart/i },
 ];
 
-test.describe('static export smoke', () => {
+test.describe('smoke', () => {
   for (const { path, title } of routes) {
     test(`${path} loads without console or network errors`, async ({ page }) => {
       const consoleErrors: string[] = [];
