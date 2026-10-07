@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.21.1](https://github.com/parammehta/portfolio/compare/v1.21.0...v1.21.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* align resume page copy with the resume ([#122](https://github.com/parammehta/portfolio/issues/122)) ([8a5ee32](https://github.com/parammehta/portfolio/commit/8a5ee3272a52ef3250ffbf25650c06621450c298))
+* update resume PDF ([#120](https://github.com/parammehta/portfolio/issues/120)) ([1491dff](https://github.com/parammehta/portfolio/commit/1491dff0670f2168a74825622d093914df626069))
+
 ## [1.21.0](https://github.com/parammehta/portfolio/compare/v1.20.7...v1.21.0) (2026-08-27)
 
 
