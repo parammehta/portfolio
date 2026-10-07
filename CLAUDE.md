@@ -86,7 +86,13 @@ and pushed over by that repo's `Sync PDF to portfolio` CI job, which opens a PR 
 - The sync PR is titled `fix:` rather than `chore:` on purpose: `chore:` gets no
   release-please bump, so the release history skips the change. (The PDF itself still goes
   live on merge — Vercel deploys every push to `main` regardless of whether a release is cut.)
-- Merging the PR is the manual step — it's what puts the new resume live.
+- The sync job queues its PR to auto-merge (squash) once the required checks pass, so a
+  resume push goes live with no manual step. To hold one back, disable auto-merge on that PR.
+- The PDF keeps the same URL across updates, so `vercel.json` gives it `Cache-Control:
+  public, max-age=0, must-revalidate`: browsers revalidate on every view instead of
+  heuristically caching it for days. That matches Vercel's default for `public/` files; the
+  rule is there so the behaviour doesn't depend on a default. Don't add a long `max-age` to
+  it — visitors (and you) would keep seeing a stale resume after an update.
 
 ## Component conventions
 

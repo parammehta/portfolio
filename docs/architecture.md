@@ -118,6 +118,8 @@ Actions: `setTheme`, `toggleTheme`, `toggleMenu`. Initial state is `{ theme: 'da
 
 Storybook for the shared component library is a separate deploy out of this repo entirely — see [refract-ui](https://github.com/parammehta/refract-ui), which publishes its own Storybook to `storybook.parammehta.com` from its own CI.
 
+`vercel.json` sets the response headers: site-wide security headers, plus `Cache-Control: public, max-age=0, must-revalidate` on `/param-mehta-resume.pdf`. The resume is replaced in place at the same URL whenever the [resume repo](https://github.com/parammehta/resume) syncs a new build, so browsers must revalidate it on each view; with no explicit header they cache it heuristically, for days, and keep showing the old resume.
+
 ## Contact Form API
 
 The contact form backend is `src/pages/api/message.api.ts`, deployed with the site as a Vercel
