@@ -1,0 +1,117 @@
+---
+title: 'A million flights, no server: search that runs in the browser'
+abstract: There is no free flight-pricing API left to call, so I built the search to run where the data already is — a columnar binary file, filtered and sorted in the browser with no network request while you use it. These are the measurements that shaped it, including the ones that proved me wrong.
+date: '2026-10-23'
+banner: /static/modern-react-css-banner.jpg
+featured: false
+---
+
+Amadeus decommissioned its self-service portal on 17 July 2026. Existing keys were disabled and the SDKs archived the same day. What remains for live fares is enterprise contracts and paid scrapers, so the free tier that every side project quietly depended on is gone.
+
+That single fact settles the architecture before any code gets written. If fare data can only be acquired in bulk and offline, then querying a provider per keystroke was never the design. The search has to happen where the data already sits, which means shipping the data to the client and doing the work there.
+
+I built [Slipstream](https://slipstream-search.vercel.app) to find out what that costs. It holds half a million flight offers over 1,200 real US markets, filters and sorts and charts them, builds multi-city itineraries, and makes **zero network requests** while you use it. This is the same instinct as [making this site static](/articles/static-first-architecture), pushed considerably further: not just no server on the request path, but no server in the search either.
+
+## A format you can read without parsing
+
+Offers live in what I called a slab: one binary buffer, each field stored as its own contiguous typed array, with a small JSON blob at the tail describing the layout. Strings live in dictionaries and rows reference them by integer.
+
+Columnar matters because a filter only reads the field it tests. A price filter streams 4MB of the price column and never touches the other 15. The same million offers as row-oriented JSON would be about 7.2 times larger, and would have to be parsed into objects before the first comparison.
+
+Decoding is where it pays off. The metadata names each column's byte offset, so the reader builds typed-array views over the buffer it already has and stops. No per-row object is allocated anywhere.
+
+```
+slab size      19.08MB  (20.0 bytes/row)
+decode          0.21ms  (zero-copy)
+```
+
+Decoding a million offers takes a fifth of a millisecond, which is less a parsing cost than the absence of one.
+
+One thing I got wrong here. I assumed compression would shrink this a lot, and Brotli at maximum quality manages **1.9x**, not the 3x I expected. Packed binary columns are high-entropy and there is little redundancy left to find. A million offers is 9.86MB on the wire. That number, not the raw size, is what tells you to shard the file per origin airport rather than ship one global slab.
+
+## Filters that stop re-reading the same rows
+
+My first design kept a bitset per predicate and intersected them. Each filter scanned all million rows, so four filters scanned four million. That measured 16.4ms, comfortably over a frame, and it would have killed the whole premise.
+
+The fix is a selection vector. The first predicate scans every row and writes survivors into a `Uint32Array`. Every predicate after it only re-checks what is left. With a filter that keeps a quarter of the rows, the second pass does a quarter of the work and the third a sixteenth. The inner loops write unconditionally and advance a cursor by zero or one, so there is no branch to mispredict:
+
+```js
+for (let i = 0; i < n; i++) {
+  const v = col[i];
+  out[k] = i;
+  k += v >= min && v <= max ? 1 : 0;
+}
+```
+
+Sorting is precomputed rather than repeated. A stable four-pass radix argsort builds one permutation per sort key at load, 11 to 18ms each, and switching between cheapest, fastest and earliest afterwards is just picking a different permutation.
+
+```
+1 filter  (slider drag)            p50   2.35ms
+4 filters (typical query)          p50   6.91ms
+histogram 48 bins                  p50   0.60ms
+date grid 60 buckets               p50   0.64ms
+window of 40 rows                  p50   0.52ms
+full frame, all of the above       p50   8.63ms   p95  8.93ms
+```
+
+Inside a 16ms frame with room to spare, which is what lets the price slider re-filter and redraw its own distribution on every pointer move instead of on release.
+
+## Multi-city without building the itineraries
+
+A three-leg trip across 100,000 offers per leg has 10^15 combinations. Materialising them is not a performance problem to optimise, it is something you must never do.
+
+You do not have to. The cheapest itinerary is necessarily the cheapest offer on every leg. And every itinerary after that differs from one you have already found by a single step up on a single leg. So the candidates worth examining are always a thin frontier around what you have emitted, and a heap over that frontier yields trips in price order. Forty itineraries cost forty pops, whatever the size of the grid.
+
+```
+3 leg queries (filter + top 40)    p50   7.30ms
+combine -> 40 cheapest trips       p50   0.02ms
+```
+
+The combining step is essentially free. The legs' own filtered queries are the entire cost of a multi-city search.
+
+I had said this feature would need a second version of the file format, with a legs table. It needed nothing at all. An itinerary is a composition produced at query time, not a kind of row, and once that was clear the feature added one kernel and no migration.
+
+## What the worker actually buys
+
+Moving the engine into a Web Worker is the obvious architecture, but at the size the demo ships it is close to a wash, and saying so is more useful than claiming a win. Dragging the price slider, one query per frame:
+
+- **500k rows** — main thread blocked 4.6ms per move, or 2.3ms with the worker. But latency to redraw goes from 4.6ms to 13.9ms.
+- **3M rows** — main thread blocked **161ms** per query, or about 2ms with the worker.
+
+At half a million rows the worker halves the blocking and costs roughly 9ms of added latency to do it. At three million it is the difference between a page that responds and one frozen for a sixth of a second on every pointer move.
+
+Notice that at 3M the inline numbers are identical for blocking and latency. When the engine runs on the main thread, the engine time _is_ the block. The app keeps the worker because the architecture should hold at the sizes the design exists for, and exposes `?engine=inline` so anyone can check the claim rather than take my word for it.
+
+## Fares someone actually paid
+
+Generated prices would have undermined everything else. The fares come from the US DOT's Airline Origin and Destination Survey, a 10% sample of tickets sold by US reporting carriers, published quarterly, public domain, no account and no rate limit.
+
+The harvester streams 1.7GB in two passes: one to rank 65,100 directional markets by traffic, one to build fare curves for the busiest 1,200. Each market keeps its observed spread as nine deciles rather than an average, because the gap between a cheap seat and an expensive one on the same route is the interesting part. The whole thing compresses to a 67KB module.
+
+The validation is that the output looks like the real market without anyone putting it there:
+
+- **LAX to JFK** — median $293, p90 $1,103, flown DL 44% / B6 35% / AA 19%
+- **LGA to ORD** — median $153, flown UA 33% / AA 27% / YX 14%
+- **LAX to HNL** — median $198, flown HA 38% / UA 22% / DL 16%
+
+JetBlue and Delta splitting the JFK transcon, a p90 up where the premium cabins sit, Hawaiian leading Los Angeles to Honolulu, Republic flying regional for the majors out of LaGuardia.
+
+Departure times are a different matter, and the README says so plainly. DB1B records what was paid and how far the passenger flew, never when they left. Schedules are generated from distance, with the connection rate taken from each market's own observed share. Fares, routes, carriers and carrier mix are data. Clocks are not.
+
+## What measurement kept telling me
+
+The useful pattern in this project was how often a confident assumption turned out to be wrong in a way only a number could reveal.
+
+I assumed scrolling to the end of 500,000 rows would hit a performance cliff. It measured 0.63ms at offset 499,000, because a tight loop over a typed array is simply fast. I did not optimise it.
+
+I assumed browsers cap element height around 33.5 million pixels. It is 2^24, measured at 16,777,214. My spacer silently shortened and the last 53% of results were unreachable. The fix maps scroll position using the DOM's real range instead of a constant I believed.
+
+And the one I would keep: my benchmark said multi-city search cost about 5.5ms, while the live page showed **58ms**. The benchmark used broad legs. A real leg is one route on one day, around fifty rows out of half a million, and finding its cheapest offers walked the entire global price order. Sorting the narrow selection directly brought it to 2.94ms.
+
+A benchmark that measures a plausible-looking case rather than the real one does not merely fail to help. It actively reassures you while the product is slow.
+
+## Where it ended up
+
+About 2,300 lines of dependency-free TypeScript, run through Node directly rather than compiled, with 125 tests. The search is a single 179KB HTML file with the engine inlined, because ES module imports are blocked on `file://` origins and the page should open from disk. That file is generated from the same source the tests run against, and a staleness check fails the build if the two drift.
+
+[Try it](https://slipstream-search.vercel.app/search) — drag the price slider and watch the distribution redraw under your cursor. The [source is on GitHub](https://github.com/parammehta/slipstream), and the landing page carries the same write-up with diagrams of the slab layout and the frontier.
