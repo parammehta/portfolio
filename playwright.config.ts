@@ -4,9 +4,14 @@ const PORT = Number(process.env.E2E_PORT ?? 3000);
 const baseURL = `http://127.0.0.1:${PORT}`;
 
 /**
- * E2E runs against the real static export in `build/`, i.e. exactly the bytes
- * that get synced to S3 — not a dev server. `npm run build` must have run first
- * (the `test:e2e` script chains it; CI reuses the build job's artifact).
+ * E2E runs against a production build served by `next start` — the same command
+ * and the same `.next` output that Vercel runs, not a dev server. `npm run
+ * build` must have run first (the `test:e2e` script chains it; CI reuses the
+ * build job's artifact).
+ *
+ * This used to be `npx serve build`, back when the site was a static export
+ * whose bytes were synced to S3. A static file server cannot run the contact
+ * form's API route, so it would have made `/api/message` untestable here.
  */
 export default defineConfig({
   testDir: './tests/e2e',
@@ -25,7 +30,7 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: `npx serve build --listen ${PORT} --no-clipboard`,
+    command: `npx next start --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

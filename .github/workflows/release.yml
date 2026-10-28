@@ -16,12 +16,14 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          # A PAT (not the default GITHUB_TOKEN) is required so that both:
-          #   1. the auto-merge below produces a push that RE-TRIGGERS this
-          #      workflow (letting release-please tag + publish the release), and
-          #   2. the published GitHub Release fires the `release` event that the
-          #      separate Deploy workflow (.github/workflows/deploy.yml) listens
-          #      for. Actions taken with GITHUB_TOKEN never trigger workflows.
+          # A PAT (not the default GITHUB_TOKEN) is required so that the
+          # auto-merge below produces a push that RE-TRIGGERS this workflow,
+          # letting release-please tag and publish the release. Actions taken
+          # with GITHUB_TOKEN never trigger workflows, so with it the Release PR
+          # would merge and then nothing would tag the commit.
+          #
+          # This no longer gates shipping: Vercel deploys every push to main,
+          # release or not. It gates the tag and the changelog.
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json

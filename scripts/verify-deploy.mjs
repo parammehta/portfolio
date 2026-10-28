@@ -29,15 +29,16 @@ const site = flag('--url') || process.env.NEXT_PUBLIC_WEBSITE_URL || 'https://pa
 const expects = all('--expect');
 
 /**
- * `output: 'export'` does not copy BUILD_ID into the export directory, so the
- * local id comes from `.next/BUILD_ID`, falling back to the chunk path baked
- * into the exported HTML — which is what actually ships, and so is the more
- * faithful comparison of the two.
+ * The local id comes from `.next/BUILD_ID`, falling back to the chunk path baked
+ * into a prerendered page for the case where BUILD_ID is missing.
  */
 function localBuildId() {
   for (const [file, extract] of [
-    ['build/index.html', html => html.match(/\/_next\/static\/([^/]+)\/_buildManifest\.js/)?.[1]],
     ['.next/BUILD_ID', text => text.trim()],
+    [
+      '.next/server/pages/index.html',
+      html => html.match(/\/_next\/static\/([^/]+)\/_buildManifest\.js/)?.[1],
+    ],
   ]) {
     try {
       const id = extract(readFileSync(file, 'utf8'));
@@ -68,7 +69,7 @@ if (!served) {
 } else {
   const local = localBuildId();
   if (!local) {
-    console.log(`• served build id ${served} (no local build/ to compare against)`);
+    console.log(`• served build id ${served} (no local .next/ to compare against)`);
   } else if (local === served) {
     console.log(`✓ build id matches local build (${served})`);
   } else {
